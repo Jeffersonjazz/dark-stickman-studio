@@ -6,7 +6,7 @@ Roteia tarefas para os agentes corretos com base no tipo de operação
 e retorna resultado padronizado em JSON.
 
 Agentes disponíveis:
-- IMAGE ENGINE       → core/image_engine.py (placeholder)
+- IMAGE ENGINE       → core/image_engine.py ✅
 - VIDEO GENERATOR    → core/video_generator.py (placeholder)
 - CINEMATIC DIRECTOR → core/cinematic_director.py
 - VIDEO EDITOR PRO   → core/ffmpeg_utils.py (wrapper)
@@ -434,8 +434,63 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
             return {"status": "ok", "stats": cache.estatisticas(), "ai_generated": True}
         return {"status": "error", "mensagem": f"Tarefa '{tarefa}' não reconhecida para PERFORMANCE"}
 
+    # ── IMAGE ENGINE ──────────────────────────────────────────────
+    if agente == "IMAGE_ENGINE":
+        from core.image_engine import (
+            gerar_imagem, upscalar_imagem, remover_fundo,
+            corrigir_imagem, redimensionar, gerar_thumbnail,
+        )
+        if tarefa == "gerar_imagem":
+            return gerar_imagem(
+                prompt=params.get("prompt", "dark cinematic scene"),
+                estilo=params.get("estilo", "cinematografico"),
+                resolucao=params.get("resolucao", "youtube_thumbnail"),
+                output_path=params.get("output_path"),
+                engine=params.get("engine", "auto"),
+                steps=params.get("steps", 30),
+            )
+        if tarefa == "upscale_imagem":
+            return upscalar_imagem(
+                input_path=params["input_path"],
+                fator=params.get("fator", 2),
+                output_path=params.get("output_path"),
+            )
+        if tarefa == "remover_fundo":
+            return remover_fundo(
+                input_path=params["input_path"],
+                output_path=params.get("output_path"),
+            )
+        if tarefa == "corrigir_imagem":
+            return corrigir_imagem(
+                input_path=params["input_path"],
+                brilho=params.get("brilho", 1.0),
+                contraste=params.get("contraste", 1.0),
+                saturacao=params.get("saturacao", 1.0),
+                nitidez=params.get("nitidez", 1.0),
+                output_path=params.get("output_path"),
+            )
+        if tarefa == "redimensionar":
+            return redimensionar(
+                input_path=params["input_path"],
+                largura=params.get("largura"),
+                altura=params.get("altura"),
+                resolucao_preset=params.get("resolucao_preset"),
+                manter_proporcao=params.get("manter_proporcao", True),
+                output_path=params.get("output_path"),
+            )
+        if tarefa == "thumbnail":
+            return gerar_thumbnail(
+                titulo=params.get("titulo", "DARK VIDEO"),
+                subtitulo=params.get("subtitulo", ""),
+                background_path=params.get("background_path"),
+                output_path=params.get("output_path"),
+                estilo=params.get("estilo", "dark_channel"),
+                canal=params.get("canal", "DARK STUDIO AAA"),
+            )
+        return {"status": "error", "mensagem": f"Tarefa '{tarefa}' não reconhecida para IMAGE_ENGINE"}
+
     # ── AGENTES PLACEHOLDER (a implementar nas próximas fases) ────
-    if agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR"):
+    if agente in ("VIDEO_GENERATOR",):
         return _placeholder(agente, tarefa, params)
 
     raise ValueError(f"Tarefa '{tarefa}' não mapeada para nenhum agente disponível.")
@@ -516,12 +571,18 @@ def check_all_agents() -> dict:
     except Exception as e:
         resultados["PERFORMANCE"] = {"status": "error", "erro": str(e)}
 
-    # Placeholders
-    for agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR"):
-        resultados[agente] = {
-            "status": "placeholder",
-            "fase": _fase_agente(agente),
-        }
+    # Image Engine (Fase 2 — implementado)
+    try:
+        from core.image_engine import check_image_engine
+        resultados["IMAGE_ENGINE"] = check_image_engine()
+    except Exception as e:
+        resultados["IMAGE_ENGINE"] = {"status": "error", "erro": str(e)}
+
+    # Video Generator (Fase 3 — placeholder)
+    resultados["VIDEO_GENERATOR"] = {
+        "status": "placeholder",
+        "fase": _fase_agente("VIDEO_GENERATOR"),
+    }
 
     n_ok = sum(1 for v in resultados.values() if v.get("status") in ("ok", "placeholder"))
 

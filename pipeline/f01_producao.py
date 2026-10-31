@@ -280,6 +280,7 @@ def produzir_video(
 
         # ── ETAPA 3: Intro/Hook ──────────────────────────────────────────
         _etapa(job_id, "renderizando_hook", 20)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_03_INTRO")
         gancho_texto = roteiro.get("gancho", cenas[0].get("narracao", titulo) if cenas else titulo)
         clip_hook = None
         # DARK CREATIVE LAB: MOTION GRAPHICS intro (prioridade sobre Manim/FFmpeg)
@@ -307,6 +308,7 @@ def produzir_video(
 
         # ── ETAPA 4: Renderizar cenas ────────────────────────────────────
         _etapa(job_id, "renderizando_cenas", 30)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_04_CENAS")
         clips_cenas = []
 
         # Opção A: DARK VIDEO STUDIO (vídeos realistas — se habilitado no preset)
@@ -371,6 +373,7 @@ def produzir_video(
 
         # ── ETAPA 5: Outro/CTA ───────────────────────────────────────────
         _etapa(job_id, "renderizando_outro", 45)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_05_OUTRO")
         cta_texto = roteiro.get("cta", f"Se inscreva no canal {canal_config.get('nome', '')}!")
         clip_outro = None
         # DARK CREATIVE LAB: MOTION GRAPHICS outro (prioridade)
@@ -398,6 +401,7 @@ def produzir_video(
 
         # ── ETAPA 6: Adicionar narração em cada cena ─────────────────────
         _etapa(job_id, "sincronizando_audio", 50)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_06_SYNC_AUDIO")
         print(f"[F01] ETAPA 6 — Sincronizando áudio com cenas")
         clips_com_audio = []
         for i, (clip, audio) in enumerate(zip(clips_cenas, audios_narracao)):
@@ -416,6 +420,7 @@ def produzir_video(
 
         # ── ETAPA 7: Concatenar clips ─────────────────────────────────────
         _etapa(job_id, "concatenando_clips", 58)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_07_CONCAT")
         print(f"[F01] ETAPA 7 — Concatenando clips")
         todos_clips = []
         if clip_hook:
@@ -440,6 +445,7 @@ def produzir_video(
 
         # ── ETAPA 8: Mixar trilha sonora ──────────────────────────────────
         _etapa(job_id, "mixando_audio", 63)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_08_MIX_AUDIO")
         print(f"[F01] ETAPA 8 — Mixando trilha sonora")
         music_path = _buscar_musica(canal_config, nicho)
         video_com_musica = output_dir / "com_musica.mp4"
@@ -456,6 +462,7 @@ def produzir_video(
 
         # ── ETAPA 9: Normalizar áudio ─────────────────────────────────────
         _etapa(job_id, "normalizando_audio", 68)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_09_NORMALIZE")
         print(f"[F01] ETAPA 9 — Normalizando áudio (-14 LUFS)")
         video_norm = output_dir / "normalizado.mp4"
         try:
@@ -466,6 +473,7 @@ def produzir_video(
 
         # ── ETAPA 10: Gerar legendas SRT ─────────────────────────────────
         _etapa(job_id, "gerando_legendas", 73)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_10_LEGENDAS")
         print(f"[F01] ETAPA 10 — Gerando legendas SRT")
         srt_path = dir_legenda / "legenda.srt"
         narracao_completa = " ".join(c.get("narracao", "") for c in cenas)
@@ -483,6 +491,7 @@ def produzir_video(
 
         # ── ETAPA 11: Burn-in de legendas ────────────────────────────────
         _etapa(job_id, "burn_in_legendas", 78)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_11_BURNIN")
         print(f"[F01] ETAPA 11 — Burn-in de legendas")
         video_legendado = output_dir / "legendado.mp4"
         if srt_path.exists() and srt_path.stat().st_size > 10:
@@ -496,6 +505,7 @@ def produzir_video(
 
         # ── ETAPA 12: Color grading ───────────────────────────────────────
         _etapa(job_id, "color_grading", 83)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_12_COLOR")
         print(f"[F01] ETAPA 12 — Color grading preset: {preset_cor}")
         video_graded = output_dir / "graded.mp4"
         try:
@@ -506,6 +516,7 @@ def produzir_video(
 
         # ── ETAPA 13: Watermark obrigatório (identificação IA) ───────────
         _etapa(job_id, "watermark_ia", 87)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_13_WATERMARK")
         print(f"[F01] ETAPA 13 — Watermark IA (identificação obrigatória)")
         video_watermark = output_dir / "watermarked.mp4"
         try:
@@ -522,6 +533,7 @@ def produzir_video(
 
         # ── ETAPA 14: Export final ────────────────────────────────────────
         _etapa(job_id, "exportando", 92)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_14_EXPORT")
         print(f"[F01] ETAPA 14 — Exportando MP4 final ({formato})")
         nome_arquivo = _slug(titulo) + f"_{job_id}.mp4"
         video_final = output_dir / nome_arquivo
@@ -539,6 +551,7 @@ def produzir_video(
 
         # ── ETAPA 15: Thumbnail + QA ──────────────────────────────────────
         _etapa(job_id, "thumbnail_qa", 97)
+        if _profiler: _profiler.iniciar_etapa("ETAPA_15_QA")
         print(f"[F01] ETAPA 15 — Thumbnail e controle de qualidade")
         thumbnail_path = dir_thumb / "thumb.png"
         try:
@@ -577,6 +590,7 @@ def produzir_video(
                 print(f"[F01] CREATIVE QA falhou (não crítico): {_e}")
 
         # ── Finalização ───────────────────────────────────────────────────
+        if _profiler: _profiler.finalizar_etapa()  # fecha ETAPA_15_QA
         duracao_total_seg = time.time() - t0
         _job_update(
             job_id,
