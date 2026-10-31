@@ -61,6 +61,12 @@ try:
 except Exception:
     _MOTION_GRAPHICS_OK = False
 
+try:
+    from core.creative_qa import verificar_qualidade as _qa_verificar_qualidade
+    _CREATIVE_QA_OK = True
+except Exception:
+    _CREATIVE_QA_OK = False
+
 # Banco de dados local
 DB_PATH = Path(__file__).parent.parent / "db" / "dark_stickman.db"
 
@@ -521,9 +527,29 @@ def produzir_video(
             print(f"[F01] Thumbnail falhou: {e}")
             thumbnail_path = None
 
-        # QA básico
+        # QA completo com CREATIVE QA
         duracao_final = get_duration(video_final)
         _qa_check(video_final, duracao_final, titulo)
+
+        qa_resultado = None
+        if _CREATIVE_QA_OK:
+            try:
+                srt_qa = dir_legenda / f"{job_id}.srt"
+                qa_resultado = _qa_verificar_qualidade(
+                    video_final,
+                    srt_path=srt_qa if srt_qa.exists() else None,
+                    canal_config=canal_config,
+                    minimo_s=240,
+                )
+                score_qa = qa_resultado.get("score", 0)
+                aprovado_qa = qa_resultado.get("aprovado", False)
+                print(f"[F01] CREATIVE QA — Score: {score_qa}/100 | {'✅ APROVADO' if aprovado_qa else '⚠️ REPROVADO'}")
+                for aviso in qa_resultado.get("avisos", []):
+                    if aviso:
+                        print(f"[F01]   ⚠ {aviso}")
+                resultado["qa"] = qa_resultado
+            except Exception as _e:
+                print(f"[F01] CREATIVE QA falhou (não crítico): {_e}")
 
         # ── Finalização ───────────────────────────────────────────────────
         duracao_total_seg = time.time() - t0
@@ -543,6 +569,8 @@ def produzir_video(
             "thumbnail": str(thumbnail_path) if thumbnail_path else None,
             "duracao": round(duracao_final, 1),
             "tempo_producao_s": round(duracao_total_seg, 1),
+            "qa_score": qa_resultado.get("score") if qa_resultado else None,
+            "qa_aprovado": qa_resultado.get("aprovado") if qa_resultado else None,
         })
 
         print(f"\n[F01] ✅ CONCLUÍDO em {duracao_total_seg:.0f}s — {video_final}")

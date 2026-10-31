@@ -14,7 +14,7 @@ Agentes disponíveis:
 - AUDIO MASTER       → core/audio_master.py
 - VISUAL CONSISTENCY → core/visual_consistency.py
 - ASSET MANAGER      → core/asset_manager.py ✅
-- CREATIVE QA        → core/creative_qa.py (placeholder)
+- CREATIVE QA        → core/creative_qa.py ✅
 
 Todos os contratos de entrada/saída usam dicts JSON documentados.
 
@@ -92,6 +92,9 @@ TASK_TYPES = {
     # QA
     "verificar_qualidade": "CREATIVE_QA",
     "verificar_resolucao": "CREATIVE_QA",
+    "verificar_audio_qa":  "CREATIVE_QA",
+    "verificar_legenda":   "CREATIVE_QA",
+    "verificar_conformidade": "CREATIVE_QA",
 }
 
 
@@ -364,8 +367,30 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
         if tarefa == "validar_licenca":
             return validar_licenca(params["licenca"])
 
+    # ── CREATIVE QA ───────────────────────────────────────────────
+    if agente == "CREATIVE_QA":
+        from core.creative_qa import (
+            verificar_qualidade, verificar_resolucao,
+            verificar_audio, verificar_legenda, verificar_conformidade_ia,
+        )
+        if tarefa == "verificar_qualidade":
+            return verificar_qualidade(
+                Path(params["video"]),
+                srt_path=Path(params["srt"]) if params.get("srt") else None,
+                canal_config=params.get("canal_config"),
+                minimo_s=params.get("minimo_s", 240),
+            )
+        if tarefa == "verificar_resolucao":
+            return verificar_resolucao(Path(params["video"]))
+        if tarefa == "verificar_audio_qa":
+            return verificar_audio(Path(params["video"]))
+        if tarefa == "verificar_legenda":
+            return verificar_legenda(Path(params["srt"]))
+        if tarefa == "verificar_conformidade":
+            return verificar_conformidade_ia(Path(params["video"]))
+
     # ── AGENTES PLACEHOLDER (a implementar nas próximas fases) ────
-    if agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "CREATIVE_QA"):
+    if agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR"):
         return _placeholder(agente, tarefa, params)
 
     raise ValueError(f"Tarefa '{tarefa}' não mapeada para nenhum agente disponível.")
@@ -432,8 +457,15 @@ def check_all_agents() -> dict:
     except Exception as e:
         resultados["ASSET_MANAGER"] = {"status": "error", "erro": str(e)}
 
+    # Creative QA
+    try:
+        from core.creative_qa import check_creative_qa
+        resultados["CREATIVE_QA"] = check_creative_qa()
+    except Exception as e:
+        resultados["CREATIVE_QA"] = {"status": "error", "erro": str(e)}
+
     # Placeholders
-    for agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "CREATIVE_QA"):
+    for agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR"):
         resultados[agente] = {
             "status": "placeholder",
             "fase": _fase_agente(agente),
