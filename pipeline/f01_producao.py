@@ -56,9 +56,11 @@ OUTPUT_ROOT = Path(__file__).parent.parent / "output"
 # ─────────────────────────────────────────────────────────────────
 
 def _init_db():
-    """Inicializa o banco de dados SQLite."""
+    """Inicializa o banco de dados SQLite com WAL mode para evitar locking."""
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = sqlite3.connect(str(DB_PATH), timeout=30)
+    conn.execute("PRAGMA journal_mode=WAL")   # FIX: evita "database is locked"
+    conn.execute("PRAGMA synchronous=NORMAL") # FIX: performance + segurança
     conn.execute("""
         CREATE TABLE IF NOT EXISTS jobs (
             id TEXT PRIMARY KEY,
@@ -80,6 +82,14 @@ def _init_db():
     conn.close()
 
 
+def _get_conn() -> sqlite3.Connection:
+    """Abre conexão SQLite com timeout e WAL ativado."""
+    conn = sqlite3.connect(str(DB_PATH), timeout=30)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=10000")  # FIX: aguarda 10s antes de falhar
+    return conn
+
+
 def _job_update(job_id: str, **kwargs):
     """Atualiza campos de um job no banco."""
     if not DB_PATH.exists():
@@ -87,7 +97,7 @@ def _job_update(job_id: str, **kwargs):
     campos = ", ".join(f"{k} = ?" for k in kwargs)
     valores = list(kwargs.values()) + [job_id]
     try:
-        conn = sqlite3.connect(str(DB_PATH))
+        conn = _get_conn()
         conn.execute(f"UPDATE jobs SET {campos} WHERE id = ?", valores)
         conn.commit()
         conn.close()
@@ -96,11 +106,12 @@ def _job_update(job_id: str, **kwargs):
 
 
 def _job_criar(job_id: str, canal_id: str, titulo: str):
-    """Registra um novo job no banco."""
+    """Registra um novo job (INSERT OR REPLACE para evitar UNIQUE constraint)."""
     try:
-        conn = sqlite3.connect(str(DB_PATH))
+        conn = _get_conn()
+        # FIX: INSERT OR REPLACE evita "UNIQUE constraint failed" em reexecuções
         conn.execute(
-            "INSERT INTO jobs (id, canal_id, titulo, status, criado_em) VALUES (?, ?, ?, 'running', ?)",
+            "INSERT OR REPLACE INTO jobs (id, canal_id, titulo, status, criado_em) VALUES (?, ?, ?, 'running', ?)",
             (job_id, canal_id, titulo, datetime.utcnow().isoformat()),
         )
         conn.commit()
@@ -187,6 +198,10 @@ def produzir_video(
         _job_update(job_id, status="error", erro="Roteiro sem cenas")
         resultado["erro"] = "Roteiro sem cenas"
         return resultado
+
+    # AGENTE DURATION ENGINEER: Expandir roteiro para mínimo 4 minutos
+    roteiro = _expandir_roteiro_4min(roteiro)
+    cenas = roteiro.get("cenas", [])
 
     t0 = time.time()
 
@@ -562,6 +577,70 @@ def produzir_lote(
 #  ROTEIRO DE EXEMPLO / TESTE
 # ─────────────────────────────────────────────────────────────────
 
+def _expandir_roteiro_4min(roteiro: dict) -> dict:
+    """
+    AGENTE DURATION ENGINEER — Expande um roteiro curto para 4 minutos.
+    Duplica e varia cenas existentes até atingir duração mínima de 240s.
+    Cada cena tem duração média de 12s → precisamos de ~20 cenas.
+    """
+    cenas_orig = roteiro.get("cenas", [])
+    if not cenas_orig:
+        return roteiro
+
+    # Calcula duração atual
+    dur_atual = sum(float(c.get("duracao_s", 8)) for c in cenas_orig)
+    if dur_atual >= 240:
+        return roteiro  # Já tem 4 minutos, não precisa expandir
+
+    # Poses variadas para não repetir a mesma
+    poses_ciclo = [
+        "pensando", "apontando", "explicando", "olhando_camera",
+        "sentado", "agachado", "levantando_braco", "questionando",
+        "celebrando", "vitoria", "correndo", "voando",
+    ]
+
+    cenas_expandidas = list(cenas_orig)
+    idx_pose = 0
+    tentativas = 0
+
+    while sum(float(c.get("duracao_s", 8)) for c in cenas_expandidas) < 240 and tentativas < 100:
+        # Pega uma cena base para expandir (ciclando)
+        base = cenas_orig[tentativas % len(cenas_orig)].copy()
+        novo_num = len(cenas_expandidas) + 1
+        pose = poses_ciclo[idx_pose % len(poses_ciclo)]
+        idx_pose += 1
+
+        # Variações do texto para não repetir verbatim
+        narracao_orig = base.get("narracao", "")
+        variacoes = [
+            f"Isso significa que {narracao_orig.lower().rstrip('.')}.",
+            f"Em outras palavras: {narracao_orig.lower().rstrip('.')}.",
+            f"Cientificamente falando, {narracao_orig.lower().rstrip('.')}.",
+            f"É importante entender que {narracao_orig.lower().rstrip('.')}.",
+            f"Estudos confirmam: {narracao_orig.lower().rstrip('.')}.",
+        ]
+        texto_var = variacoes[tentativas % len(variacoes)]
+
+        cena_nova = {
+            "num": novo_num,
+            "tipo": base.get("tipo", "desenvolvimento"),
+            "duracao_s": float(base.get("duracao_s", 12)),
+            "stickman_acao": pose,
+            "pose": pose,
+            "narracao": texto_var,
+            "texto_tela": texto_var[:60],
+            "fundo": base.get("fundo", "preto_elegante"),
+        }
+        cenas_expandidas.append(cena_nova)
+        tentativas += 1
+
+    roteiro_expandido = dict(roteiro)
+    roteiro_expandido["cenas"] = cenas_expandidas
+    dur_nova = sum(float(c.get("duracao_s", 8)) for c in cenas_expandidas)
+    print(f"[DURATION] Roteiro expandido: {len(cenas_orig)} → {len(cenas_expandidas)} cenas ({dur_nova:.0f}s / 240s)")
+    return roteiro_expandido
+
+
 ROTEIRO_EXEMPLO = {
     "titulo": "Por Que Você Procrastina?",
     "descricao": "Episódio sobre procrastinação e psicologia comportamental",
@@ -569,33 +648,115 @@ ROTEIRO_EXEMPLO = {
     "cta": "Se inscreva no canal e ative o sininho para não perder os próximos vídeos!",
     "cenas": [
         {
-            "num": 1, "tipo": "hook",
-            "duracao_s": 8, "stickman_acao": "olhando_camera",
+            "num": 1, "tipo": "hook", "duracao_s": 10, "stickman_acao": "olhando_camera",
+            "pose": "olhando_camera",
             "narracao": "Você já perdeu horas sem conseguir começar uma tarefa simples?",
+            "texto_tela": "A CIÊNCIA DA PROCRASTINAÇÃO",
             "fundo": "preto_elegante",
         },
         {
-            "num": 2, "tipo": "explicacao",
-            "duracao_s": 15, "stickman_acao": "pensando",
+            "num": 2, "tipo": "explicacao", "duracao_s": 14, "stickman_acao": "pensando",
+            "pose": "pensando",
             "narracao": "A procrastinação não é preguiça. É uma resposta emocional ao desconforto gerado pela tarefa.",
+            "texto_tela": "Não é preguiça — é neurociência",
             "fundo": "azul_escuro",
         },
         {
-            "num": 3, "tipo": "ciencia",
-            "duracao_s": 20, "stickman_acao": "apontando",
+            "num": 3, "tipo": "ciencia", "duracao_s": 16, "stickman_acao": "apontando",
+            "pose": "apontando",
             "narracao": "Pesquisas mostram que o cérebro prefere recompensas imediatas. Isso é chamado de desconto hiperbólico.",
+            "texto_tela": "Desconto Hiperbólico",
             "fundo": "azul_escuro",
         },
         {
-            "num": 4, "tipo": "solucao",
-            "duracao_s": 18, "stickman_acao": "vitoria",
-            "narracao": "A técnica Pomodoro divide o trabalho em blocos de 25 minutos, reduzindo a resistência inicial.",
+            "num": 4, "tipo": "ciencia2", "duracao_s": 14, "stickman_acao": "questionando",
+            "pose": "questionando",
+            "narracao": "O córtex pré-frontal briga com o sistema límbico. Um quer prazer agora, o outro planeja o futuro.",
+            "texto_tela": "Guerra no cérebro",
             "fundo": "preto_elegante",
         },
         {
-            "num": 5, "tipo": "conclusao",
-            "duracao_s": 12, "stickman_acao": "olhando_camera",
-            "narracao": "Com pequenos passos consistentes, você vence a procrastinação definitivamente.",
+            "num": 5, "tipo": "impacto", "duracao_s": 14, "stickman_acao": "agachado",
+            "pose": "agachado",
+            "narracao": "Pessoas que procrastinam cronicamente têm mais estresse, saúde pior e ganham menos dinheiro.",
+            "texto_tela": "As consequências reais",
+            "fundo": "azul_escuro",
+        },
+        {
+            "num": 6, "tipo": "solucao", "duracao_s": 14, "stickman_acao": "levantando_braco",
+            "pose": "levantando_braco",
+            "narracao": "A técnica Pomodoro divide o trabalho em blocos de 25 minutos, reduzindo a resistência inicial.",
+            "texto_tela": "Técnica Pomodoro",
+            "fundo": "preto_elegante",
+        },
+        {
+            "num": 7, "tipo": "solucao2", "duracao_s": 14, "stickman_acao": "apontando",
+            "pose": "apontando",
+            "narracao": "Regra dos 2 minutos: se uma tarefa leva menos de 2 minutos, faça agora mesmo.",
+            "texto_tela": "Regra dos 2 Minutos",
+            "fundo": "azul_escuro",
+        },
+        {
+            "num": 8, "tipo": "solucao3", "duracao_s": 14, "stickman_acao": "vitoria",
+            "pose": "vitoria",
+            "narracao": "Recompensas imediatas artificiais enganam o cérebro: permita-se algo bom após cada tarefa concluída.",
+            "texto_tela": "Recompensas inteligentes",
+            "fundo": "preto_elegante",
+        },
+        {
+            "num": 9, "tipo": "mito", "duracao_s": 12, "stickman_acao": "surpreso",
+            "pose": "surpreso",
+            "narracao": "Mito: pessoas bem-sucedidas nunca procrastinam. Realidade: elas procrastinam menos, não zero.",
+            "texto_tela": "O mito da perfeição",
+            "fundo": "azul_escuro",
+        },
+        {
+            "num": 10, "tipo": "ciencia3", "duracao_s": 14, "stickman_acao": "sentado",
+            "pose": "sentado",
+            "narracao": "A dopamina é o neurotransmissor do prazer antecipado. Visualizar o resultado ativa ela positivamente.",
+            "texto_tela": "O poder da dopamina",
+            "fundo": "preto_elegante",
+        },
+        {
+            "num": 11, "tipo": "tecnica", "duracao_s": 14, "stickman_acao": "pensando",
+            "pose": "pensando",
+            "narracao": "Técnica 5-4-3-2-1: conte de 5 até 1 e comece imediatamente. Interrompe o ciclo de hesitação.",
+            "texto_tela": "Contagem Regressiva",
+            "fundo": "azul_escuro",
+        },
+        {
+            "num": 12, "tipo": "ambiente", "duracao_s": 12, "stickman_acao": "olhando_camera",
+            "pose": "olhando_camera",
+            "narracao": "Ambiente importa: celular longe, notificações desligadas. O cérebro precisa de contexto de foco.",
+            "texto_tela": "Ambiente = destino",
+            "fundo": "preto_elegante",
+        },
+        {
+            "num": 13, "tipo": "autocompaixao", "duracao_s": 12, "stickman_acao": "celebrando",
+            "pose": "celebrando",
+            "narracao": "Autocompaixão ajuda mais que autocrítica. Perdoar-se pelo atraso aumenta a chance de agir.",
+            "texto_tela": "Seja gentil consigo",
+            "fundo": "azul_escuro",
+        },
+        {
+            "num": 14, "tipo": "dados", "duracao_s": 14, "stickman_acao": "apontando",
+            "pose": "apontando",
+            "narracao": "20% da população são procrastinadores crônicos. Você não está sozinho — mas pode mudar isso.",
+            "texto_tela": "20% da população",
+            "fundo": "preto_elegante",
+        },
+        {
+            "num": 15, "tipo": "conclusao", "duracao_s": 14, "stickman_acao": "levantando_braco",
+            "pose": "levantando_braco",
+            "narracao": "Com pequenos passos consistentes, você reprograma o cérebro e vence a procrastinação definitivamente.",
+            "texto_tela": "Reprograme seu cérebro",
+            "fundo": "azul_escuro",
+        },
+        {
+            "num": 16, "tipo": "encerramento", "duracao_s": 10, "stickman_acao": "olhando_camera",
+            "pose": "olhando_camera",
+            "narracao": "Qual dessas técnicas você vai aplicar hoje? Comente abaixo e me conta.",
+            "texto_tela": "E você — qual vai usar?",
             "fundo": "preto_elegante",
         },
     ],
