@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman Filosofia",
+  "nicho": "filosofia",
+  "stickman_color": "#A855F7",
+  "stickman_seed": 1005,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 0.95,
+  "watermark": true,
+  "descricao": "Filosofia, ética e existencialismo com stickman",
+  "tags_padrao": ["filosofia", "ética", "existência", "pensamento"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

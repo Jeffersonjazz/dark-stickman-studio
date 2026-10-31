@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman Psicologia",
+  "nicho": "psicologia",
+  "stickman_color": "#6366F1",
+  "stickman_seed": 1001,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 1.05,
+  "watermark": true,
+  "descricao": "Canal de psicologia comportamental e saúde mental com stickman",
+  "tags_padrao": ["psicologia", "mente", "comportamento", "autoconhecimento"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

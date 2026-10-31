@@ -1,0 +1,54 @@
+# DARK STICKMAN STUDIO — .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Venv
+venv/
+env/
+.venv/
+.env/
+
+# Output (vídeos gerados — não versionar)
+output/
+*.mp4
+*.wav
+*.mp3
+*.srt
+
+# DB local
+db/*.db
+db/*.sqlite
+
+# Logs
+logs/
+*.log
+
+# Manim
+media/
+
+# Env vars
+.env
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Piper models (pesados)
+*.onnx
+*.onnx.json

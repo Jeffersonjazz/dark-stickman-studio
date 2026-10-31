@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman Motivação",
+  "nicho": "educacao",
+  "stickman_color": "#60A5FA",
+  "stickman_seed": 1008,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 1.1,
+  "watermark": true,
+  "descricao": "Motivação, desenvolvimento pessoal e produtividade",
+  "tags_padrao": ["motivação", "produtividade", "sucesso", "mentalidade"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

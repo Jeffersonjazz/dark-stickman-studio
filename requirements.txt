@@ -1,0 +1,38 @@
+# DARK STICKMAN STUDIO — Dependências Python
+# Licença: MIT — DARK CREATIVE LAB
+# ai_generated: True
+
+# ── API ──────────────────────────────────────────────
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.7.0
+
+# ── CLI ──────────────────────────────────────────────
+typer>=0.12.0
+rich>=13.7.0
+
+# ── Imagem / Thumbnail ───────────────────────────────
+Pillow>=10.3.0
+
+# ── Áudio / TTS ──────────────────────────────────────
+# Piper TTS: instalação separada — ver setup/setup_wizard.bat
+# piper-tts instalado via pip install piper-tts (requer compilação no Windows)
+
+# ── Transcrição / Legendas ───────────────────────────
+openai-whisper>=20231117
+# WhisperX (opcional, requer PyTorch + CUDA):
+# pip install git+https://github.com/m-bain/whisperx.git
+
+# ── Animação ─────────────────────────────────────────
+# Manim CE: instalação separada
+# pip install manim
+
+# ── Utilitários ──────────────────────────────────────
+pathlib>=1.0.1
+python-multipart>=0.0.9
+
+# ── FFmpeg ───────────────────────────────────────────
+# FFmpeg deve ser instalado no sistema (não via pip)
+# Windows: winget install FFmpeg  /  Chocolatey: choco install ffmpeg
+# Linux: sudo apt install ffmpeg
+# Mac: brew install ffmpeg

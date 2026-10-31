@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman Finanças",
+  "nicho": "educacao",
+  "stickman_color": "#FCD34D",
+  "stickman_seed": 1011,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 1.05,
+  "watermark": true,
+  "descricao": "Educação financeira e investimentos com stickman",
+  "tags_padrao": ["finanças", "investimento", "economia", "dinheiro"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

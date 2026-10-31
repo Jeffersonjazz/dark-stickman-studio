@@ -1,0 +1,106 @@
+{
+  "presets": {
+    "documentario": {
+      "nome": "Documentário Cinematográfico",
+      "descricao": "Estilo documentário sério com color grade frio e cinematográfico",
+      "preset_cor": "documentario",
+      "velocidade_fala": 0.95,
+      "fundo_padrao": "azul_escuro",
+      "stickman_acoes": ["parado", "apontando", "pensando"],
+      "re_hook": true,
+      "watermark": true,
+      "ai_disclosure": true
+    },
+    "natureza": {
+      "nome": "Natureza e Vida Selvagem",
+      "descricao": "Tons verdes e orgânicos, ritmo calmo e contemplativo",
+      "preset_cor": "natureza",
+      "velocidade_fala": 0.9,
+      "fundo_padrao": "verde_escuro",
+      "stickman_acoes": ["parado", "olhando_camera", "sentado"],
+      "re_hook": true,
+      "watermark": true,
+      "ai_disclosure": true
+    },
+    "historia": {
+      "nome": "História e Acontecimentos",
+      "descricao": "Paleta quente sépia, narração solene e impactante",
+      "preset_cor": "historia",
+      "velocidade_fala": 1.0,
+      "fundo_padrao": "preto",
+      "stickman_acoes": ["apontando", "parado", "vitoria"],
+      "re_hook": true,
+      "watermark": true,
+      "ai_disclosure": true
+    },
+    "tecnologia": {
+      "nome": "Tecnologia e Inteligência Artificial",
+      "descricao": "Estilo cyberpunk azul neon, ritmo dinâmico",
+      "preset_cor": "tecnologia",
+      "velocidade_fala": 1.1,
+      "fundo_padrao": "azul_escuro",
+      "stickman_acoes": ["apontando", "correndo", "saltando"],
+      "re_hook": true,
+      "watermark": true,
+      "ai_disclosure": true
+    },
+    "misterio": {
+      "nome": "Mistério e Suspense",
+      "descricao": "Tons roxos e sombrios, narração intrigante e pausada",
+      "preset_cor": "suspense",
+      "velocidade_fala": 0.9,
+      "fundo_padrao": "preto",
+      "stickman_acoes": ["pensando", "olhando_camera", "parado"],
+      "re_hook": true,
+      "watermark": true,
+      "ai_disclosure": true
+    },
+    "educacao": {
+      "nome": "Educação",
+      "descricao": "Cores claras e amigáveis, ritmo didático e pausado",
+      "preset_cor": "educacao",
+      "velocidade_fala": 0.95,
+      "fundo_padrao": "branco_minimalista",
+      "stickman_acoes": ["apontando", "parado", "pensando"],
+      "re_hook": true,
+      "watermark": true,
+      "ai_disclosure": true
+    },
+    "relaxamento": {
+      "nome": "Relaxamento",
+      "descricao": "Tons suaves e pastéis, narração calma e serena",
+      "preset_cor": "relaxamento",
+      "velocidade_fala": 0.85,
+      "fundo_padrao": "verde_escuro",
+      "stickman_acoes": ["sentado", "parado", "olhando_camera"],
+      "re_hook": false,
+      "watermark": true,
+      "ai_disclosure": true
+    },
+    "musical": {
+      "nome": "Conteúdo Musical",
+      "descricao": "Vibrante e colorido, ritmo acelerado e energético",
+      "preset_cor": "neutral",
+      "velocidade_fala": 1.1,
+      "fundo_padrao": "azul_escuro",
+      "stickman_acoes": ["saltando", "vitoria", "correndo"],
+      "re_hook": true,
+      "watermark": true,
+      "ai_disclosure": true
+    },
+    "storytelling_dark": {
+      "nome": "Storytelling Dark",
+      "descricao": "Canal sem apresentador. Narração dramática e cinematográfica",
+      "preset_cor": "suspense",
+      "velocidade_fala": 0.95,
+      "fundo_padrao": "preto",
+      "stickman_acoes": ["parado", "olhando_camera", "apontando"],
+      "re_hook": true,
+      "watermark": true,
+      "ai_disclosure": true,
+      "nota": "O termo 'dark' refere-se ao formato faceless, não a conteúdo enganoso"
+    }
+  },
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

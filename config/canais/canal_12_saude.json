@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman Saúde",
+  "nicho": "relaxamento",
+  "stickman_color": "#F472B6",
+  "stickman_seed": 1012,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 0.95,
+  "watermark": true,
+  "descricao": "Saúde, bem-estar e qualidade de vida com stickman",
+  "tags_padrao": ["saúde", "bem-estar", "mente sã", "qualidade de vida"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

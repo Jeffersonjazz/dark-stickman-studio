@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman Ciência",
+  "nicho": "stem",
+  "stickman_color": "#34D399",
+  "stickman_seed": 1010,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 1.0,
+  "watermark": true,
+  "descricao": "Descobertas científicas e curiosidades do universo",
+  "tags_padrao": ["ciência", "universo", "descoberta", "pesquisa"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

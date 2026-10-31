@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman Tech",
+  "nicho": "tecnologia",
+  "stickman_color": "#3B82F6",
+  "stickman_seed": 1003,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 1.05,
+  "watermark": true,
+  "descricao": "Tecnologia, IA e inovação explicados com stickman",
+  "tags_padrao": ["tecnologia", "IA", "inovação", "futuro"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman Batalhas",
+  "nicho": "batalhas",
+  "stickman_color": "#EF4444",
+  "stickman_seed": 1002,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 1.1,
+  "watermark": true,
+  "descricao": "Batalhas históricas e militares animadas com stickman",
+  "tags_padrao": ["batalha", "guerra", "história", "militar"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

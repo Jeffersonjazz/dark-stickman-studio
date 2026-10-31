@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman Natureza",
+  "nicho": "natureza",
+  "stickman_color": "#4ADE80",
+  "stickman_seed": 1009,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 0.95,
+  "watermark": true,
+  "descricao": "Natureza, animais e meio ambiente com stickman",
+  "tags_padrao": ["natureza", "animais", "ecologia", "meio ambiente"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

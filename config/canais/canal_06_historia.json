@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman História",
+  "nicho": "historia",
+  "stickman_color": "#F59E0B",
+  "stickman_seed": 1006,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 1.0,
+  "watermark": true,
+  "descricao": "História mundial contada com stickman animado",
+  "tags_padrao": ["história", "civilização", "antiguidade", "eventos"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

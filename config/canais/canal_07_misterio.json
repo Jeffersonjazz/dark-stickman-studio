@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman Mistério",
+  "nicho": "misterio",
+  "stickman_color": "#8B5CF6",
+  "stickman_seed": 1007,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 0.95,
+  "watermark": true,
+  "descricao": "Mistérios, conspirações e fenômenos inexplicáveis",
+  "tags_padrao": ["mistério", "enigma", "sobrenatural", "conspiração"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

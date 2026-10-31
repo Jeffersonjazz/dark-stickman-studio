@@ -1,0 +1,15 @@
+{
+  "nome": "Stickman STEM",
+  "nicho": "stem",
+  "stickman_color": "#22C55E",
+  "stickman_seed": 1004,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 1.0,
+  "watermark": true,
+  "descricao": "Ciência, matemática e engenharia com stickman",
+  "tags_padrao": ["ciência", "matemática", "física", "educação"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}
