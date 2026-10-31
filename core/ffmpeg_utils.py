@@ -153,18 +153,23 @@ def concat_videos(clips: List[Path], output_path: Path, transition: str = "fade"
     if len(clips) == 2:
         dur_a = get_duration(clips[0])
         offset = max(0, dur_a - transition_dur)
-        cmd = [
-            FFMPEG, "-y",
-            "-i", str(clips[0]),
-            "-i", str(clips[1]),
-            "-filter_complex",
-            f"[0:v][1:v]xfade=transition=dissolve:duration={transition_dur}:offset={offset:.2f}[v];"
-            f"[0:a][1:a]acrossfade=d={transition_dur}[a]",
-            "-map", "[v]", "-map", "[a]",
+        probe_a = subprocess.run(
+            [FFPROBE, "-v", "error", "-select_streams", "a",
+             "-show_entries", "stream=codec_type", "-of", "csv=p=0", str(clips[0])],
+            capture_output=True, text=True
+        )
+        has_audio = "audio" in probe_a.stdout
+        if has_audio:
+            fg = (f"[0:v][1:v]xfade=transition=dissolve:duration={transition_dur}:offset={offset:.2f}[v];"
+                  f"[0:a][1:a]acrossfade=d={transition_dur}[a]")
+            maps = ["-map", "[v]", "-map", "[a]", "-c:a", "aac", "-b:a", "128k"]
+        else:
+            fg = f"[0:v][1:v]xfade=transition=dissolve:duration={transition_dur}:offset={offset:.2f}[v]"
+            maps = ["-map", "[v]", "-an"]
+        cmd = [FFMPEG, "-y", "-i", str(clips[0]), "-i", str(clips[1]),
+               "-filter_complex", fg] + maps + [
             "-c:v", "libx264", "-preset", "fast", "-crf", "20", "-pix_fmt", "yuv420p",
-            "-c:a", "aac", "-b:a", "128k",
-            str(output_path),
-        ]
+            str(output_path)]
         _run(cmd)
         return output_path
 
@@ -174,16 +179,34 @@ def concat_videos(clips: List[Path], output_path: Path, transition: str = "fade"
         tmp = output_path.parent / f"_xfade_{i}.mp4"
         dur_a = get_duration(current)
         offset = max(0, dur_a - transition_dur)
+        # Verificar se há áudio nos clipes
+        probe_a = subprocess.run(
+            [FFPROBE, "-v", "error", "-select_streams", "a",
+             "-show_entries", "stream=codec_type", "-of", "csv=p=0", str(current)],
+            capture_output=True, text=True
+        )
+        has_audio = "audio" in probe_a.stdout
+
+        if has_audio:
+            filtergraph = (
+                f"[0:v][1:v]xfade=transition=dissolve:duration={transition_dur}:offset={offset:.2f}[v];"
+                f"[0:a][1:a]acrossfade=d={transition_dur}[a]"
+            )
+            map_args = ["-map", "[v]", "-map", "[a]",
+                        "-c:a", "aac", "-b:a", "128k"]
+        else:
+            filtergraph = (
+                f"[0:v][1:v]xfade=transition=dissolve:duration={transition_dur}:offset={offset:.2f}[v]"
+            )
+            map_args = ["-map", "[v]", "-an"]
+
         cmd = [
             FFMPEG, "-y",
             "-i", str(current),
             "-i", str(next_clip),
-            "-filter_complex",
-            f"[0:v][1:v]xfade=transition=dissolve:duration={transition_dur}:offset={offset:.2f}[v];"
-            f"[0:a][1:a]acrossfade=d={transition_dur}[a]",
-            "-map", "[v]", "-map", "[a]",
+            "-filter_complex", filtergraph,
+        ] + map_args + [
             "-c:v", "libx264", "-preset", "fast", "-crf", "20", "-pix_fmt", "yuv420p",
-            "-c:a", "aac", "-b:a", "128k",
             str(tmp),
         ]
         _run(cmd)

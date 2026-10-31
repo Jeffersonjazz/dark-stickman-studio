@@ -18,7 +18,21 @@ from typing import Optional
 
 # Imports dos módulos core
 from core.piper_tts import narrar_roteiro, get_audio_duration
-from core.manim_scene import render_roteiro, render_intro_hook, render_outro_cta
+
+# Manim (opcional) — fallback para ffmpeg_scene quando não instalado
+try:
+    from core.manim_scene import render_roteiro, render_intro_hook, render_outro_cta
+    _MANIM_OK = True
+except Exception:
+    _MANIM_OK = False
+
+# Fallback FFmpeg+Pillow (sempre disponível)
+from core.ffmpeg_scene import (
+    renderizar_cena_pillow,
+    renderizar_intro_hook_ffmpeg,
+    renderizar_outro_cta_ffmpeg,
+)
+
 from core.ffmpeg_utils import (
     concat_videos, add_audio, mix_audio, normalize_audio,
     burn_subtitles, add_watermark_text, apply_color_grade, export_final,
@@ -190,20 +204,60 @@ def produzir_video(
 
         # ── ETAPA 3: Intro/Hook ──────────────────────────────────────────
         _etapa(job_id, "renderizando_hook", 20)
-        print(f"[F01] ETAPA 3 — Intro/Hook")
         gancho_texto = roteiro.get("gancho", cenas[0].get("narracao", titulo) if cenas else titulo)
-        clip_hook = render_intro_hook(canal_config, gancho_texto, dir_clips / "hook.mp4")
+        clip_hook = None
+        if _MANIM_OK:
+            print(f"[F01] ETAPA 3 — Intro/Hook (Manim)")
+            try:
+                clip_hook = render_intro_hook(canal_config, gancho_texto, dir_clips / "hook.mp4")
+            except Exception as e:
+                print(f"[F01] Manim hook falhou ({e}) — usando FFmpeg")
+        if clip_hook is None:
+            print(f"[F01] ETAPA 3 — Intro/Hook (FFmpeg)")
+            clip_hook = renderizar_intro_hook_ffmpeg(gancho_texto, canal_config, dir_clips / "hook.mp4")
 
-        # ── ETAPA 4: Renderizar cenas com Manim ─────────────────────────
+        # ── ETAPA 4: Renderizar cenas ────────────────────────────────────
         _etapa(job_id, "renderizando_cenas", 30)
-        print(f"[F01] ETAPA 4 — Renderizando {len(cenas)} cenas com Manim")
-        clips_cenas = render_roteiro(cenas, dir_clips, canal_config, quality=qualidade)
+        clips_cenas = []
+        if _MANIM_OK:
+            print(f"[F01] ETAPA 4 — Renderizando {len(cenas)} cenas (Manim)")
+            try:
+                clips_cenas = render_roteiro(cenas, dir_clips, canal_config, quality=qualidade)
+            except Exception as e:
+                print(f"[F01] Manim cenas falhou ({e}) — usando FFmpeg")
+                clips_cenas = []
+        # Fallback se Manim retornou lista vazia ou só Nones
+        if not any(c is not None for c in clips_cenas):
+            clips_cenas = []
+        if not clips_cenas:
+            print(f"[F01] ETAPA 4 — Renderizando {len(cenas)} cenas (FFmpeg+Pillow)")
+            for i, cena in enumerate(cenas):
+                out = dir_clips / f"cena_{i+1:02d}.mp4"
+                pose = cena.get("pose", "parado")
+                texto = cena.get("texto_tela", cena.get("narracao", "")[:60])
+                narracao = cena.get("narracao", "")
+                duracao = float(cena.get("duracao_s", 8.0))
+                clip = renderizar_cena_pillow(
+                    cena_num=i + 1, pose=pose, texto_tela=texto,
+                    narracao=narracao, duracao_s=duracao,
+                    canal_config=canal_config, output_path=out
+                )
+                clips_cenas.append(clip)
+                print(f"[F01]   Cena {i+1}/{len(cenas)} → {out.name}")
 
         # ── ETAPA 5: Outro/CTA ───────────────────────────────────────────
         _etapa(job_id, "renderizando_outro", 45)
-        print(f"[F01] ETAPA 5 — Outro/CTA")
         cta_texto = roteiro.get("cta", f"Se inscreva no canal {canal_config.get('nome', '')}!")
-        clip_outro = render_outro_cta(canal_config, cta_texto, dir_clips / "outro.mp4")
+        clip_outro = None
+        if _MANIM_OK:
+            print(f"[F01] ETAPA 5 — Outro/CTA (Manim)")
+            try:
+                clip_outro = render_outro_cta(canal_config, cta_texto, dir_clips / "outro.mp4")
+            except Exception as e:
+                print(f"[F01] Manim outro falhou ({e}) — usando FFmpeg")
+        if clip_outro is None:
+            print(f"[F01] ETAPA 5 — Outro/CTA (FFmpeg)")
+            clip_outro = renderizar_outro_cta_ffmpeg(canal_config, dir_clips / "outro.mp4")
 
         # ── ETAPA 6: Adicionar narração em cada cena ─────────────────────
         _etapa(job_id, "sincronizando_audio", 50)
@@ -237,7 +291,7 @@ def produzir_video(
         todos_clips = [c for c in todos_clips if c is not None and Path(c).exists()]
 
         if not todos_clips:
-            raise RuntimeError("Nenhum clip válido gerado. Verifique a instalação do Manim.")
+            raise RuntimeError("Nenhum clip válido gerado. Verifique logs acima.")
 
         video_concat = output_dir / "concat.mp4"
         if len(todos_clips) == 1:
