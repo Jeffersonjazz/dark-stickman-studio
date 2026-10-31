@@ -347,7 +347,9 @@ def produzir_video(
         if len(todos_clips) == 1:
             shutil.copy2(todos_clips[0], video_concat)
         else:
-            concat_videos(todos_clips, video_concat, transition="dissolve", transition_dur=0.4)
+            # Transição dissolve apenas para poucos clips (xfade com muitos clips gera filtergraph gigante → erro)
+            _transition = "dissolve" if len(todos_clips) <= 3 else "none"
+            concat_videos(todos_clips, video_concat, transition=_transition, transition_dur=0.4)
 
         # ── ETAPA 8: Mixar trilha sonora ──────────────────────────────────
         _etapa(job_id, "mixando_audio", 63)
