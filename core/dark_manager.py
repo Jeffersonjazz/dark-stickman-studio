@@ -51,11 +51,16 @@ TASK_TYPES = {
     "color_grade":         "CINEMATIC_DIRECTOR",
     "prompt_visual":       "CINEMATIC_DIRECTOR",
 
-    # Edição
+    # Edição (CINEMA EDITOR)
     "concat_clips":        "VIDEO_EDITOR_PRO",
     "add_audio":           "VIDEO_EDITOR_PRO",
     "exportar_final":      "VIDEO_EDITOR_PRO",
     "legendas":            "VIDEO_EDITOR_PRO",
+    "montar_automatico":   "VIDEO_EDITOR_PRO",
+    "renderizar":          "VIDEO_EDITOR_PRO",
+    "exportar_resolucoes": "VIDEO_EDITOR_PRO",
+    "remover_silencio":    "VIDEO_EDITOR_PRO",
+    "renderizar_lote":     "VIDEO_EDITOR_PRO",
 
     # Motion
     "titulo_animado":      "MOTION_GRAPHICS",
@@ -208,8 +213,12 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
                 params["cena"], db, params.get("prompt_base", "")
             )
 
-    # ── VIDEO EDITOR PRO ──────────────────────────────────────────
+    # ── VIDEO EDITOR PRO (CINEMA EDITOR) ─────────────────────────
     if agente == "VIDEO_EDITOR_PRO":
+        from core.cinema_editor import (
+            montar_automatico, renderizar, exportar_multi_resolucao,
+            remover_silencio, renderizar_lote, Timeline, check_cinema_editor,
+        )
         from core.ffmpeg_utils import (
             concat_videos, add_audio, export_final, burn_subtitles,
         )
@@ -233,6 +242,33 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
         if tarefa == "legendas":
             p = burn_subtitles(Path(params["video"]), Path(params["srt"]), Path(params["output"]))
             return {"output": str(p)}
+        if tarefa == "montar_automatico":
+            clips_v = [Path(c) for c in params["clips_video"]]
+            narrs = [Path(n) for n in params["narracoes"]]
+            tl = montar_automatico(
+                clips_v, narrs,
+                Path(params["output_dir"]),
+                params["canal_config"],
+                srt_path=Path(params["srt"]) if params.get("srt") else None,
+                trilha_path=Path(params["trilha"]) if params.get("trilha") else None,
+            )
+            return {"timeline": str(Path(params["output_dir"]) / "timeline.json")}
+        if tarefa == "renderizar":
+            tl = Timeline.importar_json(Path(params["timeline_json"]))
+            return renderizar(tl, Path(params["output"]))
+        if tarefa == "exportar_resolucoes":
+            return exportar_multi_resolucao(
+                Path(params["input"]),
+                Path(params["output_dir"]),
+                resolucoes=params.get("resolucoes", ["1080p", "720p"]),
+            )
+        if tarefa == "remover_silencio":
+            return remover_silencio(
+                Path(params["input"]), Path(params["output"]),
+                silence_threshold=params.get("threshold", -40.0),
+            )
+        if tarefa == "renderizar_lote":
+            return {"resultados": renderizar_lote(params["projetos"])}
 
     # ── AGENTES PLACEHOLDER (a implementar nas próximas fases) ────
     if agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "MOTION_GRAPHICS",
@@ -282,10 +318,10 @@ def check_all_agents() -> dict:
     except Exception as e:
         resultados["VISUAL_CONSISTENCY"] = {"status": "error", "erro": str(e)}
 
-    # FFmpeg (Video Editor Pro)
+    # Cinema Editor (Video Editor Pro)
     try:
-        from core.ffmpeg_utils import check_ffmpeg
-        resultados["VIDEO_EDITOR_PRO"] = {"status": "ok" if check_ffmpeg() else "ffmpeg_missing"}
+        from core.cinema_editor import check_cinema_editor
+        resultados["VIDEO_EDITOR_PRO"] = check_cinema_editor()
     except Exception as e:
         resultados["VIDEO_EDITOR_PRO"] = {"status": "error", "erro": str(e)}
 
