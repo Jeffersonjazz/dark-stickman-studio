@@ -1,0 +1,24 @@
+feature,area,priority,original,clone,notes
+svg_stickman_generator,core,must,y,done,20 poses; seeds únicos por canal
+ffmpeg_video_editing,core,must,y,done,concat/watermark/color grade/export
+piper_tts_narration,audio,must,y,done,PT-BR offline pt_BR-faber-medium
+manim_animation,animation,must,y,done,Manim CE MIT; scripts gerados dinamicamente
+whisperx_subtitles,audio,must,y,done,fallback WhisperX→Whisper→texto
+thumbnail_generation,image,must,y,done,1280x720 Pillow 12 paletas
+pipeline_f01,pipeline,must,y,done,15 etapas roteiro→MP4
+fastapi_rest_api,api,must,y,done,12 endpoints porta 7870
+cli_typer,cli,must,y,done,6 comandos Typer+Rich
+sqlite_job_tracking,db,must,y,done,ai_generated/ai_disclosure obrigatórios
+12_canal_configs,config,must,y,done,seeds 1001-1012 cores únicas
+9_cinematic_presets,config,must,y,done,documentario/natureza/historia/etc
+ai_watermark_mandatory,compliance,must,y,done,"Produzido com IA — DARK STUDIO AAA"
+color_grade_presets,video,should,y,done,8 presets FFmpeg
+thumbnail_ab_variations,image,should,y,done,gerar_variacao() até 3 versões
+re_hook_45s,engagement,should,y,done,overlay a cada 45s nos configs
+shorts_916,format,should,y,done,parâmetro formato 9:16 no pipeline
+dark_manager_integration,integration,should,y,done,contrato JSON documentado
+setup_wizard_windows,install,must,y,done,setup_wizard.bat 8 passos
+hardware_diagnosis,infra,should,n,pending,FASE 1 spec 13.8
+piper_model_download,audio,must,n,pending,modelo pt_BR-faber-medium.onnx
+real_production_test,qa,must,n,pending,FASE 10 spec
+github_push,delivery,must,n,pending,requer criação manual do repo
