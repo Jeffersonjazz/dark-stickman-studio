@@ -173,46 +173,66 @@ def concat_videos(clips: List[Path], output_path: Path, transition: str = "fade"
         _run(cmd)
         return output_path
 
-    # Múltiplos clipes: encadear xfades recursivamente
-    current = clips[0]
-    for i, next_clip in enumerate(clips[1:]):
-        tmp = output_path.parent / f"_xfade_{i}.mp4"
-        dur_a = get_duration(current)
-        offset = max(0, dur_a - transition_dur)
-        # Verificar se há áudio nos clipes
-        probe_a = subprocess.run(
-            [FFPROBE, "-v", "error", "-select_streams", "a",
-             "-show_entries", "stream=codec_type", "-of", "csv=p=0", str(current)],
-            capture_output=True, text=True
+    # AGENTE VIDEO ENGINEER FIX: batch xfade usando filter_complex único (O(n) vs O(n²))
+    # Obtém duração de cada clipe para calcular offsets
+    durations = [get_duration(c) for c in clips]
+
+    # Verificar se clipes têm áudio
+    probe_a = subprocess.run(
+        [FFPROBE, "-v", "error", "-select_streams", "a",
+         "-show_entries", "stream=codec_type", "-of", "csv=p=0", str(clips[0])],
+        capture_output=True, text=True
+    )
+    has_audio = "audio" in probe_a.stdout
+
+    n = len(clips)
+    # Monta inputs FFmpeg
+    inputs = []
+    for c in clips:
+        inputs += ["-i", str(c)]
+
+    # Monta filter_complex com xfade chain em batch
+    # Calcula offsets acumulados: offset_i = sum(dur_0..dur_{i-1}) - i * transition_dur
+    fg_parts = []
+    cur_v = "[0:v]"
+    cur_a = "[0:a]" if has_audio else None
+    acc_offset = durations[0]
+
+    for i in range(1, n):
+        offset = max(0.01, acc_offset - transition_dur)
+        next_v = f"[{i}:v]"
+        out_v = f"[xv{i}]" if i < n - 1 else "[vout]"
+
+        fg_parts.append(
+            f"{cur_v}{next_v}xfade=transition=dissolve:duration={transition_dur}:offset={offset:.3f}{out_v}"
         )
-        has_audio = "audio" in probe_a.stdout
+        cur_v = out_v
 
         if has_audio:
-            filtergraph = (
-                f"[0:v][1:v]xfade=transition=dissolve:duration={transition_dur}:offset={offset:.2f}[v];"
-                f"[0:a][1:a]acrossfade=d={transition_dur}[a]"
+            next_a = f"[{i}:a]"
+            out_a = f"[xa{i}]" if i < n - 1 else "[aout]"
+            fg_parts.append(
+                f"{cur_a}{next_a}acrossfade=d={transition_dur}{out_a}"
             )
-            map_args = ["-map", "[v]", "-map", "[a]",
-                        "-c:a", "aac", "-b:a", "128k"]
-        else:
-            filtergraph = (
-                f"[0:v][1:v]xfade=transition=dissolve:duration={transition_dur}:offset={offset:.2f}[v]"
-            )
-            map_args = ["-map", "[v]", "-an"]
+            cur_a = out_a
 
-        cmd = [
-            FFMPEG, "-y",
-            "-i", str(current),
-            "-i", str(next_clip),
-            "-filter_complex", filtergraph,
-        ] + map_args + [
-            "-c:v", "libx264", "-preset", "fast", "-crf", "20", "-pix_fmt", "yuv420p",
-            str(tmp),
-        ]
-        _run(cmd)
-        current = tmp
+        acc_offset += durations[i] - transition_dur
 
-    shutil.move(str(current), str(output_path))
+    filtergraph = ";".join(fg_parts)
+
+    if has_audio:
+        map_args = ["-map", "[vout]", "-map", "[aout]", "-c:a", "aac", "-b:a", "128k"]
+    else:
+        map_args = ["-map", "[vout]", "-an"]
+
+    cmd = [FFMPEG, "-y"] + inputs + [
+        "-filter_complex", filtergraph,
+    ] + map_args + [
+        "-c:v", "libx264", "-preset", "fast", "-crf", "20", "-pix_fmt", "yuv420p",
+        str(output_path),
+    ]
+    _run(cmd)
+    return output_path
     return output_path
 
 
