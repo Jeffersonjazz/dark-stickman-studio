@@ -12,7 +12,7 @@ import shutil
 import sqlite3
 import time
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -112,7 +112,7 @@ def _job_criar(job_id: str, canal_id: str, titulo: str):
         # FIX: INSERT OR REPLACE evita "UNIQUE constraint failed" em reexecuções
         conn.execute(
             "INSERT OR REPLACE INTO jobs (id, canal_id, titulo, status, criado_em) VALUES (?, ?, ?, 'running', ?)",
-            (job_id, canal_id, titulo, datetime.utcnow().isoformat()),
+            (job_id, canal_id, titulo, datetime.now(timezone.utc).isoformat()),
         )
         conn.commit()
         conn.close()
@@ -441,7 +441,7 @@ def produzir_video(
             progresso=100,
             output_path=str(video_final),
             thumbnail_path=str(thumbnail_path) if thumbnail_path else None,
-            finalizado_em=datetime.utcnow().isoformat(),
+            finalizado_em=datetime.now(timezone.utc).isoformat(),
         )
 
         resultado.update({
