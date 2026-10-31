@@ -1,0 +1,152 @@
+{
+  "audio": {
+    "sample_rate": 22050,
+    "quality": "medium"
+  },
+  "espeak": {
+    "voice": "pt-br"
+  },
+  "inference": {
+    "noise_scale": 0.667,
+    "length_scale": 1,
+    "noise_w": 0.8
+  },
+  "phoneme_type": "espeak",
+  "phoneme_map": {
+    "c": [
+      "k"
+    ]
+  },
+  "phoneme_id_map": {
+    "_": [
+      0
+    ],
+    "^": [
+      1
+    ],
+    "$": [
+      2
+    ],
+    " ": [
+      3
+    ],
+    "!": [
+      4
+    ],
+    "'": [
+      5
+    ],
+    "(": [
+      6
+    ],
+    ")": [
+      7
+    ],
+    ",": [
+      8
+    ],
+    "-": [
+      9
+    ],
+    ".": [
+      10
+    ],
+    ":": [
+      11
+    ],
+    ";": [
+      12
+    ],
+    "?": [
+      13
+    ],
+    "a": [
+      14
+    ],
+    "b": [
+      15
+    ],
+    "c": [
+      16
+    ],
+    "d": [
+      17
+    ],
+    "e": [
+      18
+    ],
+    "f": [
+      19
+    ],
+    "h": [
+      20
+    ],
+    "i": [
+      21
+    ],
+    "j": [
+      22
+    ],
+    "k": [
+      23
+    ],
+    "l": [
+      24
+    ],
+    "m": [
+      25
+    ],
+    "n": [
+      26
+    ],
+    "o": [
+      27
+    ],
+    "p": [
+      28
+    ],
+    "q": [
+      29
+    ],
+    "r": [
+      30
+    ],
+    "s": [
+      31
+    ],
+    "t": [
+      32
+    ],
+    "u": [
+      33
+    ],
+    "v": [
+      34
+    ],
+    "w": [
+      35
+    ],
+    "x": [
+      36
+    ],
+    "y": [
+      37
+    ],
+    "z": [
+      38
+    ]
+  },
+  "num_symbols": 256,
+  "num_speakers": 1,
+  "speaker_id_map": {},
+  "piper_version": "1.0.0",
+  "language": {
+    "code": "pt_BR",
+    "family": "pt",
+    "region": "BR",
+    "name_native": "Português",
+    "name_english": "Portuguese",
+    "country_english": "Brazil"
+  },
+  "dataset": "faber"
+}
