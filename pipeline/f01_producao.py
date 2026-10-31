@@ -19,6 +19,13 @@ from typing import Optional
 # Imports dos módulos core
 from core.piper_tts import narrar_roteiro, get_audio_duration
 
+# DARK VIDEO STUDIO — geração de vídeos realistas (Phase 3)
+try:
+    from core.dark_video_studio import generate_scene_videos, check_backends as _check_video_backends
+    _VIDEO_STUDIO_OK = True
+except Exception:
+    _VIDEO_STUDIO_OK = False
+
 # Manim (opcional) — fallback para ffmpeg_scene quando não instalado
 try:
     from core.manim_scene import render_roteiro, render_intro_hook, render_outro_cta
@@ -234,17 +241,45 @@ def produzir_video(
         # ── ETAPA 4: Renderizar cenas ────────────────────────────────────
         _etapa(job_id, "renderizando_cenas", 30)
         clips_cenas = []
-        if _MANIM_OK:
-            print(f"[F01] ETAPA 4 — Renderizando {len(cenas)} cenas (Manim)")
+
+        # Opção A: DARK VIDEO STUDIO (vídeos realistas — se habilitado no preset)
+        _usar_video_studio = (
+            _VIDEO_STUDIO_OK
+            and canal_config.get("video_realista", False)
+            and any(c.get("prompt_visual") for c in cenas)
+        )
+        if _usar_video_studio:
+            preset_video = canal_config.get("video_preset", "documentario")
+            print(f"[F01] ETAPA 4 — DARK VIDEO STUDIO ({preset_video}) para {len(cenas)} cenas")
             try:
-                clips_cenas = render_roteiro(cenas, dir_clips, canal_config, quality=qualidade)
+                video_clips = generate_scene_videos(
+                    cenas, dir_clips / "video_studio", preset=preset_video, verbose=True
+                )
+                # Combina: usa vídeo realista se gerado, senão fallback stickman
+                for i, (vc, cena) in enumerate(zip(video_clips, cenas)):
+                    if vc and Path(vc).exists():
+                        clips_cenas.append(Path(vc))
+                        print(f"[F01]   Cena {i+1}/{len(cenas)} → VIDEO STUDIO ✅")
+                    else:
+                        clips_cenas.append(None)  # será preenchido abaixo
             except Exception as e:
-                print(f"[F01] Manim cenas falhou ({e}) — usando FFmpeg")
+                print(f"[F01] VIDEO STUDIO falhou ({e}) — usando animação stickman")
                 clips_cenas = []
-        # Fallback se Manim retornou lista vazia ou só Nones
+
+        # Opção B: Manim (stickman animado)
+        if not _usar_video_studio or not any(c is not None for c in clips_cenas):
+            clips_cenas = []
+            if _MANIM_OK:
+                print(f"[F01] ETAPA 4 — Renderizando {len(cenas)} cenas (Manim)")
+                try:
+                    clips_cenas = render_roteiro(cenas, dir_clips, canal_config, quality=qualidade)
+                except Exception as e:
+                    print(f"[F01] Manim cenas falhou ({e}) — usando FFmpeg")
+                    clips_cenas = []
+
+        # Opção C: FFmpeg+Pillow (fallback sempre disponível)
         if not any(c is not None for c in clips_cenas):
             clips_cenas = []
-        if not clips_cenas:
             print(f"[F01] ETAPA 4 — Renderizando {len(cenas)} cenas (FFmpeg+Pillow)")
             for i, cena in enumerate(cenas):
                 out = dir_clips / f"cena_{i+1:02d}.mp4"
