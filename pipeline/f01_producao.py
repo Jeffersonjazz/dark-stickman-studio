@@ -48,6 +48,19 @@ from core.ffmpeg_utils import (
 from core.legenda import pipeline_legenda, audio_para_srt, srt_de_narracao
 from core.thumbnail import gerar_thumbnail, gerar_variacao
 
+# DARK CREATIVE LAB — Agentes integrados
+try:
+    from core.visual_consistency import setup_projeto, gerar_prompt_com_continuidade, validar_consistencia_roteiro
+    _VISUAL_CONSISTENCY_OK = True
+except Exception:
+    _VISUAL_CONSISTENCY_OK = False
+
+try:
+    from core.motion_graphics import gerar_intro, gerar_outro, gerar_pacote_canal
+    _MOTION_GRAPHICS_OK = True
+except Exception:
+    _MOTION_GRAPHICS_OK = False
+
 # Banco de dados local
 DB_PATH = Path(__file__).parent.parent / "db" / "dark_stickman.db"
 
@@ -190,6 +203,16 @@ def produzir_video(
         d.mkdir(parents=True, exist_ok=True)
 
     _job_criar(job_id, canal_id, titulo)
+
+    # ── DARK CREATIVE LAB: Inicializar VISUAL CONSISTENCY ────────────
+    _vc_db = None
+    if _VISUAL_CONSISTENCY_OK:
+        try:
+            _vc_db = setup_projeto(output_dir, canal_config, preset_nome=preset_cor)
+            print(f"[F01] VISUAL CONSISTENCY inicializada — nicho={nicho}")
+        except Exception as _e:
+            print(f"[F01] Visual Consistency init falhou: {_e}")
+
     resultado = {
         "job_id": job_id,
         "status": "error",
@@ -228,7 +251,20 @@ def produzir_video(
         _etapa(job_id, "renderizando_hook", 20)
         gancho_texto = roteiro.get("gancho", cenas[0].get("narracao", titulo) if cenas else titulo)
         clip_hook = None
-        if _MANIM_OK:
+        # DARK CREATIVE LAB: MOTION GRAPHICS intro (prioridade sobre Manim/FFmpeg)
+        if _MOTION_GRAPHICS_OK:
+            print(f"[F01] ETAPA 3 — Intro/Hook (MOTION GRAPHICS)")
+            try:
+                mg_intro = gerar_intro(
+                    canal_config, dir_clips / "hook.mp4",
+                    duracao=5.0, estilo=preset_cor, resolucao="1920x1080"
+                )
+                if mg_intro.get("status") == "ok":
+                    clip_hook = Path(mg_intro["output"])
+                    print(f"[F01] MOTION GRAPHICS intro ✅ — {clip_hook.name}")
+            except Exception as e:
+                print(f"[F01] Motion Graphics intro falhou ({e}) — fallback")
+        if clip_hook is None and _MANIM_OK:
             print(f"[F01] ETAPA 3 — Intro/Hook (Manim)")
             try:
                 clip_hook = render_intro_hook(canal_config, gancho_texto, dir_clips / "hook.mp4")
@@ -282,6 +318,13 @@ def produzir_video(
             clips_cenas = []
             print(f"[F01] ETAPA 4 — Renderizando {len(cenas)} cenas (FFmpeg+Pillow)")
             for i, cena in enumerate(cenas):
+                # DARK CREATIVE LAB: enriquecer prompt com VISUAL CONSISTENCY
+                if _VISUAL_CONSISTENCY_OK and _vc_db is not None:
+                    try:
+                        cena = dict(cena)  # cópia para não mutar o original
+                        cena["_prompt_vc"] = gerar_prompt_com_continuidade(cena, _vc_db, cena.get("narracao",""))
+                    except Exception:
+                        pass
                 out = dir_clips / f"cena_{i+1:02d}.mp4"
                 pose = cena.get("pose", "parado")
                 texto = cena.get("texto_tela", cena.get("narracao", "")[:60])
@@ -299,7 +342,20 @@ def produzir_video(
         _etapa(job_id, "renderizando_outro", 45)
         cta_texto = roteiro.get("cta", f"Se inscreva no canal {canal_config.get('nome', '')}!")
         clip_outro = None
-        if _MANIM_OK:
+        # DARK CREATIVE LAB: MOTION GRAPHICS outro (prioridade)
+        if _MOTION_GRAPHICS_OK:
+            print(f"[F01] ETAPA 5 — Outro/CTA (MOTION GRAPHICS)")
+            try:
+                mg_outro = gerar_outro(
+                    canal_config, dir_clips / "outro.mp4",
+                    duracao=8.0, cta_texto=cta_texto, resolucao="1920x1080"
+                )
+                if mg_outro.get("status") == "ok":
+                    clip_outro = Path(mg_outro["output"])
+                    print(f"[F01] MOTION GRAPHICS outro ✅ — {clip_outro.name}")
+            except Exception as e:
+                print(f"[F01] Motion Graphics outro falhou ({e}) — fallback")
+        if clip_outro is None and _MANIM_OK:
             print(f"[F01] ETAPA 5 — Outro/CTA (Manim)")
             try:
                 clip_outro = render_outro_cta(canal_config, cta_texto, dir_clips / "outro.mp4")
