@@ -46,9 +46,15 @@ def probe(path: Path) -> dict:
 
 
 def get_duration(path: Path) -> float:
-    """Duração do arquivo em segundos."""
-    info = probe(path)
-    return float(info["format"].get("duration", 0))
+    """Duração do arquivo em segundos. Retorna 0.0 se arquivo não existir ou inválido."""
+    path = Path(path)
+    if not path.exists():
+        return 0.0
+    try:
+        info = probe(path)
+        return float(info["format"].get("duration", 0))
+    except Exception:
+        return 0.0
 
 
 def svg_to_png(svg_path: Path, png_path: Path, width: int = 1920, height: int = 1080) -> Path:
@@ -130,7 +136,11 @@ def concat_videos(clips: List[Path], output_path: Path, transition: str = "fade"
     """
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    clips = [Path(c) for c in clips]
+    # Filtra apenas clips existentes
+    clips = [Path(c) for c in clips if c is not None and Path(c).exists()]
+
+    if not clips:
+        raise ValueError("concat_videos: nenhum clipe válido fornecido")
 
     if transition == "none" or len(clips) == 1:
         # Concatenação simples via arquivo de lista
