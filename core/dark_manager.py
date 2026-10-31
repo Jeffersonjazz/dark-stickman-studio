@@ -13,7 +13,7 @@ Agentes disponíveis:
 - MOTION GRAPHICS    → core/motion_graphics.py ✅
 - AUDIO MASTER       → core/audio_master.py
 - VISUAL CONSISTENCY → core/visual_consistency.py
-- ASSET MANAGER      → core/asset_manager.py (placeholder)
+- ASSET MANAGER      → core/asset_manager.py ✅
 - CREATIVE QA        → core/creative_qa.py (placeholder)
 
 Todos os contratos de entrada/saída usam dicts JSON documentados.
@@ -84,6 +84,10 @@ TASK_TYPES = {
     # Assets
     "registrar_asset":     "ASSET_MANAGER",
     "buscar_asset":        "ASSET_MANAGER",
+    "organizar_projeto":   "ASSET_MANAGER",
+    "listar_assets":       "ASSET_MANAGER",
+    "varredura":           "ASSET_MANAGER",
+    "validar_licenca":     "ASSET_MANAGER",
 
     # QA
     "verificar_qualidade": "CREATIVE_QA",
@@ -326,8 +330,42 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
                 resolucao=params.get("resolucao", "1920x1080"),
             )
 
+    # ── ASSET MANAGER ─────────────────────────────────────────────
+    if agente == "ASSET_MANAGER":
+        from core.asset_manager import (
+            registrar_asset, buscar_asset, organizar_projeto,
+            listar_assets_projeto, varredura_assets, validar_licenca,
+        )
+        if tarefa == "registrar_asset":
+            return registrar_asset(
+                Path(params["arquivo"]),
+                Path(params["projeto_dir"]),
+                canal=params.get("canal", "global"),
+                tags=params.get("tags", []),
+                licenca=params.get("licenca", "MIT"),
+                descricao=params.get("descricao", ""),
+                copiar=params.get("copiar", False),
+            )
+        if tarefa == "buscar_asset":
+            return buscar_asset(
+                Path(params["projeto_dir"]),
+                asset_id=params.get("asset_id"),
+                tipo=params.get("tipo"),
+                canal=params.get("canal"),
+                tag=params.get("tag"),
+                licenca=params.get("licenca"),
+            )
+        if tarefa == "organizar_projeto":
+            return organizar_projeto(Path(params["projeto_dir"]), params.get("canal_config", {}))
+        if tarefa == "listar_assets":
+            return listar_assets_projeto(Path(params["projeto_dir"]))
+        if tarefa == "varredura":
+            return varredura_assets(Path(params["projeto_dir"]), canal=params.get("canal", "global"))
+        if tarefa == "validar_licenca":
+            return validar_licenca(params["licenca"])
+
     # ── AGENTES PLACEHOLDER (a implementar nas próximas fases) ────
-    if agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "ASSET_MANAGER", "CREATIVE_QA"):
+    if agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "CREATIVE_QA"):
         return _placeholder(agente, tarefa, params)
 
     raise ValueError(f"Tarefa '{tarefa}' não mapeada para nenhum agente disponível.")
@@ -387,8 +425,15 @@ def check_all_agents() -> dict:
     except Exception as e:
         resultados["MOTION_GRAPHICS"] = {"status": "error", "erro": str(e)}
 
+    # Asset Manager
+    try:
+        from core.asset_manager import check_asset_manager
+        resultados["ASSET_MANAGER"] = check_asset_manager()
+    except Exception as e:
+        resultados["ASSET_MANAGER"] = {"status": "error", "erro": str(e)}
+
     # Placeholders
-    for agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "ASSET_MANAGER", "CREATIVE_QA"):
+    for agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "CREATIVE_QA"):
         resultados[agente] = {
             "status": "placeholder",
             "fase": _fase_agente(agente),
