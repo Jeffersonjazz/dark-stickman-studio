@@ -7,7 +7,7 @@ e retorna resultado padronizado em JSON.
 
 Agentes disponíveis:
 - IMAGE ENGINE       → core/image_engine.py ✅
-- VIDEO GENERATOR    → core/video_generator.py (placeholder)
+- VIDEO GENERATOR    → core/video_generator.py ✅
 - CINEMATIC DIRECTOR → core/cinematic_director.py
 - VIDEO EDITOR PRO   → core/ffmpeg_utils.py (wrapper)
 - MOTION GRAPHICS    → core/motion_graphics.py ✅
@@ -44,6 +44,7 @@ TASK_TYPES = {
     "gerar_video":         "VIDEO_GENERATOR",
     "animar_imagem":       "VIDEO_GENERATOR",
     "b_roll":              "VIDEO_GENERATOR",
+    "gerar_cenas":         "VIDEO_GENERATOR",
 
     # Cinematografia
     "plano_cenas":         "CINEMATIC_DIRECTOR",
@@ -489,9 +490,60 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
             )
         return {"status": "error", "mensagem": f"Tarefa '{tarefa}' não reconhecida para IMAGE_ENGINE"}
 
-    # ── AGENTES PLACEHOLDER (a implementar nas próximas fases) ────
-    if agente in ("VIDEO_GENERATOR",):
-        return _placeholder(agente, tarefa, params)
+    # ── VIDEO GENERATOR ───────────────────────────────────────────
+    if agente == "VIDEO_GENERATOR":
+        from core.video_generator import (
+            gerar_video, imagem_para_video, gerar_broll, gerar_cenas_video,
+        )
+        if tarefa == "gerar_video":
+            return gerar_video(
+                prompt=params.get("prompt", "dark cinematic scene"),
+                output_path=params.get("output_path"),
+                resolucao=params.get("resolucao", "1080p"),
+                duracao_s=int(params.get("duracao_s", 8)),
+                estilo=params.get("estilo", "cinematografico"),
+                movimento=params.get("movimento", "zoom_in"),
+                engine=params.get("engine", "auto"),
+                steps=int(params.get("steps", 20)),
+            )
+        if tarefa == "animar_imagem":
+            return imagem_para_video(
+                input_path=params["input_path"],
+                output_path=params.get("output_path"),
+                duracao_s=int(params.get("duracao_s", 8)),
+                movimento=params.get("movimento", "zoom_in"),
+                resolucao=params.get("resolucao", "1080p"),
+                estilo=params.get("estilo", "cinematografico"),
+                fps=int(params.get("fps", 30)),
+            )
+        if tarefa == "b_roll":
+            return {
+                "status": "ok",
+                "clips": gerar_broll(
+                    prompt=params.get("prompt", "natureza cinematografica"),
+                    output_dir=params["output_dir"],
+                    num_clips=int(params.get("num_clips", 3)),
+                    duracao_s=int(params.get("duracao_s", 6)),
+                    resolucao=params.get("resolucao", "1080p"),
+                    estilo=params.get("estilo", "documentario"),
+                ),
+                "ai_generated": True,
+                "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+            }
+        if tarefa == "gerar_cenas":
+            paths = gerar_cenas_video(
+                cenas=params["cenas"],
+                output_dir=params["output_dir"],
+                preset=params.get("preset", "documentario"),
+                verbose=params.get("verbose", False),
+            )
+            return {
+                "status": "ok",
+                "videos": paths,
+                "ai_generated": True,
+                "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+            }
+        return {"status": "error", "mensagem": f"Tarefa '{tarefa}' não reconhecida para VIDEO_GENERATOR"}
 
     raise ValueError(f"Tarefa '{tarefa}' não mapeada para nenhum agente disponível.")
 
@@ -578,11 +630,12 @@ def check_all_agents() -> dict:
     except Exception as e:
         resultados["IMAGE_ENGINE"] = {"status": "error", "erro": str(e)}
 
-    # Video Generator (Fase 3 — placeholder)
-    resultados["VIDEO_GENERATOR"] = {
-        "status": "placeholder",
-        "fase": _fase_agente("VIDEO_GENERATOR"),
-    }
+    # Video Generator (Fase 3 — implementado)
+    try:
+        from core.video_generator import check_video_generator
+        resultados["VIDEO_GENERATOR"] = check_video_generator()
+    except Exception as e:
+        resultados["VIDEO_GENERATOR"] = {"status": "error", "erro": str(e)}
 
     n_ok = sum(1 for v in resultados.values() if v.get("status") in ("ok", "placeholder"))
 
