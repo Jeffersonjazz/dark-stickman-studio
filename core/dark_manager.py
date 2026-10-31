@@ -10,7 +10,7 @@ Agentes disponíveis:
 - VIDEO GENERATOR    → core/video_generator.py (placeholder)
 - CINEMATIC DIRECTOR → core/cinematic_director.py
 - VIDEO EDITOR PRO   → core/ffmpeg_utils.py (wrapper)
-- MOTION GRAPHICS    → core/motion_graphics.py (placeholder)
+- MOTION GRAPHICS    → core/motion_graphics.py ✅
 - AUDIO MASTER       → core/audio_master.py
 - VISUAL CONSISTENCY → core/visual_consistency.py
 - ASSET MANAGER      → core/asset_manager.py (placeholder)
@@ -66,6 +66,9 @@ TASK_TYPES = {
     "titulo_animado":      "MOTION_GRAPHICS",
     "legenda_animada":     "MOTION_GRAPHICS",
     "infografico":         "MOTION_GRAPHICS",
+    "gerar_intro":         "MOTION_GRAPHICS",
+    "gerar_outro":         "MOTION_GRAPHICS",
+    "pacote_canal":        "MOTION_GRAPHICS",
 
     # Áudio
     "narrar":              "AUDIO_MASTER",
@@ -270,9 +273,61 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
         if tarefa == "renderizar_lote":
             return {"resultados": renderizar_lote(params["projetos"])}
 
+    # ── MOTION GRAPHICS ───────────────────────────────────────────
+    if agente == "MOTION_GRAPHICS":
+        from core.motion_graphics import (
+            gerar_titulo_animado, gerar_lower_third,
+            gerar_intro, gerar_outro, gerar_pacote_canal, gerar_contador,
+        )
+        if tarefa == "titulo_animado":
+            return gerar_titulo_animado(
+                params["texto"],
+                Path(params["output"]),
+                duracao=params.get("duracao", 4.0),
+                animacao=params.get("animacao", "fade"),
+                resolucao=params.get("resolucao", "1920x1080"),
+            )
+        if tarefa == "legenda_animada":
+            return gerar_lower_third(
+                params["titulo"],
+                subtitulo=params.get("subtitulo", ""),
+                output_path=Path(params["output"]),
+                duracao=params.get("duracao", 5.0),
+                resolucao=params.get("resolucao", "1920x1080"),
+            )
+        if tarefa == "infografico":
+            # Contador animado como infográfico numérico
+            return gerar_contador(
+                params["valor"],
+                params.get("label", ""),
+                Path(params["output"]),
+                duracao=params.get("duracao", 3.0),
+                resolucao=params.get("resolucao", "1920x1080"),
+            )
+        if tarefa == "gerar_intro":
+            return gerar_intro(
+                params["canal_config"],
+                Path(params["output"]),
+                estilo=params.get("estilo", "documentario"),
+                resolucao=params.get("resolucao", "1920x1080"),
+            )
+        if tarefa == "gerar_outro":
+            return gerar_outro(
+                params["canal_config"],
+                Path(params["output"]),
+                cta_texto=params.get("cta", "INSCREVA-SE"),
+                resolucao=params.get("resolucao", "1920x1080"),
+            )
+        if tarefa == "pacote_canal":
+            return gerar_pacote_canal(
+                params["canal_config"],
+                Path(params["output_dir"]),
+                titulo_video=params.get("titulo", ""),
+                resolucao=params.get("resolucao", "1920x1080"),
+            )
+
     # ── AGENTES PLACEHOLDER (a implementar nas próximas fases) ────
-    if agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "MOTION_GRAPHICS",
-                   "ASSET_MANAGER", "CREATIVE_QA"):
+    if agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "ASSET_MANAGER", "CREATIVE_QA"):
         return _placeholder(agente, tarefa, params)
 
     raise ValueError(f"Tarefa '{tarefa}' não mapeada para nenhum agente disponível.")
@@ -325,9 +380,15 @@ def check_all_agents() -> dict:
     except Exception as e:
         resultados["VIDEO_EDITOR_PRO"] = {"status": "error", "erro": str(e)}
 
+    # Motion Graphics
+    try:
+        from core.motion_graphics import check_motion_graphics
+        resultados["MOTION_GRAPHICS"] = check_motion_graphics()
+    except Exception as e:
+        resultados["MOTION_GRAPHICS"] = {"status": "error", "erro": str(e)}
+
     # Placeholders
-    for agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "MOTION_GRAPHICS",
-                    "ASSET_MANAGER", "CREATIVE_QA"):
+    for agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR", "ASSET_MANAGER", "CREATIVE_QA"):
         resultados[agente] = {
             "status": "placeholder",
             "fase": _fase_agente(agente),
