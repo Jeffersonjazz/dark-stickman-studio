@@ -95,6 +95,13 @@ TASK_TYPES = {
     "verificar_audio_qa":  "CREATIVE_QA",
     "verificar_legenda":   "CREATIVE_QA",
     "verificar_conformidade": "CREATIVE_QA",
+
+    # Performance (Fase 11)
+    "benchmark":           "PERFORMANCE",
+    "profiling":           "PERFORMANCE",
+    "relatorio_custo":     "PERFORMANCE",
+    "params_ffmpeg":       "PERFORMANCE",
+    "stats_cache":         "PERFORMANCE",
 }
 
 
@@ -389,6 +396,44 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
         if tarefa == "verificar_conformidade":
             return verificar_conformidade_ia(Path(params["video"]))
 
+    # ── PERFORMANCE ───────────────────────────────────────────────
+    if agente == "PERFORMANCE":
+        from core.performance import (
+            ffmpeg_params_otimizados,
+            sugerir_perfil_ffmpeg,
+            check_performance,
+            AssetCache,
+            PipelineProfiler,
+            CustoEstimador,
+        )
+        if tarefa == "params_ffmpeg":
+            return {
+                "status": "ok",
+                "params": ffmpeg_params_otimizados(params.get("perfil", "balanced")),
+                "perfil": params.get("perfil", "balanced"),
+                "ai_generated": True,
+            }
+        if tarefa == "benchmark":
+            return check_performance()
+        if tarefa == "profiling":
+            # Retorna relatório de profiling de um job salvo
+            job_id = params.get("job_id", "unknown")
+            output_dir = Path(params.get("output_dir", "."))
+            profiler_file = output_dir / f"profiler_{job_id}.json"
+            if profiler_file.exists():
+                import json
+                return {"status": "ok", "relatorio": json.loads(profiler_file.read_text())}
+            return {"status": "not_found", "mensagem": f"Relatório de profiling não encontrado: {profiler_file}"}
+        if tarefa == "relatorio_custo":
+            # Retorna relatório de custo de um job (usa CustoEstimador como exemplo)
+            estimador = CustoEstimador()
+            return {"status": "ok", "relatorio": estimador.relatorio(), "ai_generated": True}
+        if tarefa == "stats_cache":
+            cache_dir = Path(params.get("cache_dir", "."))
+            cache = AssetCache(cache_dir)
+            return {"status": "ok", "stats": cache.estatisticas(), "ai_generated": True}
+        return {"status": "error", "mensagem": f"Tarefa '{tarefa}' não reconhecida para PERFORMANCE"}
+
     # ── AGENTES PLACEHOLDER (a implementar nas próximas fases) ────
     if agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR"):
         return _placeholder(agente, tarefa, params)
@@ -463,6 +508,13 @@ def check_all_agents() -> dict:
         resultados["CREATIVE_QA"] = check_creative_qa()
     except Exception as e:
         resultados["CREATIVE_QA"] = {"status": "error", "erro": str(e)}
+
+    # Performance (Fase 11)
+    try:
+        from core.performance import check_performance
+        resultados["PERFORMANCE"] = check_performance()
+    except Exception as e:
+        resultados["PERFORMANCE"] = {"status": "error", "erro": str(e)}
 
     # Placeholders
     for agente in ("IMAGE_ENGINE", "VIDEO_GENERATOR"):

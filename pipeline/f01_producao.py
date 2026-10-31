@@ -67,6 +67,12 @@ try:
 except Exception:
     _CREATIVE_QA_OK = False
 
+try:
+    from core.performance import PipelineProfiler, AssetCache, CustoEstimador, gerar_relatorio_performance
+    _PERFORMANCE_OK = True
+except Exception:
+    _PERFORMANCE_OK = False
+
 # Banco de dados local
 DB_PATH = Path(__file__).parent.parent / "db" / "dark_stickman.db"
 
@@ -210,6 +216,19 @@ def produzir_video(
 
     _job_criar(job_id, canal_id, titulo)
 
+    # ── DARK CREATIVE LAB: Inicializar PERFORMANCE PROFILER ──────────
+    _profiler = None
+    _custo = None
+    _cache = None
+    if _PERFORMANCE_OK:
+        try:
+            _profiler = PipelineProfiler(job_id)
+            _custo = CustoEstimador()
+            _cache = AssetCache(dir_audio)
+            print(f"[F01] PERFORMANCE PROFILER inicializado — job_id={job_id}")
+        except Exception as _e:
+            print(f"[F01] Performance profiler init falhou: {_e}")
+
     # ── DARK CREATIVE LAB: Inicializar VISUAL CONSISTENCY ────────────
     _vc_db = None
     if _VISUAL_CONSISTENCY_OK:
@@ -251,7 +270,13 @@ def produzir_video(
         _etapa(job_id, "narracao_tts", 10)
         print(f"\n[F01] ETAPA 2 — Narração TTS ({len(cenas)} cenas)")
         modelo_piper = canal_config.get("piper_model", "faber-medium")
-        audios_narracao = narrar_roteiro(cenas, dir_audio, model=modelo_piper)
+        if _profiler:
+            with _profiler.etapa("ETAPA_02_TTS", meta={"modelo": modelo_piper, "num_cenas": len(cenas)}):
+                audios_narracao = narrar_roteiro(cenas, dir_audio, model=modelo_piper)
+            if _custo:
+                _custo.registrar("tts_gtts", len(cenas), f"Narração {len(cenas)} cenas")
+        else:
+            audios_narracao = narrar_roteiro(cenas, dir_audio, model=modelo_piper)
 
         # ── ETAPA 3: Intro/Hook ──────────────────────────────────────────
         _etapa(job_id, "renderizando_hook", 20)
@@ -576,10 +601,31 @@ def produzir_video(
         print(f"\n[F01] ✅ CONCLUÍDO em {duracao_total_seg:.0f}s — {video_final}")
         print(f"[F01]    Duração: {duracao_final:.1f}s | Preset: {preset_cor} | Job: {job_id}")
 
+        # ── PERFORMANCE: Salvar relatório de profiling ────────────────────
+        if _PERFORMANCE_OK and _profiler:
+            try:
+                relatorio_perf = gerar_relatorio_performance(
+                    job_id, _profiler, _custo, _cache, output_dir
+                )
+                resultado["performance"] = {
+                    "duracao_producao_s": relatorio_perf.get("duracao_total_s"),
+                    "relatorio_path": relatorio_perf.get("relatorio_path"),
+                    "custo_estimado_brl": relatorio_perf.get("custo", {}).get("custo_total_brl", 0),
+                }
+                print(f"[F01] PERFORMANCE — Relatório salvo: {relatorio_perf.get('relatorio_path')}")
+            except Exception as _ep:
+                print(f"[F01] Performance report falhou (não crítico): {_ep}")
+
     except Exception as e:
         _job_update(job_id, status="error", erro=str(e), etapa_atual="erro")
         resultado["erro"] = str(e)
         print(f"\n[F01] ❌ ERRO no job {job_id}: {e}")
+        # Salva relatório parcial mesmo em caso de erro
+        if _PERFORMANCE_OK and _profiler:
+            try:
+                gerar_relatorio_performance(job_id, _profiler, _custo, _cache, output_dir)
+            except Exception:
+                pass
 
     return resultado
 
