@@ -141,7 +141,7 @@ if imagens:
         "ffmpeg", "-y",
         "-f", "concat", "-safe", "0", "-i", str(img_list),
         "-i", str(narration_combined),
-        "-vf", f"{{ken_burns}},{GRADE_FILTRO}",
+        "-vf", f"{{ken_burns}},{{GRADE_FILTRO}}",
         "-c:v", "libx264", "-preset", "medium", "-crf", "20",
         "-c:a", "aac", "-b:a", "192k",
         "-shortest", "-pix_fmt", "yuv420p",
