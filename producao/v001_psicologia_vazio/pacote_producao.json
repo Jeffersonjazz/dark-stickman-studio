@@ -1,0 +1,226 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "projeto": "V001 — Por Que Você Se Sente Vazio Mesmo Tendo Tudo?",
+  "nicho": "psicologia",
+  "canal": "dark_psicologia",
+  "duracao_alvo_minutos": 10,
+  "formato": "horizontal_1080p",
+  "preset_cinematografico": "documentario_cinematografico",
+  "color_grading": "teal_orange_psicologia",
+  "agentes_envolvidos": [
+    "CINEMATIC DIRECTOR",
+    "IMAGE ENGINE",
+    "AUDIO MASTER",
+    "VIDEO EDITOR PRO",
+    "VISUAL CONSISTENCY",
+    "CREATIVE QA"
+  ],
+  "roteiro": {
+    "titulo": "Por Que Você Se Sente Vazio Mesmo Tendo Tudo?",
+    "hook_abertura": "Você tem emprego, tem família, talvez até dinheiro — mas existe um vazio que nenhuma conquista consegue preencher. Isso tem um nome na psicologia, e entender isso pode mudar tudo.",
+    "cenas": [
+      {
+        "id": "C01",
+        "timestamp": "0:00",
+        "nome": "HOOK — Abertura Emocional",
+        "duracao_s": 45,
+        "narracao": "Você tem emprego. Tem família. Talvez até dinheiro. Mas existe um vazio que nenhuma conquista consegue preencher. Esse sentimento tem um nome na psicologia — e entender isso pode mudar completamente a forma como você vê sua vida.",
+        "prompt_visual": "Ultra-cinematic shot, noir atmosphere, empty modern apartment at night, city lights through floor-to-ceiling windows, single figure silhouette sitting alone looking out, cold blue tones, shallow depth of field, 8K photorealistic, volumetric fog, anamorphic lens flare, cinematic color grade teal-orange",
+        "movimento_camera": "slow dolly forward",
+        "estilo": "noir_urbano",
+        "elementos": ["figura solitária", "janela iluminada", "cidade ao fundo", "objetos de sucesso vazios"],
+        "audio": {
+          "trilha": "ambient_dark_piano",
+          "volume_trilha": 0.3,
+          "narrador": "masculino_grave_pt_br",
+          "pausa_apos": 1.5
+        }
+      },
+      {
+        "id": "C02",
+        "timestamp": "0:45",
+        "nome": "Viktor Frankl — Logoterapia",
+        "duracao_s": 105,
+        "narracao": "Em 1946, o psiquiatra Viktor Frankl sobreviveu a campos de concentração nazistas. O que ele descobriu lá dentro contradiz tudo que a sociedade moderna nos ensina sobre felicidade. Frankl percebeu que o ser humano não busca prazer — ele busca sentido. Essa é a diferença entre a felicidade que compramos e a felicidade que construímos.",
+        "prompt_visual": "Historical documentary style, black and white conversion with subtle sepia tones, old European library interior, scattered books and manuscripts, soft candlelight, vintage photograph aesthetic, cinematic grain, deep focus, atmosphere of contemplation and wisdom",
+        "movimento_camera": "slow pan left",
+        "estilo": "documentario_historico",
+        "elementos": ["livros antigos", "documentos históricos", "ambiente acadêmico"],
+        "texto_overlay": "Viktor Frankl — 1905-1997",
+        "audio": {
+          "trilha": "orchestral_somber",
+          "volume_trilha": 0.2,
+          "narrador": "masculino_grave_pt_br",
+          "pausa_apos": 1.0
+        }
+      },
+      {
+        "id": "C03",
+        "timestamp": "2:30",
+        "nome": "As 3 Causas do Vazio",
+        "duracao_s": 90,
+        "narracao": "A psicologia moderna identifica três causas principais para esse vazio existencial. Primeiro: a ausência de propósito. Quando nossas ações não têm significado além de nós mesmos. Segundo: a desconexão social. Não a solidão física, mas a falta de vínculos profundos. Terceiro: a armadilha da comparação. Vivemos conectados a versões curadas e irreais da vida alheia.",
+        "prompt_visual": "Three split-screen cinematic compositions: 1) Person at desk working robotically, fluorescent office light, expressionless face; 2) Crowded social gathering but central figure isolated, bokeh effect around them; 3) Person scrolling phone, face illuminated by blue screen in dark room, infinite social media scroll reflected in eyes",
+        "movimento_camera": "static tripod then rack focus",
+        "estilo": "contemporaneo_dark",
+        "elementos": ["escritório moderno", "multidão solitária", "redes sociais"],
+        "infografico": {
+          "titulo": "3 CAUSAS DO VAZIO EXISTENCIAL",
+          "itens": ["1. Ausência de propósito", "2. Desconexão social profunda", "3. Armadilha da comparação"],
+          "estilo_visual": "minimalista_dark",
+          "cor_destaque": "#7c6af5"
+        },
+        "audio": {
+          "trilha": "tension_building",
+          "volume_trilha": 0.25,
+          "narrador": "masculino_grave_pt_br",
+          "pausa_apos": 1.5
+        }
+      },
+      {
+        "id": "C04",
+        "timestamp": "4:00",
+        "nome": "Neurociência — O Ciclo da Dopamina",
+        "duracao_s": 90,
+        "narracao": "A neurociência explica por que a conquista não preenche o vazio. Nosso cérebro libera dopamina na antecipação de uma recompensa — não na recompensa em si. Quando compramos o carro novo, conseguimos a promoção ou atingimos o número de seguidores desejado, a dopamina já foi embora. O cérebro já está buscando o próximo objetivo. É um ciclo sem fim projetado pela evolução para nos manter em movimento.",
+        "prompt_visual": "Scientific visualization style, human brain with neural pathways illuminated in electric blue and purple, dopamine molecule floating in synaptic space, 3D render aesthetic with photorealistic textures, dark background, glowing connections, medical documentary quality",
+        "movimento_camera": "orbital rotation around brain",
+        "estilo": "cientifico_cinematografico",
+        "elementos": ["cérebro 3D", "neurônios", "sinapses", "moléculas de dopamina"],
+        "animacao_texto": "DOPAMINA: anticipação > recompensa",
+        "audio": {
+          "trilha": "electronic_scientific",
+          "volume_trilha": 0.2,
+          "narrador": "masculino_grave_pt_br",
+          "pausa_apos": 1.0
+        }
+      },
+      {
+        "id": "C05",
+        "timestamp": "5:30",
+        "nome": "Casos Documentados",
+        "duracao_s": 90,
+        "narracao": "Em 2021, a Universidade de Harvard publicou um estudo de 80 anos acompanhando a vida de centenas de pessoas. A conclusão foi surpreendente para muitos: o que mais prevê satisfação com a vida não é riqueza, fama ou sucesso profissional. São os relacionamentos de qualidade. Não a quantidade de conexões, mas a profundidade delas.",
+        "prompt_visual": "Aged documentary footage aesthetic, warm sepia tones with subtle color restoration, university library setting with leather-bound research volumes, researchers examining longitudinal data charts, Harvard architectural details, authentic academic atmosphere, 16mm film grain",
+        "movimento_camera": "handheld subtle movement",
+        "estilo": "documentario_academico",
+        "elementos": ["biblioteca universitária", "pesquisadores", "dados longitudinais", "livros clássicos"],
+        "fonte_overlay": "Harvard Study of Adult Development — 80 anos de pesquisa",
+        "audio": {
+          "trilha": "contemplative_strings",
+          "volume_trilha": 0.2,
+          "narrador": "masculino_grave_pt_br",
+          "pausa_apos": 1.5
+        }
+      },
+      {
+        "id": "C06",
+        "timestamp": "7:00",
+        "nome": "5 Estratégias Baseadas em Ciência",
+        "duracao_s": 90,
+        "narracao": "Baseado em evidências científicas, existem cinco estratégias comprovadas para sair do ciclo do vazio. Um: cultive propósito além de você mesmo. Dois: invista em vínculos profundos, não em conexões superficiais. Três: pratique presença — o antídoto da comparação é a gratidão pelo que é real. Quatro: busque flow — estados de imersão total em atividades significativas. Cinco: contribua — o sentido mais duradouro vem de impacto na vida de outros.",
+        "prompt_visual": "Five sequential cinematic vignettes: 1) Person volunteering at community project, golden hour lighting; 2) Deep conversation between two people over coffee, warm intimate lighting; 3) Mindfulness meditation in nature, morning mist, serene; 4) Artist completely absorbed in creative work, flow state, dramatic studio lighting; 5) Teacher with students, genuine connection, bright hopeful atmosphere",
+        "movimento_camera": "match cut entre cenas",
+        "estilo": "esperancoso_cinematografico",
+        "elementos": ["comunidade", "conexão", "natureza", "criatividade", "educação"],
+        "infografico": {
+          "titulo": "5 ESTRATÉGIAS COMPROVADAS",
+          "itens": ["1. Propósito além de você", "2. Vínculos profundos", "3. Presença vs comparação", "4. Estado de Flow", "5. Contribuição"],
+          "estilo_visual": "cards_animados",
+          "cor_destaque": "#2dd4a0"
+        },
+        "audio": {
+          "trilha": "uplifting_orchestral",
+          "volume_trilha": 0.3,
+          "narrador": "masculino_grave_pt_br",
+          "pausa_apos": 1.0
+        }
+      },
+      {
+        "id": "C07",
+        "timestamp": "8:30",
+        "nome": "Felicidade Hedônica vs Eudaimônica",
+        "duracao_s": 60,
+        "narracao": "Aristóteles já diferenciava dois tipos de felicidade. A eudaimonia — felicidade pelo florescimento humano, pelo cumprimento do potencial — é a que resiste ao tempo. A hedonia — prazer e ausência de dor — é a que o consumo moderno vende. E a ciência confirma: pessoas com propósito eudaimônico apresentam menor inflamação, melhor sistema imune, e maior longevidade. O vazio não é falha sua. É um sinal do que ainda precisa ser construído.",
+        "prompt_visual": "Ancient Greek philosophical aesthetic meets modern minimalism, marble textures with golden accents, split visual between ancient scroll imagery and modern person in contemplation, timeless quality, deep meaningful lighting, classical architecture details in background",
+        "movimento_camera": "slow pull back revealing scale",
+        "estilo": "filosofico_cinematografico",
+        "elementos": ["filosofia grega", "pessoa contemporânea", "dualidade temporal"],
+        "texto_final": "O vazio não é falha — é chamado.",
+        "audio": {
+          "trilha": "epic_orchestral_conclusion",
+          "volume_trilha": 0.35,
+          "narrador": "masculino_grave_pt_br",
+          "pausa_apos": 2.0
+        }
+      },
+      {
+        "id": "C08",
+        "timestamp": "9:30",
+        "nome": "CTA — Encerramento",
+        "duracao_s": 30,
+        "narracao": "Se esse vídeo fez sentido para você, compartilhe com alguém que também precisa ouvir isso. Curta, se inscreva e ative o sino — porque aqui falamos sobre o que a ciência revela sobre a mente humana. Até o próximo.",
+        "prompt_visual": "Dark elegant closing screen, channel branding elements, minimal text animation, sophisticated dark background with subtle purple accent lighting, professional end screen aesthetic",
+        "movimento_camera": "static",
+        "estilo": "encerramento_dark",
+        "elementos": ["logo do canal", "call to action", "próximos vídeos"],
+        "audio": {
+          "trilha": "ambient_fade_out",
+          "volume_trilha": 0.2,
+          "narrador": "masculino_grave_pt_br",
+          "pausa_apos": 0
+        }
+      }
+    ]
+  },
+  "consistencia_visual": {
+    "paleta_cores": {
+      "primaria": "#0a0a0f",
+      "secundaria": "#1a1a27",
+      "acento": "#7c6af5",
+      "texto": "#e8e8f0",
+      "destaque": "#2dd4a0"
+    },
+    "estilo_fotografia": "noir_cinematografico",
+    "iluminacao": "chiaroscuro_moderno",
+    "temperatura_cor": "fria_azulada",
+    "grain_cinematografico": "leve_35mm",
+    "aspect_ratio": "16:9",
+    "resolucao": "1920x1080"
+  },
+  "thumbnail": {
+    "conceito": "Rosto cortado ao meio — metade iluminada, metade sombra. Texto: 'POR QUE VOCÊ SE SENTE VAZIO?' em tipografia bold branca. Fundo gradiente preto-roxo escuro.",
+    "prompt_ia": "Split face portrait, half illuminated half in shadow, dramatic chiaroscuro lighting, cinematic portrait, photorealistic, 4K, dark background, psychological tension, youtube thumbnail style, high contrast, professional photography",
+    "texto_principal": "POR QUE VOCÊ SE SENTE VAZIO?",
+    "texto_secundario": "mesmo tendo tudo",
+    "fonte": "Montserrat ExtraBold",
+    "cores": ["#ffffff", "#7c6af5", "#0a0a0f"],
+    "resolucao": "1280x720"
+  },
+  "seo_youtube": {
+    "titulo_principal": "Por Que Você Se Sente Vazio Mesmo Tendo Tudo? | Psicologia",
+    "titulos_alternativos": [
+      "O Vazio que Nenhuma Conquista Preenche — Psicologia Explica",
+      "Por Que Você É Bem-Sucedido Mas Infeliz? A Ciência Responde",
+      "Vazio Existencial: Por Que Você Nunca Se Sente Suficiente"
+    ],
+    "tags": ["psicologia", "vazio existencial", "Viktor Frankl", "bem-estar", "saúde mental", "neurociência", "logoterapia", "felicidade", "propósito de vida", "dopamina", "Harvard", "autoconhecimento"],
+    "categoria": "Ciência e Tecnologia",
+    "idioma": "pt-BR",
+    "publico_alvo": "18-45 anos, interessados em autoconhecimento e psicologia"
+  },
+  "pipeline_execucao": {
+    "status": "PRONTO_PARA_PRODUCAO",
+    "etapas": [
+      {"etapa": 1, "nome": "Gerar imagens por cena via DALL-E/SD", "agente": "IMAGE ENGINE", "status": "pendente"},
+      {"etapa": 2, "nome": "Gerar narração TTS pt-BR", "agente": "AUDIO MASTER", "status": "pendente"},
+      {"etapa": 3, "nome": "Ken Burns nas imagens + movimento câmera", "agente": "VIDEO EDITOR PRO", "status": "pendente"},
+      {"etapa": 4, "nome": "Sincronizar narração + trilha", "agente": "AUDIO MASTER", "status": "pendente"},
+      {"etapa": 5, "nome": "Inserir infográficos e texto overlay", "agente": "MOTION GRAPHICS", "status": "pendente"},
+      {"etapa": 6, "nome": "Color grading teal-orange", "agente": "VIDEO EDITOR PRO", "status": "pendente"},
+      {"etapa": 7, "nome": "Gerar thumbnail", "agente": "IMAGE ENGINE", "status": "pendente"},
+      {"etapa": 8, "nome": "QA e exportação final", "agente": "CREATIVE QA", "status": "pendente"}
+    ]
+  }
+}

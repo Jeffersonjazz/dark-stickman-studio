@@ -1,0 +1,52 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "video": "V001",
+  "agente": "AUDIO MASTER",
+  "total_cenas": 8,
+  "sucessos": 0,
+  "score": "0/8",
+  "resultados": {
+    "C01_hook": {
+      "arquivo": "/tmp/dark-stickman-studio/producao/v001_psicologia_vazio/audio/C01_hook_para_gravar.txt",
+      "engine": "manual",
+      "status": "pendente"
+    },
+    "C02_frankl": {
+      "arquivo": "/tmp/dark-stickman-studio/producao/v001_psicologia_vazio/audio/C02_frankl_para_gravar.txt",
+      "engine": "manual",
+      "status": "pendente"
+    },
+    "C03_causas": {
+      "arquivo": "/tmp/dark-stickman-studio/producao/v001_psicologia_vazio/audio/C03_causas_para_gravar.txt",
+      "engine": "manual",
+      "status": "pendente"
+    },
+    "C04_neurociencia": {
+      "arquivo": "/tmp/dark-stickman-studio/producao/v001_psicologia_vazio/audio/C04_neurociencia_para_gravar.txt",
+      "engine": "manual",
+      "status": "pendente"
+    },
+    "C05_harvard": {
+      "arquivo": "/tmp/dark-stickman-studio/producao/v001_psicologia_vazio/audio/C05_harvard_para_gravar.txt",
+      "engine": "manual",
+      "status": "pendente"
+    },
+    "C06_estrategias": {
+      "arquivo": "/tmp/dark-stickman-studio/producao/v001_psicologia_vazio/audio/C06_estrategias_para_gravar.txt",
+      "engine": "manual",
+      "status": "pendente"
+    },
+    "C07_eudaimonia": {
+      "arquivo": "/tmp/dark-stickman-studio/producao/v001_psicologia_vazio/audio/C07_eudaimonia_para_gravar.txt",
+      "engine": "manual",
+      "status": "pendente"
+    },
+    "C08_cta": {
+      "arquivo": "/tmp/dark-stickman-studio/producao/v001_psicologia_vazio/audio/C08_cta_para_gravar.txt",
+      "engine": "manual",
+      "status": "pendente"
+    }
+  },
+  "proximo_passo": "Executar montar_video.py para sincronizar com imagens"
+}

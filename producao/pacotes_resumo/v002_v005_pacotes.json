@@ -1,0 +1,253 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "versao": "1.3.0",
+  "total_videos": 5,
+  "status_geral": "PRONTOS_PARA_PRODUCAO",
+
+  "v002_historia": {
+    "id": "V002",
+    "titulo": "O Homem Que Fingiu Ser Morto Por 35 Anos e Ninguém Percebeu",
+    "nicho": "historia",
+    "duracao_alvo": "12 min",
+    "preset": "documentario_cinematografico",
+    "color_grading": "sepia_vintage_noir",
+    "roteiro_resumo": {
+      "C01": {
+        "tempo": "0:00", "duracao": 60,
+        "narracao": "Em novembro de 1974, um homem deixou suas roupas numa praia em Miami e desapareceu. O mundo inteiro acreditou que ele tinha se afogado. Mas John Stonehouse estava vivo — e havia planejado cada detalhe da sua própria morte.",
+        "prompt_visual": "Miami beach 1974, vintage photograph aesthetic, men's suit and shoes abandoned on shore, ocean waves, golden hour, 16mm film grain, melancholic mystery atmosphere, Super 8 documentary style, police crime scene tape, newspaper headlines in period typography",
+        "movimento": "crane shot descendo para roupas abandonadas"
+      },
+      "C02": {
+        "tempo": "1:00", "duracao": 90,
+        "narracao": "John Stonehouse era membro do Parlamento britânico. Ministro do governo Wilson. Um homem de poder, influência e aparente sucesso. Mas por trás da fachada impecável, havia dívidas, uma amante, investigações que se aproximavam — e uma psique à beira do colapso.",
+        "prompt_visual": "British Parliament exterior, Big Ben, 1970s London atmosphere, suited politician walking confidently through corridors of power, cold grey English sky, documentary newsreel aesthetic, black limousine, official portraits on walls",
+        "movimento": "handheld following subject"
+      },
+      "C03": {
+        "tempo": "2:30", "duracao": 90,
+        "narracao": "A psicologia tem nome para o que Stonehouse fez: 'fuga dissociativa'. Em situações de pressão extrema, o cérebro pode criar uma nova identidade como mecanismo de defesa. Ele passou meses preparando documentos falsos, contas bancárias no exterior, e uma nova vida. Uma nova pessoa.",
+        "prompt_visual": "Psychological dissociation visualization, double exposure portrait showing two faces of same person, one confident, one desperate, surreal but cinematic, psychological thriller aesthetic, mirror reflections, identity fragmentation visualization",
+        "movimento": "rack focus entre duas versões"
+      },
+      "C04": {
+        "tempo": "4:30", "duracao": 90,
+        "narracao": "No dia 20 de novembro de 1974, Stonehouse voou para Miami, deixou suas roupas na praia, e embarcou num avião para a Austrália sob identidade falsa. A polícia britânica concluiu: afogamento acidental. A imprensa publicou necrológios. A família chorou.",
+        "prompt_visual": "Miami International Airport 1974, vintage departure boards, man in disguise with briefcase, surveillance documentary style, grainy CCTV aesthetic, airport crowds, tension visible in careful movements, period-accurate 1970s clothing and atmosphere",
+        "movimento": "static surveillance camera angle"
+      },
+      "C05": {
+        "tempo": "6:00", "duracao": 90,
+        "narracao": "Seis semanas depois, a polícia australiana, investigando uma fraude diferente, encontrou um homem usando identidade falsa em Melbourne. Era Stonehouse. A descoberta virou escândalo internacional. Ele foi extraditado, julgado, e condenado a 7 anos de prisão.",
+        "prompt_visual": "Melbourne 1975, Australian detective era photography, courtroom dramatic lighting, newspaper front pages in multiple languages 'STONEHOUSE ALIVE', extradition aircraft, British press corps documenting every moment, justice system machinery",
+        "movimento": "quick cuts documentário"
+      },
+      "C06": {
+        "tempo": "8:00", "duracao": 90,
+        "narracao": "O caso Stonehouse não foi único. Em 1987, Ken Kesey desapareceu fingindo suicídio no México. Em 2002, John Darwin, um professor britânico, passou 5 anos morto para sua própria família enquanto vivia numa casa ao lado. A psicologia chama esses casos de 'pseudocídio' — e eles são mais comuns do que imaginamos.",
+        "prompt_visual": "Documentary montage of multiple disappearance cases across decades, newspaper clippings wall, investigation board with red string connections, cold case detective aesthetic, black and white photos with color highlights, timeline visualization",
+        "movimento": "pan across investigation board"
+      },
+      "C07": {
+        "tempo": "10:00", "duracao": 90,
+        "narracao": "O que leva um ser humano a apagar a própria existência? Segundo a psiquiatra Elizabeth Howell, especialista em dissociação, a resposta está em pressão insustentável combinada com a incapacidade de pedir ajuda. A fuga não é fraqueza — é um sistema de emergência que o cérebro ativa quando não vê outra saída.",
+        "prompt_visual": "Psychological documentary aesthetic, expert interview setting, academic bookshelves, warm professional lighting, psychological concepts visualized as abstract brain imagery, empathetic but analytical tone, scientific credibility",
+        "movimento": "slow zoom in"
+      },
+      "CTA": {
+        "tempo": "11:30", "duracao": 30,
+        "narracao": "A história de John Stonehouse é um lembrete de que as pressões invisíveis podem ser as mais destrutivas. Se você conhece alguém sob pressão extrema, às vezes a coisa mais importante é simplesmente perguntar: como você está de verdade? Se esse vídeo te fez pensar, compartilhe. Até o próximo.",
+        "prompt_visual": "Dark elegant end screen, channel branding, subtle historical document texture in background",
+        "movimento": "static"
+      }
+    },
+    "thumbnail": {
+      "conceito": "Foto vintage em preto e branco de praia deserta, roupas abandonadas em primeiro plano, manchete 'MORTO?' riscada com vermelho",
+      "prompt_ia": "Vintage 1974 beach photograph, abandoned men's suit and shoes on sand, mysterious, black and white, film grain, high contrast, no people, ocean waves, solitude",
+      "texto": "FINGIU ESTAR MORTO | por 35 anos",
+      "cor_destaque": "#f5834a"
+    },
+    "seo": {
+      "titulo": "O Homem Que Fingiu Ser Morto Por 35 Anos — História Real",
+      "tags": ["história real", "John Stonehouse", "fuga dissociativa", "mistério histórico", "true crime", "psicologia", "fraude de identidade"]
+    }
+  },
+
+  "v003_tecnologia": {
+    "id": "V003",
+    "titulo": "A Inteligência Artificial Que Previu Sua Morte — E Estava Certa",
+    "nicho": "tecnologia",
+    "duracao_alvo": "11 min",
+    "preset": "tecnologia_inteligencia_artificial",
+    "color_grading": "tech_blue_clinical",
+    "roteiro_resumo": {
+      "C01": {
+        "tempo": "0:00", "duracao": 45,
+        "narracao": "Em 2019, um hospital programou uma inteligência artificial para prever quais pacientes morreriam nas próximas 24 horas. Ela acertou 90% das vezes. Mas a pergunta que ninguém conseguia responder era: o que fazer com essa informação?",
+        "prompt_visual": "Hospital ICU at night, blue clinical lighting, heart monitors with steady rhythms, AI prediction interface glowing on screen, neural network visualization overlay, doctor silhouette watching data, life and death in data form, technical precision meets human emotion",
+        "movimento": "slow push in to screen"
+      },
+      "C02": {
+        "tempo": "0:45", "duracao": 90,
+        "narracao": "A IA hospitalar funciona como um sistema de reconhecimento de padrões em tempo real. Ela analisa simultaneamente centenas de variáveis: pressão arterial, frequência cardíaca, níveis de oxigênio, resultados de exames, histórico médico, medicações administradas — e identifica combinações invisíveis ao olho humano que precedem o colapso.",
+        "prompt_visual": "Medical data visualization, multiple patient vital sign streams flowing into AI processing core, machine learning pattern recognition visualization, hospital dashboard with real-time analysis, clean clinical blue and white aesthetic, scientific accuracy, Bloomberg Terminal meets medical interface",
+        "movimento": "camera orbits data visualization"
+      },
+      "C03": {
+        "tempo": "2:30", "duracao": 90,
+        "narracao": "O estudo que mudou tudo foi publicado na Nature Medicine em 2019 por pesquisadores da Universidade da Califórnia. O sistema analisou registros de 216 mil pacientes ao longo de 10 anos. Resultado: a IA identificou deterioração clínica significativa com 24 a 48 horas de antecedência — antes de qualquer sintoma visível.",
+        "prompt_visual": "Academic research environment, scientific journals and medical research publications, data analysis screens, peer review process visualization, Nature Medicine cover aesthetic, scientific credibility, researchers collaborating over medical AI system",
+        "movimento": "documentary handheld"
+      },
+      "C04": {
+        "tempo": "4:00", "duracao": 90,
+        "narracao": "A DeepMind, divisão de IA do Google, foi além. Em 2020, desenvolveu um sistema capaz de prever insuficiência renal aguda até 48 horas antes dos exames convencionais detectarem qualquer anomalia. Em testes, o sistema teria prevenido 50% dos casos graves — se médicos tivessem agido com base em suas previsões.",
+        "prompt_visual": "Google DeepMind aesthetic, dark theme with Google blue accents, kidney visualization with AI analysis overlay, medical AI interface, Silicon Valley meets healthcare, professional tech documentation aesthetic, deep learning visualization",
+        "movimento": "tech reveal animation feel"
+      },
+      "C05": {
+        "tempo": "5:30", "duracao": 90,
+        "narracao": "Mas aqui surge o dilema que a medicina nunca enfrentou. Se uma IA prevê que um paciente morrerá nas próximas 12 horas, com 90% de certeza — mas o paciente está consciente e aparentemente estável — você conta a ele? Você conta à família? Qual é a obrigação ética de um algoritmo?",
+        "prompt_visual": "Hospital ethics committee meeting, solemn faces around conference table, medical ethics philosophical visualization, doctor and patient conversation framing the ethical dilemma, warm human lighting contrasting cold clinical AI, moral weight visible in composition",
+        "movimento": "static wide then slow zoom"
+      },
+      "C06": {
+        "tempo": "7:00", "duracao": 90,
+        "narracao": "Na China, o governo implementou um sistema de 'score de saúde' social que usa dados de wearables, histórico médico e comportamento para prever doenças e até expectativa de vida. O sistema é usado por seguradoras, empregadores e bancos. Se seu score de saúde for baixo, seu crédito pode ser negado.",
+        "prompt_visual": "Dystopian social credit visualization, Chinese urban environment with surveillance cameras, health score displays in public spaces, biometric data collection, authoritarian tech aesthetic, Blade Runner meets social control, data surveillance of everyday life",
+        "movimento": "panning surveillance aesthetic"
+      },
+      "C07": {
+        "tempo": "8:30", "duracao": 60,
+        "narracao": "No Brasil, os hospitais Albert Einstein e Sírio-Libanês já utilizam sistemas de IA para triagem de risco. O Hospital das Clínicas de São Paulo testa algoritmos para predição de sepse — uma das principais causas de morte hospitalar. Estamos na transição — e a velocidade dessa mudança vai nos surpreender.",
+        "prompt_visual": "Brazilian hospital modern facility, Hospital das Clínicas São Paulo architectural exterior, medical technology integration, South American healthcare context, bilingual medical interfaces, hopeful but cautious atmosphere",
+        "movimento": "establishing wide to close"
+      },
+      "C08": {
+        "tempo": "9:30", "duracao": 60,
+        "narracao": "A pergunta que vai definir a medicina dos próximos 20 anos não é se a IA pode prever doenças melhor que médicos. Ela já pode. A pergunta é: quando uma máquina sabe quando você vai morrer — com que direito ela guarda esse segredo de você? Se esse vídeo abriu sua mente para algo novo, compartilhe. Até o próximo.",
+        "prompt_visual": "Philosophical closing, human hands and robotic hands reaching toward medical knowledge, balance of human and artificial intelligence, hopeful but uncertain future, cinematic conclusion",
+        "movimento": "epic pull back"
+      }
+    },
+    "thumbnail": {
+      "conceito": "Tela de hospital mostrando predição de IA '98% — próximas 24h', médico olhando com expressão tensa",
+      "texto": "A IA QUE PREVIU | SUA MORTE",
+      "cor_destaque": "#4a9ef5"
+    },
+    "seo": {
+      "titulo": "A IA Que Prevê Sua Morte com 90% de Precisão — Isso Já Existe",
+      "tags": ["inteligência artificial", "IA hospitalar", "DeepMind saúde", "tecnologia médica", "ética da IA", "futuro da medicina", "machine learning"]
+    }
+  },
+
+  "v004_misterio": {
+    "id": "V004",
+    "titulo": "O Arquivo Que o Governo Apagou — Mas 3 Cópias Sobreviveram",
+    "nicho": "misterio",
+    "duracao_alvo": "13 min",
+    "preset": "misterio_suspense",
+    "color_grading": "shadow_conspiracy_green",
+    "roteiro_resumo": {
+      "C01": {"tempo": "0:00", "duracao": 60,
+        "narracao": "Em 2013, às 14h37 de uma terça-feira, um arquivo de 847 páginas foi publicado acidentalmente no servidor público do Departamento de Justiça dos Estados Unidos. Em 4 horas, foi removido. Mas três pessoas já tinham feito cópias completas.",
+        "prompt_visual": "Government server room, countdown timer, document pages flying through digital space, deletion progress bar reaching 100%, three anonymous figures downloading simultaneously, cyberpunk government aesthetic, green phosphor monitor glow, urgency"
+      },
+      "C02": {"tempo": "1:00", "duracao": 90,
+        "narracao": "O documento era um relatório interno sobre operações de vigilância em massa realizadas entre 2001 e 2013. Não era o Programa PRISM — esse viria a público com Snowden no mesmo ano. Era algo diferente: detalhava acordos secretos com 23 corporações privadas para acesso irrestrito a dados de comunicação de cidadãos americanos.",
+        "prompt_visual": "Classified document aesthetic, redacted pages with black bars, NSA building exterior, data surveillance visualization, corporate logos intertwined with government seals (fictional/generic), conspiracy board aesthetic, legal paper and official stamps",
+        "movimento": "slow reveal of document pages"
+      },
+      "C03": {"tempo": "2:30", "duracao": 60,
+        "narracao": "As três pessoas que baixaram o arquivo permaneceram anônimas por semanas. Então, gradualmente, fragmentos começaram a aparecer em fóruns, blogs e publicações independentes — nunca o documento completo, sempre partes calculadas. Alguém estava controlando a revelação.",
+        "prompt_visual": "Dark web forum aesthetic, information leaking through digital cracks, anonymous online discussion, pieces of classified puzzle being assembled, hacker/whistleblower aesthetic, green and black terminal, encrypted communication visualization",
+        "movimento": "information flow animation feel"
+      },
+      "C04": {"tempo": "4:00", "duracao": 90,
+        "narracao": "O que as cópias revelaram mudou a percepção sobre privacidade digital. Três descobertas principais: primeiro, acordos de acesso a metadados com empresas de telefonia e internet firmados antes de qualquer autorização judicial conhecida. Segundo, operações de infiltração em fóruns privados de jornalistas. Terceiro, um programa de pontuação de 'risco social' para cidadãos americanos — semelhante ao que a China formalizaria anos depois.",
+        "prompt_visual": "Three revelation scenes: 1) Phone company server room data flowing to government, 2) Journalist forum infiltrated visualization, 3) American social risk score interface, each more disturbing than the last, documentary exposure aesthetic, impact of revelations visualized"
+      },
+      "C05": {"tempo": "6:00", "duracao": 90,
+        "narracao": "Isso nos leva ao Paradoxo de Streisand: em 1994, Barbara Streisand processou um fotógrafo para remover uma foto de sua mansão da internet. Resultado? A foto, que tinha tido 6 visualizações, foi vista por 400 mil pessoas em um mês. Toda tentativa de apagar informação na era digital tende a amplificá-la.",
+        "prompt_visual": "Barbara Streisand paradox visualization (without actual person or property), amplification wave concept, information going viral through attempt to suppress it, internet meme culture meets serious consequence, cascade effect visualization",
+        "movimento": "exponential growth visualization"
+      },
+      "C06": {"tempo": "8:00", "duracao": 90,
+        "narracao": "Três casos históricos provam esse padrão: o Pentágono Papers, vazado pelo analista Daniel Ellsberg em 1971 — o governo Nixon obteve ordem judicial para suprimir. O New York Times publicou na mesma semana. Os Arquivos da CIA sobre Chile, publicados em 1998 — cada tentativa de redação criou mais interesse nas partes censuradas. E os E-mails do DNC em 2016 — a tentativa de suprimir criou o maior escândalo político do ano.",
+        "prompt_visual": "Historical document timeline, Pentagon Papers headline, CIA Chile declassified stamps, DNC email controversy visualization, pattern recognition across decades, journalism as historical record, First Amendment visual metaphor"
+      },
+      "C07": {"tempo": "10:00", "duracao": 90,
+        "narracao": "Quanto às três pessoas que copiaram o documento original de 2013, o que aconteceu com elas? Uma identificada posteriormente era jornalista freelancer que assinou acordo de não divulgação. Uma segunda era pesquisadora acadêmica que recebeu visita de agentes federais e optou por não publicar. A terceira permanece desconhecida. Mas os fragmentos que ela liberou ainda circulam — e continuam sendo verificados.",
+        "prompt_visual": "Three fates: 1) Journalist signing NDA in sterile office, 2) Academic at doorway with federal agents, 3) Anonymous figure in darkness still sharing fragments, dramatic but grounded, consequence of truth-telling, moral weight of information"
+      },
+      "CTA": {"tempo": "11:30", "duracao": 30,
+        "narracao": "A internet não esquece. E talvez seja exatamente isso que o poder mais teme. Se esse vídeo abriu seus olhos para algo, compartilhe — porque informação suprimida ainda quer ser livre. Até o próximo.",
+        "prompt_visual": "Dark powerful ending, light breaking through darkness, information freedom symbolism, channel branding"
+      }
+    },
+    "thumbnail": {
+      "conceito": "Documento com 'DELETADO' em vermelho, barra de progresso '100% REMOVIDO', título provocador",
+      "texto": "ARQUIVO SECRETO | o governo apagou — mas 3 cópias sobreviveram",
+      "cor_destaque": "#f54a74"
+    },
+    "seo": {
+      "titulo": "O Arquivo que o Governo Apagou — Mas 3 Cópias Sobreviveram",
+      "tags": ["documentos secretos", "governo", "vigilância", "privacidade", "whistleblower", "NSA", "Paradoxo Streisand", "mistério real"]
+    }
+  },
+
+  "v005_natureza": {
+    "id": "V005",
+    "titulo": "A Floresta Que Respira — O Fenômeno Que a Ciência Não Consegue Explicar",
+    "nicho": "natureza",
+    "duracao_alvo": "9 min",
+    "preset": "natureza_vida_selvagem",
+    "color_grading": "forest_green_gold",
+    "roteiro_resumo": {
+      "C01": {"tempo": "0:00", "duracao": 45,
+        "narracao": "Em 1997, uma cientista canadense publicou uma descoberta que a maioria dos biólogos achou impossível. As árvores de uma floresta não apenas vivem lado a lado — elas se comunicam. Compartilham recursos. Cuidam umas das outras. E a rede que as conecta é mais complexa que o cérebro humano.",
+        "prompt_visual": "Ancient forest canopy at dawn, camera flying slowly between massive tree trunks, bioluminescent mycelium network visible at roots, morning mist, golden light filtering through, drone shot quality, David Attenborough BBC aesthetic, sacred and ancient atmosphere"
+      },
+      "C02": {"tempo": "0:45", "duracao": 90,
+        "narracao": "Suzanne Simard era pesquisadora florestal quando notou algo estranho: quando árvores de uma espécie eram removidas, árvores de outras espécies nas proximidades adoeciam — mesmo sem competição por luz ou água. Ela passou anos investigando o solo. O que encontrou foi uma rede subterrânea de fungos micorrizais que conectava as raízes de centenas de árvores.",
+        "prompt_visual": "Scientific discovery aesthetic, researcher with soil samples in old-growth forest, microscope revealing fungal network, cross-section of forest floor showing mycelium web, discovery moment captured in documentary style, British Columbia forest setting, scientific wonder",
+        "movimento": "from researcher to microscope to vast network reveal"
+      },
+      "C03": {"tempo": "2:30", "duracao": 90,
+        "narracao": "A rede micelial funciona como um sistema nervoso subterrâneo. Árvores maiores, as 'árvores-mãe', enviam carbono e nutrientes para mudas menores que crescem à sua sombra. Mas vai além: quando uma árvore é atacada por insetos, ela emite compostos químicos pela rede que alertam outras árvores — que então produzem toxinas defensivas antes de serem atacadas.",
+        "prompt_visual": "Underground mycelium network visualization, warm amber bioluminescence, nutrients flowing as light pulses from large mother tree to small saplings, cross-section earth view, molecular compounds traveling through fungal threads, scientific visualization meets natural beauty",
+        "movimento": "underground perspective looking up at roots"
+      },
+      "C04": {"tempo": "4:00", "duracao": 90,
+        "narracao": "As árvores-mãe — geralmente os indivíduos mais velhos e maiores da floresta — mantêm conexões com centenas de outras árvores simultaneamente. Estudos mostram que quando uma árvore-mãe está morrendo, ela deliberadamente aumenta o envio de carbono e sinais químicos para seus 'filhos' — como se passasse um testamento biológico para a próxima geração.",
+        "prompt_visual": "Mother tree documentary moment, ancient Douglas fir hundreds of years old, network connections glowing to younger trees, autumn season, leaves falling, passing of knowledge through mycelium, BBC Earth cinematic quality, emotional connection to nature"
+      },
+      "C05": {"tempo": "5:30", "duracao": 60,
+        "narracao": "Em 2016, pesquisadores descobriram que a rede não é apenas de nutrição — é de comunicação ativa. Quando uma árvore sofre estresse hídrico, ela emite sinais elétricos pela rede micelial. Outras árvores, a metros de distância, fecham seus estômatos em resposta — conservando água antes de precisar.",
+        "prompt_visual": "Electrical signal visualization through forest, nodes lighting up in sequence like neural firing, time-lapse of stomata closing across multiple trees, scientific measurement of forest communication, split-screen lab microscope and forest reality"
+      },
+      "C06": {"tempo": "7:00", "duracao": 60,
+        "narracao": "Simard hoje afirma que a floresta funciona como um organismo único — não uma coleção de indivíduos competindo por recursos, mas uma comunidade que evolui em cooperação. Essa descoberta está mudando como gerenciamos florestas: remover árvores-mãe idosas, como se fazia em manejo florestal convencional, pode colapsar a rede inteira.",
+        "prompt_visual": "Deforestation contrast with old growth forest, loss of network when trees removed, regeneration when mother trees preserved, conservation message through visual storytelling, hope in forest preservation, cinematic environmentalism"
+      },
+      "C07": {"tempo": "8:00", "duracao": 60,
+        "narracao": "A floresta que parece silenciosa está em constante conversa. E essa conversa começou muito antes dos humanos. Os fungos micorrizais existem há 450 milhões de anos — eles ajudaram as primeiras plantas a colonizar a terra. Somos jovens demais para entender completamente o que estamos destruindo.",
+        "prompt_visual": "Geological time visualization, 450 million years of evolution, first plants on land, mycelium as ancient technology, human presence as brief flicker, humbling perspective on our place in biological time, epic time-lapse concept"
+      },
+      "CTA": {"tempo": "9:00", "duracao": 30,
+        "narracao": "A próxima vez que você estiver numa floresta, lembre: você está caminhando sobre um internet que tem 450 milhões de anos. E ela está conversando. Se esse vídeo abriu seus olhos para a inteligência da natureza, compartilhe. Até o próximo.",
+        "prompt_visual": "Forest floor close up, mycelium visible, human footstep, wonder and respect, channel branding"
+      }
+    },
+    "thumbnail": {
+      "conceito": "Vista de cima de floresta densa, rede luminosa de conexões visível abaixo das copas, como um sistema nervoso",
+      "texto": "A FLORESTA | que respira",
+      "cor_destaque": "#2dd4a0"
+    },
+    "seo": {
+      "titulo": "A Floresta Que Respira — A Rede Invisível que Conecta as Árvores",
+      "tags": ["floresta", "Wood Wide Web", "fungos micorrizais", "Suzanne Simard", "natureza fascinante", "ciência", "árvores comunicam", "biologia"]
+    }
+  }
+}
