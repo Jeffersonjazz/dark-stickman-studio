@@ -1,0 +1,52 @@
+{
+  "data": "2026-11-01 00:36",
+  "videos_mes": 720,
+  "custo_atual_mensal": 0.0,
+  "cenarios": {
+    "gratuito": {
+      "descricao": "Stack atual — 100% gratuito/local",
+      "tts": "Kokoro → Piper → Edge TTS",
+      "imagens": "Pillow gradiente",
+      "video": "FFmpeg zoompan",
+      "custo_por_video": 0.0,
+      "custo_mensal": 0.0,
+      "qualidade_estimada": "6–7/10",
+      "recomendado_para": "início / todos os canais"
+    },
+    "hibrido": {
+      "descricao": "Imagens via HF Inference (FLUX gratuito) + TTS local",
+      "tts": "Kokoro local",
+      "imagens": "HF FLUX Schnell (gratuito) → Pillow fallback",
+      "video": "FFmpeg zoompan",
+      "custo_por_video": 0.0,
+      "custo_mensal": 0.0,
+      "qualidade_estimada": "8/10",
+      "recomendado_para": "canais em crescimento (>1k subs)"
+    },
+    "premium": {
+      "descricao": "Replicate FLUX + ElevenLabs TTS",
+      "tts": "ElevenLabs (R$0,12/vídeo)",
+      "imagens": "Replicate FLUX Schnell (R$0,015/vídeo × 5 img)",
+      "video": "FFmpeg zoompan",
+      "custo_por_video": 0.135,
+      "custo_mensal": 97.2,
+      "qualidade_estimada": "9–10/10",
+      "recomendado_para": "canais monetizados (>10k subs)"
+    }
+  },
+  "dependencias": {
+    "ffmpeg": true,
+    "ffprobe": true,
+    "python": true,
+    "pillow": true,
+    "edge_tts": true,
+    "gtts": true,
+    "kokoro": false,
+    "piper": false,
+    "whisper": true,
+    "replicate": false,
+    "openai": false
+  },
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}
