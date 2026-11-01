@@ -122,7 +122,7 @@ class DarkVideoEngine:
         hf_token: Optional[str] = None,
         output_dir: Optional[Path] = None,
         fps: int = 24,
-        timeout: int = 300,
+        timeout: int = 8,
     ):
         self.hf_token = hf_token or os.environ.get("HF_TOKEN", "")
         self.output_dir = Path(output_dir) if output_dir else Path("/tmp/dark_video_cache")
@@ -452,11 +452,16 @@ class DarkVideoEngine:
     def status(self) -> dict:
         ffmpeg_ok = subprocess.run(["ffmpeg", "-version"], capture_output=True).returncode == 0
         return {
+            "status": "ok",
             "ffmpeg": ffmpeg_ok,
             "hf_token": bool(self.hf_token),
             "modelos_hf": [m["nome"] for m in HF_VIDEO_MODELS],
             "movimentos_ken_burns": list(KEN_BURNS_PRESETS.keys()),
-            "custo_mensal": 0.00,
+            "funcionalidades": [
+                "texto_para_video", "imagem_para_video", "animar_lote",
+                "video_para_video", "gerar_b_roll",
+            ],
+            "custo_mensal_brl": 0.00,
             "ai_generated": True,
             "ai_disclosure": AI_DISCLOSURE,
         }

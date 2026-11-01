@@ -1,38 +1,53 @@
-# DARK STICKMAN STUDIO — Dependências Python
-# Licença: MIT — DARK CREATIVE LAB
+# DARK STICKMAN STUDIO — DARK CREATIVE LAB
+# Dependências Python — custo R$0,00/mês
 # ai_generated: True
+# ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
 
-# ── API ──────────────────────────────────────────────
+# ── API / Web ─────────────────────────────────────────────────────────────────
 fastapi>=0.111.0
 uvicorn[standard]>=0.30.0
 pydantic>=2.7.0
+python-multipart>=0.0.9
 
-# ── CLI ──────────────────────────────────────────────
+# ── CLI / Interface ───────────────────────────────────────────────────────────
 typer>=0.12.0
 rich>=13.7.0
 
-# ── Imagem / Thumbnail ───────────────────────────────
+# ── Imagem ────────────────────────────────────────────────────────────────────
 Pillow>=10.3.0
+requests>=2.31.0
 
-# ── Áudio / TTS ──────────────────────────────────────
-# Piper TTS: instalação separada — ver setup/setup_wizard.bat
-# piper-tts instalado via pip install piper-tts (requer compilação no Windows)
+# ── TTS — Narração em português (custo zero) ─────────────────────────────────
+edge-tts>=7.0.0          # Microsoft Edge TTS — pt-BR nativo, gratuito
+# gtts>=2.5.0            # Google TTS (fallback, requer internet)
+# piper-tts>=1.2.0       # TTS local offline (requer modelo .onnx)
+# kokoro-onnx>=0.4.9     # TTS local alta qualidade
 
-# ── Transcrição / Legendas ───────────────────────────
-openai-whisper>=20231117
-# WhisperX (opcional, requer PyTorch + CUDA):
-# pip install git+https://github.com/m-bain/whisperx.git
+# ── Áudio ─────────────────────────────────────────────────────────────────────
+# FFmpeg (instalado no sistema — ver setup_wizard.bat)
 
-# ── Animação ─────────────────────────────────────────
-# Manim CE: instalação separada
-# pip install manim
+# ── Transcrição / Legendas ────────────────────────────────────────────────────
+openai-whisper>=20231117  # transcrição offline
+# whisperx               # opcional: alinhamento de legendas (requer GPU)
 
-# ── Utilitários ──────────────────────────────────────
+# ── Utilitários ───────────────────────────────────────────────────────────────
 pathlib>=1.0.1
-python-multipart>=0.0.9
 
-# ── FFmpeg ───────────────────────────────────────────
-# FFmpeg deve ser instalado no sistema (não via pip)
-# Windows: winget install FFmpeg  /  Chocolatey: choco install ffmpeg
-# Linux: sudo apt install ffmpeg
-# Mac: brew install ffmpeg
+# ── Opcionais avançados (GPU/nuvem) ───────────────────────────────────────────
+# torch>=2.3.0           # PyTorch — necessário para Whisper e modelos locais
+# torchvision            # visão computacional
+# diffusers>=0.29.0      # Stable Diffusion local
+# transformers>=4.41.0   # modelos HuggingFace
+# accelerate>=0.30.0     # otimização GPU
+
+# ── Notas de instalação ───────────────────────────────────────────────────────
+# FFmpeg (obrigatório):
+#   Windows : winget install FFmpeg
+#   Linux   : sudo apt install ffmpeg
+#   Mac     : brew install ffmpeg
+#
+# Para instalar tudo de uma vez:
+#   pip install -r requirements.txt
+#
+# Modelos locais opcionais (Piper pt-BR):
+#   Ver setup/setup_wizard.bat para download automático

@@ -1,150 +1,161 @@
 @echo off
-:: DARK STICKMAN STUDIO — Setup Wizard para Windows
-:: Instala todas as dependências automaticamente.
+:: ============================================================
+:: DARK STICKMAN STUDIO — SETUP WIZARD v1.0
+:: DARK CREATIVE LAB — Instalador Automatico para Windows
 :: ai_generated: True
 :: ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
+:: Custo: R$0,00/mes — 100% open source
+:: ============================================================
+title DARK STICKMAN STUDIO — Instalador
+color 0A
 
-title DARK STICKMAN STUDIO — Setup Wizard
-color 0B
 echo.
-echo  ██████╗  █████╗ ██████╗ ██╗  ██╗    ███████╗████████╗██╗ ██████╗██╗  ██╗███╗   ███╗ █████╗ ███╗   ██╗
-echo  ██╔══██╗██╔══██╗██╔══██╗██║ ██╔╝    ██╔════╝╚══██╔══╝██║██╔════╝██║ ██╔╝████╗ ████║██╔══██╗████╗  ██║
-echo  ██║  ██║███████║██████╔╝█████╔╝     ███████╗   ██║   ██║██║     █████╔╝ ██╔████╔██║███████║██╔██╗ ██║
-echo  ██║  ██║██╔══██║██╔══██╗██╔═██╗     ╚════██║   ██║   ██║██║     ██╔═██╗ ██║╚██╔╝██║██╔══██║██║╚██╗██║
-echo  ██████╔╝██║  ██║██║  ██║██║  ██╗    ███████║   ██║   ██║╚██████╗██║  ██╗██║ ╚═╝ ██║██║  ██║██║ ╚████║
-echo  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚══════╝   ╚═╝   ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝
-echo.
-echo  Produzido com IA — DARK STUDIO AAA — DARK CREATIVE LAB
-echo  ================================================================
+echo  ####################################################
+echo  ##  DARK STICKMAN STUDIO - DARK CREATIVE LAB      ##
+echo  ##  Instalador Automatico v1.0                    ##
+echo  ##  Custo: R$0,00/mes                             ##
+echo  ####################################################
 echo.
 
-:: ── Verificar Python ──────────────────────────────────────────────────────────
-echo [1/8] Verificando Python...
+:: 1. Verificar Python 3.10+
+echo [1/8] Verificando Python 3.10+...
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo  [ERRO] Python nao encontrado. Baixe em https://python.org e instale.
-    echo         Marque "Add Python to PATH" durante a instalacao.
-    pause
-    exit /b 1
+    echo [ERRO] Python nao encontrado!
+    echo Baixe em: https://www.python.org/downloads/
+    echo Marque "Add Python to PATH" durante a instalacao.
+    pause & exit /b 1
 )
-python --version
-echo  [OK] Python encontrado.
-echo.
+python -c "import sys; exit(0 if sys.version_info >= (3,10) else 1)" >nul 2>&1
+if errorlevel 1 (
+    echo [AVISO] Python 3.10+ recomendado.
+    choice /c SN /m "Continuar mesmo assim?"
+    if errorlevel 2 exit /b 1
+)
+echo [OK] Python encontrado.
 
-:: ── Verificar pip ─────────────────────────────────────────────────────────────
-echo [2/8] Atualizando pip...
+:: 2. Criar ambiente virtual
+echo.
+echo [2/8] Criando ambiente virtual...
+if not exist "venv" (
+    python -m venv venv
+)
+call venv\Scripts\activate.bat
+echo [OK] Ambiente virtual pronto.
+
+:: 3. Atualizar pip
+echo.
+echo [3/8] Atualizando pip...
 python -m pip install --upgrade pip --quiet
-echo  [OK] pip atualizado.
-echo.
+echo [OK] pip atualizado.
 
-:: ── Instalar dependencias Python ──────────────────────────────────────────────
-echo [3/8] Instalando dependencias Python...
+:: 4. Instalar dependencias Python
+echo.
+echo [4/8] Instalando dependencias Python (aguarde)...
 pip install -r requirements.txt --quiet
 if errorlevel 1 (
-    echo  [AVISO] Algumas dependencias podem ter falhado. Verifique acima.
-) else (
-    echo  [OK] Dependencias instaladas.
+    echo [AVISO] Instalando pacotes essenciais individualmente...
+    pip install fastapi uvicorn pydantic typer rich Pillow requests edge-tts openai-whisper --quiet
 )
-echo.
+echo [OK] Dependencias instaladas.
 
-:: ── Verificar FFmpeg ──────────────────────────────────────────────────────────
-echo [4/8] Verificando FFmpeg...
+:: 5. Verificar/instalar FFmpeg
+echo.
+echo [5/8] Verificando FFmpeg...
 ffmpeg -version >nul 2>&1
 if errorlevel 1 (
-    echo  [AVISO] FFmpeg nao encontrado.
-    echo         Opcoes de instalacao:
-    echo           1. winget install FFmpeg
-    echo           2. choco install ffmpeg  (requer Chocolatey)
-    echo           3. Download manual: https://ffmpeg.org/download.html
-    echo.
-    echo  Pressione qualquer tecla para tentar instalar via winget...
-    pause
-    winget install FFmpeg --accept-source-agreements --accept-package-agreements
+    echo FFmpeg nao encontrado. Instalando via winget...
+    winget install --id Gyan.FFmpeg -e --silent >nul 2>&1
     ffmpeg -version >nul 2>&1
     if errorlevel 1 (
-        echo  [ERRO] FFmpeg ainda nao encontrado. Instale manualmente e adicione ao PATH.
+        echo [AVISO] FFmpeg nao instalado. Instale manualmente:
+        echo   winget install Gyan.FFmpeg
+        echo   OU baixe em: https://ffmpeg.org/download.html
+        echo   (Adicione FFmpeg ao PATH do sistema)
     ) else (
-        echo  [OK] FFmpeg instalado via winget.
+        echo [OK] FFmpeg instalado.
     )
 ) else (
-    echo  [OK] FFmpeg encontrado.
+    echo [OK] FFmpeg disponivel.
 )
-echo.
 
-:: ── Manim CE ─────────────────────────────────────────────────────────────────
-echo [5/8] Instalando Manim CE...
-pip install manim --quiet
-if errorlevel 1 (
-    echo  [AVISO] Manim pode ter falhado. Tente manualmente: pip install manim
-    echo         Dependencias extras: pip install manim[jupyterlab,webgl_renderer]
+:: 6. Criar estrutura de pastas
+echo.
+echo [6/8] Criando estrutura de pastas...
+set BASE=%USERPROFILE%\DarkStudioAAA
+for %%d in (projetos assets\imagens assets\videos assets\audio assets\fontes exports logs modelos temp) do (
+    mkdir "%BASE%\%%d" >nul 2>&1
+)
+echo [OK] Pastas em: %BASE%
+
+:: Salvar configuracao local
+(
+echo {
+echo   "base_dir": "%BASE:\=\\%",
+echo   "version": "1.0.0",
+echo   "custo_brl": 0.0,
+echo   "ai_generated": true,
+echo   "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+echo }
+) > "%BASE%\config_local.json"
+
+:: 7. Modelo Piper TTS pt-BR (opcional)
+echo.
+echo [7/8] Modelo TTS local (opcional)...
+choice /c SN /m "Baixar Piper TTS pt-BR offline (~67MB)?"
+if not errorlevel 2 (
+    mkdir "%BASE%\modelos\piper" >nul 2>&1
+    set PIPER_BASE=https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/faber/medium
+    curl -L -o "%BASE%\modelos\piper\pt_BR-faber-medium.onnx" "%PIPER_BASE%/pt_BR-faber-medium.onnx"
+    curl -L -o "%BASE%\modelos\piper\pt_BR-faber-medium.onnx.json" "%PIPER_BASE%/pt_BR-faber-medium.onnx.json"
+    if exist "%BASE%\modelos\piper\pt_BR-faber-medium.onnx" (
+        echo [OK] Piper TTS pt-BR baixado.
+    ) else (
+        echo [AVISO] Baixe manualmente em: https://huggingface.co/rhasspy/piper-voices
+    )
 ) else (
-    echo  [OK] Manim CE instalado.
+    echo [INFO] Usando edge-tts online (requer internet durante uso).
 )
-echo.
 
-:: ── Piper TTS ─────────────────────────────────────────────────────────────────
-echo [6/8] Instalando Piper TTS...
-pip install piper-tts --quiet
-if errorlevel 1 (
-    echo  [AVISO] piper-tts nao instalado via pip.
-    echo         Alternativa: baixe o binario em https://github.com/rhasspy/piper/releases
-    echo         e adicione ao PATH ou defina PIPER_PATH no .env
-) else (
-    echo  [OK] Piper TTS instalado.
-)
+:: 8. Criar launcher e atalho
 echo.
+echo [8/8] Criando launcher...
+(
+echo @echo off
+echo title DARK STICKMAN STUDIO
+echo cd /d "%%~dp0"
+echo call venv\Scripts\activate.bat
+echo echo Iniciando DARK STICKMAN STUDIO...
+echo echo Acesse: http://localhost:8000/panel
+echo start "" "http://localhost:8000/panel"
+echo python -m uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+echo pause
+) > launcher.bat
 
-:: ── Whisper ───────────────────────────────────────────────────────────────────
-echo [7/8] Instalando OpenAI Whisper...
-pip install openai-whisper --quiet
-if errorlevel 1 (
-    echo  [AVISO] Whisper pode ter falhado. Tente: pip install openai-whisper
-) else (
-    echo  [OK] Whisper instalado.
-)
-echo.
+:: Atalho na area de trabalho
+set VBS=%TEMP%\shortcut_dark.vbs
+(
+echo Set ws = WScript.CreateObject("WScript.Shell"^)
+echo Set sc = ws.CreateShortcut(ws.SpecialFolders("Desktop"^) ^& "\DARK STUDIO AAA.lnk"^)
+echo sc.TargetPath = "%~dp0launcher.bat"
+echo sc.WorkingDirectory = "%~dp0"
+echo sc.Description = "DARK STICKMAN STUDIO — DARK CREATIVE LAB"
+echo sc.Save
+) > "%VBS%"
+cscript //nologo "%VBS%" >nul 2>&1
+del "%VBS%" >nul 2>&1
+echo [OK] Atalho "DARK STUDIO AAA" criado na area de trabalho.
 
-:: ── Criar diretorios ─────────────────────────────────────────────────────────
-echo [8/8] Criando estrutura de diretorios...
-if not exist "output" mkdir output
-if not exist "output\thumbnails" mkdir output\thumbnails
-if not exist "db" mkdir db
-if not exist "logs" mkdir logs
-echo  [OK] Diretorios criados.
+:: Conclusao
 echo.
-
-:: ── Verificacao final ─────────────────────────────────────────────────────────
-echo  ================================================================
-echo  VERIFICACAO FINAL
-echo  ================================================================
-echo.
-python -c "import fastapi; print('FastAPI: OK')" 2>nul || echo "FastAPI: FALHOU"
-python -c "import typer; print('Typer CLI: OK')" 2>nul || echo "Typer: FALHOU"
-python -c "from PIL import Image; print('Pillow: OK')" 2>nul || echo "Pillow: FALHOU"
-python -c "import whisper; print('Whisper: OK')" 2>nul || echo "Whisper: FALHOU"
-python -c "import manim; print('Manim CE: OK')" 2>nul || echo "Manim: FALHOU"
-ffmpeg -version >nul 2>&1 && echo "FFmpeg: OK" || echo "FFmpeg: NAO ENCONTRADO"
-echo.
-
-:: ── Registrar CLI ─────────────────────────────────────────────────────────────
-echo  Registrando comando 'dark-stickman' no PATH...
-pip install -e . --quiet 2>nul || echo  [INFO] Instale manualmente: pip install -e .
-echo.
-
-:: ── Conclusao ─────────────────────────────────────────────────────────────────
-echo  ================================================================
-echo  SETUP CONCLUIDO!
-echo  ================================================================
-echo.
-echo  Como usar:
-echo    dark-stickman status            -- verifica dependencias
-echo    dark-stickman canais            -- lista os 12 canais
-echo    dark-stickman produzir --canal psicologia --titulo "SEU TITULO"
-echo    dark-stickman api               -- inicia API na porta 7870
-echo.
-echo  Documentacao: README.md
-echo  Issues: https://github.com/Jeffersonjazz/dark-stickman-studio/issues
-echo.
-echo  Produzido com IA — DARK STUDIO AAA — DARK CREATIVE LAB
+echo  ####################################################
+echo  ##   INSTALACAO CONCLUIDA!                        ##
+echo  ##                                                ##
+echo  ##   Para iniciar: execute launcher.bat           ##
+echo  ##   Ou clique no atalho: DARK STUDIO AAA         ##
+echo  ##   URL: http://localhost:8000/panel             ##
+echo  ##                                                ##
+echo  ##   Custo mensal: R$0,00                         ##
+echo  ####################################################
 echo.
 pause
