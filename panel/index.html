@@ -1589,7 +1589,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
               <div class="form-group"><label>Projeto</label><input type="text" id="pc-proj" placeholder="ID do projeto"></div>
               <div class="form-group"><label>Nome</label><input type="text" id="pc-nome" placeholder="Ex: Detetive Silva"></div>
               <div class="form-group"><label>Descrição Visual</label><textarea id="pc-desc" rows="2" placeholder="Aparência, roupa, expressão..."></textarea></div>
-              <button class="btn btn-ghost btn-sm" onclick="toast('Personagem registrado no banco visual','ok')">Registrar Personagem</button>
+              <button class="btn btn-ghost btn-sm" onclick="registrarPersonagem()">Registrar Personagem</button>
             </div>
           </div>
           <div class="card">
@@ -1600,7 +1600,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
               <div class="form-group"><label>Iluminação</label>
                 <select id="cs-ilum"><option value="natural">Natural</option><option value="artificial">Artificial</option><option value="dramatica">Dramática</option><option value="noturna">Noturna</option></select>
               </div>
-              <button class="btn btn-ghost btn-sm" onclick="toast('Cenário registrado no banco visual','ok')">Registrar Cenário</button>
+              <button class="btn btn-ghost btn-sm" onclick="registrarCenario()">Registrar Cenário</button>
             </div>
           </div>
         </div>
@@ -2365,6 +2365,43 @@ async function loadBanco() {
       const el = document.getElementById(id);
       if(el) el.innerHTML = '<div class="empty"><div class="empty-icon">🔌</div><p>API offline — use: <code>dark-stickman banco listar</code></p></div>';
     });
+  }
+}
+
+// ── FASE 8: Registrar Personagem ──────────────────────────────────────
+async function registrarPersonagem() {
+  const proj = document.getElementById('pc-proj').value.trim();
+  const nome = document.getElementById('pc-nome').value.trim();
+  const desc = document.getElementById('pc-desc').value.trim();
+  if (!proj || !nome) { toast('Preencha Projeto e Nome', 'err'); return; }
+  const res = await api(`/banco/projetos/${proj}/personagens`, {
+    method: 'POST',
+    body: JSON.stringify({ nome, descricao_visual: desc || `Personagem ${nome}`, imagem_ref: null })
+  });
+  if (res && res.status === 'ok') {
+    toast(`✅ Personagem "${nome}" registrado no projeto ${proj}`, 'ok');
+    document.getElementById('pc-nome').value = '';
+    document.getElementById('pc-desc').value = '';
+  } else {
+    toast(res?.mensagem || 'API offline — personagem não registrado', 'err');
+  }
+}
+
+// ── FASE 8: Registrar Cenário ─────────────────────────────────────────
+async function registrarCenario() {
+  const proj = document.getElementById('cs-proj').value.trim();
+  const nome = document.getElementById('cs-nome').value.trim();
+  const ilum = document.getElementById('cs-ilum').value;
+  if (!proj || !nome) { toast('Preencha Projeto e Nome', 'err'); return; }
+  const res = await api(`/banco/projetos/${proj}/cenarios`, {
+    method: 'POST',
+    body: JSON.stringify({ nome, iluminacao: ilum, descricao_visual: `${nome} — iluminação ${ilum}`, imagem_ref: null })
+  });
+  if (res && res.status === 'ok') {
+    toast(`✅ Cenário "${nome}" registrado no projeto ${proj}`, 'ok');
+    document.getElementById('cs-nome').value = '';
+  } else {
+    toast(res?.mensagem || 'API offline — cenário não registrado', 'err');
   }
 }
 
