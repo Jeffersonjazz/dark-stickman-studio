@@ -242,7 +242,7 @@ class DarkCinemaEditor:
         Montagem completa: clips + áudio + legendas + color grade.
         Clone de: DaVinci Resolve Timeline + Premiere sequence.
         """
-        output_path = output_path or self.output_dir / f"montagem_{int(__import__('time').time())}.mp4"
+        output_path = Path(output_path) if output_path else self.output_dir / f"montagem_{int(__import__('time').time())}.mp4"
 
         # 1. Preparar clips com fade
         clips_processados = []
@@ -391,6 +391,7 @@ class DarkCinemaEditor:
         """Exporta em múltiplas resoluções de uma vez."""
         resolucoes = resolucoes or ["1080p", "720p"]
         output_dir = Path(output_dir) if output_dir else self.output_dir
+        output_dir.mkdir(parents=True, exist_ok=True)
         return [
             self.exportar(video_path, res, output_path=output_dir / f"{Path(video_path).stem}_{res}.mp4")
             for res in resolucoes
@@ -519,11 +520,16 @@ class DarkCinemaEditor:
             vidstab_ok = "vidstab" in ret.stdout
 
         return {
+            "status": "ok",
             "ffmpeg": ffmpeg_ok,
             "vidstab": vidstab_ok,
             "presets_color": list(COLOR_PRESETS.keys()),
             "resolucoes": list(RESOLUCOES.keys()),
-            "custo_mensal": 0.00,
+            "funcionalidades": [
+                "montar_video", "color_grade", "exportar_lote",
+                "remover_silencio", "estabilizar", "converter_formato",
+            ],
+            "custo_mensal_brl": 0.00,
             "ai_generated": True,
             "ai_disclosure": AI_DISCLOSURE,
         }

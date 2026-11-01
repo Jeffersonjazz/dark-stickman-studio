@@ -503,22 +503,38 @@ class DarkAudioStudio:
             "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
         }
 
-    def narrar_lote(self, textos: list[dict], output_dir: Optional[str] = None) -> list[dict]:
-        """Narra múltiplos segmentos (pipeline para vídeo completo)."""
+    def narrar_lote(self, textos: list[dict], output_dir: Optional[str] = None,
+                    max_workers: int = 4) -> list[dict]:
+        """
+        Narra múltiplos segmentos em paralelo (ThreadPoolExecutor).
+        max_workers=4 reduz tempo ~4x no PC local com TTS async.
+        """
+        from concurrent.futures import ThreadPoolExecutor, as_completed
         if output_dir:
             Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-        resultados = []
-        for i, item in enumerate(textos):
+        def _processar(args):
+            i, item = args
             texto = item.get("texto", "")
             nicho = item.get("nicho", "geral")
             voz = item.get("voz", "narrador")
             out = str(Path(output_dir) / f"narr_{i:03d}.mp3") if output_dir else None
             res = self.narrar(texto, voz=voz, nicho=nicho, output_path=out)
             res["indice"] = i
-            resultados.append(res)
+            return i, res
 
-        return resultados
+        resultados_map = {}
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(_processar, (i, item)): i for i, item in enumerate(textos)}
+            for fut in as_completed(futures):
+                try:
+                    idx, res = fut.result()
+                    resultados_map[idx] = res
+                except Exception as e:
+                    i = futures[fut]
+                    resultados_map[i] = {"audio_path": None, "status": "erro", "indice": i, "erro": str(e)}
+
+        return [resultados_map[i] for i in sorted(resultados_map)]
 
     def status(self) -> dict:
         backends = self._detectar_backends()

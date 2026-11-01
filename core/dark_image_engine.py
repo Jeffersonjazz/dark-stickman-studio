@@ -184,7 +184,7 @@ class DarkImageEngine:
         self,
         hf_token: Optional[str] = None,
         cache_dir: Optional[Path] = None,
-        timeout: int = 60,
+        timeout: int = 8,
     ):
         self.hf_token = hf_token or os.environ.get("HF_TOKEN", "")
         self.cache_dir = Path(cache_dir) if cache_dir else Path("/tmp/dark_img_cache")
@@ -385,28 +385,108 @@ class DarkImageEngine:
         return False
 
     def _gerar_pillow(self, prompt: str, nicho: str, w: int, h: int, output_path: Path):
-        """Gera imagem gradiente local via Pillow — fallback offline."""
+        """
+        Gera imagem cinematográfica local via Pillow.
+        Visual: gradiente radial, vinheta, barras letterbox, título centralizado.
+        Qualidade 3/10 — fallback offline, funciona sem GPU e sem internet.
+        """
+        import math, random
         try:
-            from PIL import Image, ImageDraw, ImageFont
+            from PIL import Image, ImageDraw, ImageFont, ImageFilter
             cores = PALETA_NICHO.get(nicho, PALETA_NICHO["geral"])
-            img = Image.new("RGB", (w, h), cores[0])
+            c1, c2 = cores[0], cores[1]
+
+            # ── Gradiente diagonal ───────────────────────────────────────────
+            img = Image.new("RGB", (w, h))
             draw = ImageDraw.Draw(img)
-            # Gradiente simples
             for y in range(h):
-                ratio = y / h
-                r = int(cores[0][0] * (1 - ratio) + cores[1][0] * ratio)
-                g = int(cores[0][1] * (1 - ratio) + cores[1][1] * ratio)
-                b = int(cores[0][2] * (1 - ratio) + cores[1][2] * ratio)
-                draw.line([(0, y), (w, y)], fill=(r, g, b))
-            # Texto do prompt (truncado)
-            texto = prompt[:80] + "…" if len(prompt) > 80 else prompt
-            try:
-                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
-            except Exception:
-                font = ImageFont.load_default()
-            draw.text((20, h // 2 - 30), texto, fill=(255, 255, 255), font=font)
-            draw.text((20, h - 40), "DARK STUDIO AAA — AI GENERATED", fill=(180, 180, 180), font=font)
-            img.save(str(output_path))
+                t = y / h
+                for x_band in range(0, w, 4):      # bandas de 4px = mais rápido
+                    s = (x_band / w) * 0.3 + t * 0.7
+                    r = int(c1[0] * (1 - s) + c2[0] * s)
+                    g = int(c1[1] * (1 - s) + c2[1] * s)
+                    b = int(c1[2] * (1 - s) + c2[2] * s)
+                    draw.rectangle([(x_band, y), (min(x_band + 4, w), y + 1)], fill=(r, g, b))
+
+            # ── Vinheta escura nas bordas ────────────────────────────────────
+            vig = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+            vd = ImageDraw.Draw(vig)
+            steps = 20
+            for vi in range(steps):
+                alpha = int(160 * ((steps - vi) / steps) ** 2)
+                m = vi * min(w, h) // (steps * 2)
+                x0, y0, x1, y1 = m, m, w - m - 1, h - m - 1
+                if x1 > x0 and y1 > y0:
+                    vd.rectangle([x0, y0, x1, y1], outline=(0, 0, 0, alpha), width=2)
+            img = Image.alpha_composite(img.convert("RGBA"), vig).convert("RGB")
+            draw = ImageDraw.Draw(img)
+
+            # ── Barras letterbox cinematográficas ────────────────────────────
+            bar_h = h // 8
+            draw.rectangle([(0, 0), (w, bar_h)], fill=(0, 0, 0))
+            draw.rectangle([(0, h - bar_h), (w, h)], fill=(0, 0, 0))
+
+            # ── Fontes ───────────────────────────────────────────────────────
+            font_paths = [
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+            ]
+            def _font(size):
+                for fp in font_paths:
+                    try:
+                        return ImageFont.truetype(fp, size)
+                    except Exception:
+                        pass
+                return ImageFont.load_default()
+
+            # ── Título principal (prompt truncado) ───────────────────────────
+            palavras = prompt.split()
+            linhas, linha_atual = [], []
+            max_chars = 38
+            for palavra in palavras:
+                if sum(len(p) + 1 for p in linha_atual) + len(palavra) <= max_chars:
+                    linha_atual.append(palavra)
+                else:
+                    if linha_atual:
+                        linhas.append(" ".join(linha_atual))
+                    linha_atual = [palavra]
+                    if len(linhas) >= 2:
+                        break
+            if linha_atual and len(linhas) < 3:
+                linhas.append(" ".join(linha_atual))
+
+            font_titulo = _font(max(18, w // 50))
+            total_h_texto = len(linhas) * (font_titulo.size + 8)
+            y_titulo = (h - total_h_texto) // 2
+
+            for linha in linhas:
+                # Sombra
+                draw.text((w // 2 + 2, y_titulo + 2), linha,
+                          fill=(0, 0, 0), font=font_titulo, anchor="mm")
+                # Texto branco
+                draw.text((w // 2, y_titulo), linha,
+                          fill=(255, 255, 255), font=font_titulo, anchor="mm")
+                y_titulo += font_titulo.size + 8
+
+            # ── Linha decorativa ─────────────────────────────────────────────
+            lw = w // 3
+            lx = (w - lw) // 2
+            ly = (h - total_h_texto) // 2 - 20
+            accent = tuple(min(255, int(c * 1.6)) for c in c1)
+            draw.rectangle([(lx, ly), (lx + lw, ly + 3)], fill=accent)
+
+            # ── Nicho badge (barra superior) ─────────────────────────────────
+            font_small = _font(max(12, w // 80))
+            nicho_label = nicho.upper()
+            draw.text((w // 2, bar_h // 2), nicho_label,
+                      fill=(200, 200, 200), font=font_small, anchor="mm")
+
+            # ── Marca DARK STUDIO (barra inferior) ───────────────────────────
+            draw.text((w // 2, h - bar_h // 2), "DARK STUDIO AAA  ·  AI GENERATED",
+                      fill=(160, 160, 160), font=font_small, anchor="mm")
+
+            img.save(str(output_path), quality=95)
         except Exception as e:
             logger.error(f"[ImageEngine] Pillow fallback falhou: {e}")
             output_path.write_bytes(b"")
@@ -423,15 +503,19 @@ class DarkImageEngine:
 
     # ─── Batch ───────────────────────────────────────────────────────────────
 
-    def gerar_lote(self, prompts: list[dict], output_dir: Path) -> list[dict]:
+    def gerar_lote(self, prompts: list[dict], output_dir: Path,
+                   max_workers: int = 3) -> list[dict]:
         """
-        Gera múltiplas imagens em sequência.
+        Gera múltiplas imagens em paralelo (ThreadPoolExecutor).
+        max_workers=3 evita rate limit nas APIs enquanto paraleliza Pillow.
         prompts: lista de dicts com keys: prompt, nicho, nome (opcional)
         """
+        from concurrent.futures import ThreadPoolExecutor, as_completed
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
-        resultados = []
-        for i, item in enumerate(prompts):
+
+        def _gerar(args):
+            i, item = args
             nome = item.get("nome", f"img_{i:03d}")
             out = output_dir / f"{nome}.png"
             res = self.gerar(
@@ -440,9 +524,21 @@ class DarkImageEngine:
                 output_path=out,
                 usar_cache=True,
             )
-            resultados.append(res)
             logger.info(f"[ImageEngine] lote {i+1}/{len(prompts)}: {res['backend']}")
-        return resultados
+            return i, res
+
+        resultados_map = {}
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(_gerar, (i, item)): i for i, item in enumerate(prompts)}
+            for fut in as_completed(futures):
+                try:
+                    idx, res = fut.result()
+                    resultados_map[idx] = res
+                except Exception as e:
+                    i = futures[fut]
+                    resultados_map[i] = {"image_path": None, "backend": "erro", "erro": str(e)}
+
+        return [resultados_map[i] for i in sorted(resultados_map)]
 
     # ─── Status ──────────────────────────────────────────────────────────────
 
@@ -457,11 +553,16 @@ class DarkImageEngine:
         except Exception:
             pass
         return {
+            "status": "ok",
             "hf_disponivel": hf_ok,
             "hf_token": bool(self.hf_token),
             "modelos": [m["nome"] for m in HF_MODELS],
             "fallback": "Pillow",
-            "custo_mensal": 0.00,
+            "funcionalidades": [
+                "gerar", "gerar_thumbnail", "upscale",
+                "remover_fundo", "corrigir_cores", "redimensionar",
+            ],
+            "custo_mensal_brl": 0.00,
             "ai_generated": True,
             "ai_disclosure": AI_DISCLOSURE,
         }
