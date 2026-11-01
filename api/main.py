@@ -87,15 +87,21 @@ if PANEL_DIR.exists():
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
 def _get_db():
+    """Abre conexão SQLite com WAL mode + busy_timeout para evitar locking."""
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    return sqlite3.connect(str(DB_PATH))
+    conn = sqlite3.connect(str(DB_PATH), timeout=30)
+    conn.execute("PRAGMA journal_mode=WAL")      # FIX #80: WAL evita database locked
+    conn.execute("PRAGMA busy_timeout=10000")    # FIX #80: aguarda 10s antes de falhar
+    conn.execute("PRAGMA synchronous=NORMAL")
+    return conn
 
 
 def _job_exists(job_id: str) -> bool:
     try:
         conn = _get_db()
         cur = conn.cursor()
-        cur.execute("SELECT 1 FROM jobs WHERE job_id = ?", (job_id,))
+        # FIX #78: coluna correta é 'id', não 'job_id'
+        cur.execute("SELECT 1 FROM jobs WHERE id = ?", (job_id,))
         exists = cur.fetchone() is not None
         conn.close()
         return exists
@@ -108,7 +114,8 @@ def _get_job(job_id: str) -> Optional[dict]:
         conn = _get_db()
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
-        cur.execute("SELECT * FROM jobs WHERE job_id = ?", (job_id,))
+        # FIX #78: coluna correta é 'id', não 'job_id'
+        cur.execute("SELECT * FROM jobs WHERE id = ?", (job_id,))
         row = cur.fetchone()
         conn.close()
         return dict(row) if row else None
@@ -125,7 +132,8 @@ def _list_jobs(canal: Optional[str] = None, status: Optional[str] = None,
         q = "SELECT * FROM jobs WHERE 1=1"
         params = []
         if canal:
-            q += " AND canal = ?"
+            # FIX #78: coluna canal_id (definida em f01_producao.py)
+            q += " AND canal_id = ?"
             params.append(canal)
         if status:
             q += " AND status = ?"

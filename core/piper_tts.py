@@ -81,7 +81,20 @@ def _synthesize_edge_tts(text: str, output_path: Path, voice: str = EDGE_TTS_VOI
             communicate = edge_tts.Communicate(text, voice)
             await communicate.save(str(mp3_tmp))
 
-        asyncio.run(_run())
+        # FIX #79: asyncio.run() falha se já existe event loop (FastAPI/uvicorn).
+        # Usa nest_asyncio ou cria loop isolado em thread.
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            # Contexto async ativo — executa em thread separada
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                pool.submit(asyncio.run, _run()).result(timeout=60)
+        else:
+            asyncio.run(_run())
 
         if not mp3_tmp.exists() or mp3_tmp.stat().st_size < 100:
             return False

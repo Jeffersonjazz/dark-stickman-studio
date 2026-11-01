@@ -37,8 +37,8 @@ html { background: var(--bg); color: var(--fg); font-family: 'Inter', system-ui,
 body {
   background: var(--bg);
   min-height: 100vh;
-  padding-left: max(0px, env(safe-area-inset-left, 0px));
-  padding-right: max(0px, env(safe-area-inset-right, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 0;
   display: flex;
   flex-direction: column;
@@ -1464,7 +1464,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
         <script>
         async function subtitlePipeline() {
           const media = document.getElementById('sub-media').value.trim();
-          if (!media) { alert('Informe o caminho do vídeo/áudio.'); return; }
+          if (!media) { darkToast('Informe o caminho do vídeo/áudio.','warn'); return; }
           const idioma = document.getElementById('sub-idioma').value;
           const modelo = document.getElementById('sub-modelo').value;
           const estilo = document.getElementById('sub-estilo').value;
@@ -1494,7 +1494,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
 
         async function gerarSrtRoteiro() {
           const roteiro = document.getElementById('sub-roteiro').value.trim();
-          if (!roteiro) { alert('Digite o roteiro.'); return; }
+          if (!roteiro) { darkToast('Digite o roteiro.','warn'); return; }
           const duracao = document.getElementById('sub-duracao').value;
           const res = document.getElementById('sub-srt-res');
           res.style.display = 'block';
@@ -1519,7 +1519,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
         async function queimarLegendas() {
           const video = document.getElementById('sub-qvideo').value.trim();
           const srt = document.getElementById('sub-qsrt').value.trim();
-          if (!video || !srt) { alert('Informe o vídeo e o arquivo SRT.'); return; }
+          if (!video || !srt) { darkToast('Informe o vídeo e o arquivo SRT.','warn'); return; }
           const estilo = document.getElementById('sub-qestilo').value;
           const res = document.getElementById('sub-queimar-res');
           res.style.display = 'block';
@@ -1706,7 +1706,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
           const tipo = document.getElementById('sb-tipo').value;
           const narracao = document.getElementById('sb-narracao').value.trim();
           const res = document.getElementById('sb-add-res');
-          if (!proj || !desc) { alert('Informe o ID do projeto e a descrição da cena.'); return; }
+          if (!proj || !desc) { darkToast('Informe o ID do projeto e a descrição da cena.','warn'); return; }
           if (!storyboardLocal[proj]) storyboardLocal[proj] = [];
           const cena = { num, dur, desc, prompt, cam, mov, tipo, narracao, criado_em: new Date().toISOString() };
           storyboardLocal[proj].push(cena);
@@ -1759,7 +1759,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
           const proj = document.getElementById('sb-load-proj').value.trim();
           try { const saved = localStorage.getItem('dark_storyboard'); if (saved) storyboardLocal = JSON.parse(saved); } catch(e) {}
           const cenas = storyboardLocal[proj] || [];
-          if (!cenas.length) { alert('Nenhuma cena para exportar. Carregue o projeto primeiro.'); return; }
+          if (!cenas.length) { darkToast('Nenhuma cena para exportar. Carregue o projeto primeiro.','warn'); return; }
           const dados = { projeto: proj, total_cenas: cenas.length, duracao_total_s: cenas.reduce((a,c)=>a+c.dur,0), ai_generated: true, ai_disclosure: 'Produzido com DARK STUDIO AAA — DARK CREATIVE LAB', cenas };
           const blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
           const a = document.createElement('a');
@@ -1889,7 +1889,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
         <script>
         async function gerarShort() {
           const roteiro = document.getElementById('sf-roteiro').value.trim();
-          if (!roteiro) { alert('Digite o roteiro do Short.'); return; }
+          if (!roteiro) { darkToast('Digite o roteiro do Short.','warn'); return; }
           const titulo  = document.getElementById('sf-titulo').value.trim();
           const formato = document.getElementById('sf-formato').value;
           const nicho   = document.getElementById('sf-nicho').value;
@@ -1920,7 +1920,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
 
         async function converterVertical() {
           const videoPath = document.getElementById('sf-video-path').value.trim();
-          if (!videoPath) { alert('Informe o caminho do vídeo.'); return; }
+          if (!videoPath) { darkToast('Informe o caminho do vídeo.','warn'); return; }
           const modo    = document.getElementById('sf-modo').value;
           const formato = document.getElementById('sf-conv-formato').value;
 
@@ -2001,6 +2001,32 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
 <script>
 // ── Config ──────────────────────────────────────────────────────────
 const API = (window.DARK_API_URL || 'http://localhost:7870');
+
+// ── FIX UX/UI PhD: substituir alert() por toast inline ──────────────
+// alert() é bloqueante e pode não funcionar em contexto embedded.
+// darkToast() exibe feedback não-bloqueante dentro da própria página.
+function darkToast(msg, tipo = 'warn', duracao = 3500) {
+  let container = document.getElementById('dark-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'dark-toast-container';
+    container.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;';
+    document.body.appendChild(container);
+  }
+  const cores = { warn:'#f5c542', err:'#f0504a', ok:'#2dd4a0', info:'#4a9ef5' };
+  const toast = document.createElement('div');
+  toast.style.cssText = `background:#1a1d24;border:1px solid ${cores[tipo]||cores.warn};color:#e4e7f0;padding:10px 16px;border-radius:8px;font-size:13px;max-width:320px;box-shadow:0 4px 24px #0008;pointer-events:auto;animation:slideIn .2s ease;`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity='0'; toast.style.transition='opacity .3s'; setTimeout(()=>toast.remove(),300); }, duracao);
+}
+// Injeta estilo de animação (apenas uma vez)
+if (!document.getElementById('dark-toast-style')) {
+  const s = document.createElement('style');
+  s.id = 'dark-toast-style';
+  s.textContent = '@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}';
+  document.head.appendChild(s);
+}
 
 // ── Navigation ──────────────────────────────────────────────────────
 const titles = {
