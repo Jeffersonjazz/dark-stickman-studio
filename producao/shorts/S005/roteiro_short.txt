@@ -1,0 +1,45 @@
+# ROTEIRO DE NARRAÇÃO — SHORT S005
+## AGENTE AUDIO MASTER — DARK SHORTS FACTORY
+## Canal: Dark Natureza · Duração alvo: 55s
+## Voz: pt-BR-AntonioNeural · rate=-8% · pitch=-2Hz
+
+ai_generated: True
+ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
+
+---
+
+## TOM E DIREÇÃO
+- **Velocidade:** -8% (mais dinâmico para Shorts)
+- **Tom:** Urgente, íntimo, como um segredo revelado
+- **Padrão de pausa:** Vírgulas = 0.3s · Pontos = 0.6s · [PAUSA] = 1.0s
+
+---
+
+## NARRAÇÃO COMPLETA
+
+[HOOK — 0:00]
+Enquanto você assiste isso, florestas inteiras estão se comunicando.
+
+[PAUSA 0.8]
+
+[CORPO — 0:05]
+Em 1997, Suzanne Simard descobriu que árvores compartilham nutrientes por redes de fungos. A 'internet das florestas'. Árvores-mãe alimentam as pequenas. Árvores moribundas transmitem recursos aos vizinhos. A floresta não é uma coleção de indivíduos. É um organismo.
+
+[PAUSA 0.5]
+
+[CTA — 0:45]
+Isso mudou como você vê uma floresta? 🌿
+
+---
+
+## CONTAGEM ESTIMADA
+- Palavras totais: ~55
+- Duração estimada: 55s (a -8% speed)
+
+---
+
+## MARCADORES DE EDIÇÃO
+- 🔴 0:00 — Hook inicia (sobreposição texto OBRIGATÓRIA)
+- 🟡 0:05 — Corpo começa (iniciar B-roll)
+- 🟢 0:43 — CTA (texto CTA aparece)
+- ⬛ 0:55 — Fade out

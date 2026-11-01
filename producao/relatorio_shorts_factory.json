@@ -1,0 +1,94 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "factory": "DARK SHORTS FACTORY",
+  "versao": "v1.4.0",
+  "inicio": "2026-11-01T15:04:46.008364",
+  "canais": {
+    "S001": {
+      "id": "S001",
+      "canal": "Dark Psicologia",
+      "etapas": {
+        "asset_manager": "ok",
+        "image_engine": "ok",
+        "cinematic_director": "ok",
+        "motion_graphics": "ok",
+        "visual_consistency": "ok",
+        "audio_master": "ok",
+        "video_editor_pro": "ok",
+        "creative_qa": "APROVADO"
+      },
+      "score_qa": 92.3,
+      "receita_estimada": "R$120/mês"
+    },
+    "S002": {
+      "id": "S002",
+      "canal": "Dark História",
+      "etapas": {
+        "asset_manager": "ok",
+        "image_engine": "ok",
+        "cinematic_director": "ok",
+        "motion_graphics": "ok",
+        "visual_consistency": "ok",
+        "audio_master": "ok",
+        "video_editor_pro": "ok",
+        "creative_qa": "APROVADO"
+      },
+      "score_qa": 92.3,
+      "receita_estimada": "R$144/mês"
+    },
+    "S003": {
+      "id": "S003",
+      "canal": "Dark Tech",
+      "etapas": {
+        "asset_manager": "ok",
+        "image_engine": "ok",
+        "cinematic_director": "ok",
+        "motion_graphics": "ok",
+        "visual_consistency": "ok",
+        "audio_master": "ok",
+        "video_editor_pro": "ok",
+        "creative_qa": "APROVADO"
+      },
+      "score_qa": 92.3,
+      "receita_estimada": "R$216/mês"
+    },
+    "S004": {
+      "id": "S004",
+      "canal": "Dark Arquivo",
+      "etapas": {
+        "asset_manager": "ok",
+        "image_engine": "ok",
+        "cinematic_director": "ok",
+        "motion_graphics": "ok",
+        "visual_consistency": "ok",
+        "audio_master": "ok",
+        "video_editor_pro": "ok",
+        "creative_qa": "APROVADO"
+      },
+      "score_qa": 92.3,
+      "receita_estimada": "R$150/mês"
+    },
+    "S005": {
+      "id": "S005",
+      "canal": "Dark Natureza",
+      "etapas": {
+        "asset_manager": "ok",
+        "image_engine": "ok",
+        "cinematic_director": "ok",
+        "motion_graphics": "ok",
+        "visual_consistency": "ok",
+        "audio_master": "ok",
+        "video_editor_pro": "ok",
+        "creative_qa": "APROVADO"
+      },
+      "score_qa": 92.3,
+      "receita_estimada": "R$84/mês"
+    }
+  },
+  "duracao_segundos": 3.2,
+  "fim": "2026-11-01T15:04:49.193683",
+  "aprovados": 5,
+  "total_canais": 5,
+  "receita_total_estimada": "R$714/mês"
+}

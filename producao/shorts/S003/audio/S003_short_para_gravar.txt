@@ -1,0 +1,5 @@
+Uma IA previu a morte de pacientes com 90% de precisão.
+
+O algoritmo do DeepMind analisou 700 mil registros médicos. Identificou insuficiência renal antes dos médicos. Salvou vidas — mas também levantou uma questão perturbadora: você quer saber quando vai morrer? A tecnologia já pode te dizer. A pergunta é: você está pronto para ouvir?
+
+Comenta: você deixaria a IA decidir seu tratamento?

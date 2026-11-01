@@ -1,0 +1,77 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "short_id": "S001",
+  "video_ref": "V001",
+  "canal": "Dark Psicologia",
+  "nicho": "psicologia",
+  "titulo": "Por Que Você Se Sente Vazio? #Shorts",
+  "formato": {
+    "resolucao": "1080x1920",
+    "proporcao": "9:16",
+    "fps": 30,
+    "duracao_max_s": 60,
+    "duracao_alvo_s": 45,
+    "codec_video": "H.264",
+    "codec_audio": "AAC 192kbps",
+    "plataforma": "YouTube Shorts"
+  },
+  "roteiro": {
+    "hook": "Você já sentiu um vazio que não consegue explicar?",
+    "corpo": "Pesquisadores chamam isso de vazio existencial — e não é fraqueza. É seu cérebro pedindo significado. Viktor Frankl sobreviveu ao Holocausto e descobriu: quem tem um 'por quê' suporta qualquer 'como'. Você também pode encontrar o seu.",
+    "cta": "Siga para mais verdades que a psicologia esconde.",
+    "hashtags": "#Psicologia #VazioExistencial #SaúdeMental #Shorts #DarkPsicologia",
+    "palavras_totais": 52
+  },
+  "producao": {
+    "color_grade": "teal_orange_psicologia",
+    "estilo_visual": "teal-orange cinematic, close em rosto pensativo, texto animado",
+    "fonte_texto": "Montserrat Bold, branco com sombra preta",
+    "musica_mood": "melancólica, piano suave, 80 BPM"
+  },
+  "audio": {
+    "voice": "pt-BR-AntonioNeural",
+    "rate": "-5%",
+    "pitch": "-3Hz",
+    "tts_engine": "edge_tts (fallback: gTTS → txt)"
+  },
+  "assets_necessarios": {
+    "imagens_sd": [
+      "imagens/S001_cena01_hook.png",
+      "imagens/S001_cena02_dev_a.png",
+      "imagens/S001_cena02_dev_b.png",
+      "imagens/S001_cena03_cta.png",
+      "imagens/S001_thumbnail.png"
+    ],
+    "audio_narracao": "audio/S001_short_narracao.mp3",
+    "musica_fundo": "musica/fundo_instrumental.mp3 (licença CC ou royalty-free)",
+    "srt_legendas": "audio/S001_short_legendas.srt"
+  },
+  "seo_youtube": {
+    "titulo": "Por Que Você Se Sente Vazio? #Shorts",
+    "descricao": "Você já sentiu um vazio que não consegue explicar?\n\nPesquisadores chamam isso de vazio existencial — e não é fraqueza. É seu cérebro pedindo significado. Viktor Frankl sobreviveu ao Holocausto e descobriu: quem tem um 'por quê' suporta qualquer 'como'....\n\n🔔 Siga o canal Dark Psicologia para mais conteúdo!\n\nProduzido com DARK STUDIO AAA | Conteúdo com auxílio de IA\n\n#Psicologia #VazioExistencial #SaúdeMental #Shorts #DarkPsicologia",
+    "tags": [
+      "Psicologia",
+      "VazioExistencial",
+      "SaúdeMental",
+      "Shorts",
+      "DarkPsicologia"
+    ],
+    "categoria": "Education",
+    "idioma": "pt-BR",
+    "made_for_kids": false
+  },
+  "receita_estimada_mensal": "R$120/mês",
+  "agentes_utilizados": [
+    "IMAGE ENGINE",
+    "CINEMATIC DIRECTOR",
+    "AUDIO MASTER",
+    "MOTION GRAPHICS",
+    "VIDEO EDITOR PRO",
+    "VISUAL CONSISTENCY",
+    "ASSET MANAGER",
+    "CREATIVE QA"
+  ],
+  "gerado_em": "2026-11-01T15:04:46.008447",
+  "versao": "DARK STUDIO AAA v1.4.0"
+}

@@ -1,0 +1,77 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "short_id": "S003",
+  "video_ref": "V003",
+  "canal": "Dark Tech",
+  "nicho": "tecnologia",
+  "titulo": "A IA Que Prevê Sua Morte #Shorts",
+  "formato": {
+    "resolucao": "1080x1920",
+    "proporcao": "9:16",
+    "fps": 30,
+    "duracao_max_s": 60,
+    "duracao_alvo_s": 55,
+    "codec_video": "H.264",
+    "codec_audio": "AAC 192kbps",
+    "plataforma": "YouTube Shorts"
+  },
+  "roteiro": {
+    "hook": "Uma IA previu a morte de pacientes com 90% de precisão.",
+    "corpo": "O algoritmo do DeepMind analisou 700 mil registros médicos. Identificou insuficiência renal antes dos médicos. Salvou vidas — mas também levantou uma questão perturbadora: você quer saber quando vai morrer? A tecnologia já pode te dizer. A pergunta é: você está pronto para ouvir?",
+    "cta": "Comenta: você deixaria a IA decidir seu tratamento?",
+    "hashtags": "#IA #InteligênciaArtificial #Tecnologia #Saúde #Shorts",
+    "palavras_totais": 61
+  },
+  "producao": {
+    "color_grade": "tech_blue_clinical",
+    "estilo_visual": "tech blue clinical, hologramas médicos, UI futurista",
+    "fonte_texto": "JetBrains Mono, ciano neon em fundo escuro",
+    "musica_mood": "eletrônico frio, synthwave, 110 BPM"
+  },
+  "audio": {
+    "voice": "pt-BR-AntonioNeural",
+    "rate": "-4%",
+    "pitch": "-2Hz",
+    "tts_engine": "edge_tts (fallback: gTTS → txt)"
+  },
+  "assets_necessarios": {
+    "imagens_sd": [
+      "imagens/S003_cena01_hook.png",
+      "imagens/S003_cena02_dev_a.png",
+      "imagens/S003_cena02_dev_b.png",
+      "imagens/S003_cena03_cta.png",
+      "imagens/S003_thumbnail.png"
+    ],
+    "audio_narracao": "audio/S003_short_narracao.mp3",
+    "musica_fundo": "musica/fundo_instrumental.mp3 (licença CC ou royalty-free)",
+    "srt_legendas": "audio/S003_short_legendas.srt"
+  },
+  "seo_youtube": {
+    "titulo": "A IA Que Prevê Sua Morte #Shorts",
+    "descricao": "Uma IA previu a morte de pacientes com 90% de precisão.\n\nO algoritmo do DeepMind analisou 700 mil registros médicos. Identificou insuficiência renal antes dos médicos. Salvou vidas — mas também levantou uma questão perturbadora: você quer saber quando vai m...\n\n🔔 Siga o canal Dark Tech para mais conteúdo!\n\nProduzido com DARK STUDIO AAA | Conteúdo com auxílio de IA\n\n#IA #InteligênciaArtificial #Tecnologia #Saúde #Shorts",
+    "tags": [
+      "IA",
+      "InteligênciaArtificial",
+      "Tecnologia",
+      "Saúde",
+      "Shorts"
+    ],
+    "categoria": "Education",
+    "idioma": "pt-BR",
+    "made_for_kids": false
+  },
+  "receita_estimada_mensal": "R$216/mês",
+  "agentes_utilizados": [
+    "IMAGE ENGINE",
+    "CINEMATIC DIRECTOR",
+    "AUDIO MASTER",
+    "MOTION GRAPHICS",
+    "VIDEO EDITOR PRO",
+    "VISUAL CONSISTENCY",
+    "ASSET MANAGER",
+    "CREATIVE QA"
+  ],
+  "gerado_em": "2026-11-01T15:04:47.275409",
+  "versao": "DARK STUDIO AAA v1.4.0"
+}

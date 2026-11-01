@@ -1,0 +1,45 @@
+# ROTEIRO DE NARRAÇÃO — SHORT S003
+## AGENTE AUDIO MASTER — DARK SHORTS FACTORY
+## Canal: Dark Tech · Duração alvo: 55s
+## Voz: pt-BR-AntonioNeural · rate=-4% · pitch=-2Hz
+
+ai_generated: True
+ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
+
+---
+
+## TOM E DIREÇÃO
+- **Velocidade:** -4% (mais dinâmico para Shorts)
+- **Tom:** Urgente, íntimo, como um segredo revelado
+- **Padrão de pausa:** Vírgulas = 0.3s · Pontos = 0.6s · [PAUSA] = 1.0s
+
+---
+
+## NARRAÇÃO COMPLETA
+
+[HOOK — 0:00]
+Uma IA previu a morte de pacientes com 90% de precisão.
+
+[PAUSA 0.8]
+
+[CORPO — 0:05]
+O algoritmo do DeepMind analisou 700 mil registros médicos. Identificou insuficiência renal antes dos médicos. Salvou vidas — mas também levantou uma questão perturbadora: você quer saber quando vai morrer? A tecnologia já pode te dizer. A pergunta é: você está pronto para ouvir?
+
+[PAUSA 0.5]
+
+[CTA — 0:45]
+Comenta: você deixaria a IA decidir seu tratamento?
+
+---
+
+## CONTAGEM ESTIMADA
+- Palavras totais: ~63
+- Duração estimada: 55s (a -4% speed)
+
+---
+
+## MARCADORES DE EDIÇÃO
+- 🔴 0:00 — Hook inicia (sobreposição texto OBRIGATÓRIA)
+- 🟡 0:05 — Corpo começa (iniciar B-roll)
+- 🟢 0:43 — CTA (texto CTA aparece)
+- ⬛ 0:55 — Fade out

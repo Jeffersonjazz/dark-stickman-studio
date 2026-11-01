@@ -1,0 +1,77 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "short_id": "S002",
+  "video_ref": "V002",
+  "canal": "Dark História",
+  "nicho": "historia",
+  "titulo": "O Homem Que Enganou o Mundo #Shorts",
+  "formato": {
+    "resolucao": "1080x1920",
+    "proporcao": "9:16",
+    "fps": 30,
+    "duracao_max_s": 60,
+    "duracao_alvo_s": 50,
+    "codec_video": "H.264",
+    "codec_audio": "AAC 192kbps",
+    "plataforma": "YouTube Shorts"
+  },
+  "roteiro": {
+    "hook": "Em 1974, um político britânico fingiu sua própria morte.",
+    "corpo": "John Stonehouse deixou as roupas na praia e virou outra pessoa na Austrália. Ele tinha uma amante, dívidas e segredos. A Scotland Yard o encontrou no Natal. Ele passou 3 anos preso. E ainda tentou voltar para a política.",
+    "cta": "Curta se acha que ele foi inteligente ou idiota.",
+    "hashtags": "#História #Mistério #CrimesReais #Stonehouse #Shorts",
+    "palavras_totais": 55
+  },
+  "producao": {
+    "color_grade": "sepia_vintage_noir",
+    "estilo_visual": "sepia vintage noir, jornais antigos, filme granulado",
+    "fonte_texto": "Playfair Display, sépia com borda envelhecida",
+    "musica_mood": "suspense années 70, orquestra densa, 95 BPM"
+  },
+  "audio": {
+    "voice": "pt-BR-AntonioNeural",
+    "rate": "-6%",
+    "pitch": "-4Hz",
+    "tts_engine": "edge_tts (fallback: gTTS → txt)"
+  },
+  "assets_necessarios": {
+    "imagens_sd": [
+      "imagens/S002_cena01_hook.png",
+      "imagens/S002_cena02_dev_a.png",
+      "imagens/S002_cena02_dev_b.png",
+      "imagens/S002_cena03_cta.png",
+      "imagens/S002_thumbnail.png"
+    ],
+    "audio_narracao": "audio/S002_short_narracao.mp3",
+    "musica_fundo": "musica/fundo_instrumental.mp3 (licença CC ou royalty-free)",
+    "srt_legendas": "audio/S002_short_legendas.srt"
+  },
+  "seo_youtube": {
+    "titulo": "O Homem Que Enganou o Mundo #Shorts",
+    "descricao": "Em 1974, um político britânico fingiu sua própria morte.\n\nJohn Stonehouse deixou as roupas na praia e virou outra pessoa na Austrália. Ele tinha uma amante, dívidas e segredos. A Scotland Yard o encontrou no Natal. Ele passou 3 anos preso. E ainda tentou vol...\n\n🔔 Siga o canal Dark História para mais conteúdo!\n\nProduzido com DARK STUDIO AAA | Conteúdo com auxílio de IA\n\n#História #Mistério #CrimesReais #Stonehouse #Shorts",
+    "tags": [
+      "História",
+      "Mistério",
+      "CrimesReais",
+      "Stonehouse",
+      "Shorts"
+    ],
+    "categoria": "Education",
+    "idioma": "pt-BR",
+    "made_for_kids": false
+  },
+  "receita_estimada_mensal": "R$144/mês",
+  "agentes_utilizados": [
+    "IMAGE ENGINE",
+    "CINEMATIC DIRECTOR",
+    "AUDIO MASTER",
+    "MOTION GRAPHICS",
+    "VIDEO EDITOR PRO",
+    "VISUAL CONSISTENCY",
+    "ASSET MANAGER",
+    "CREATIVE QA"
+  ],
+  "gerado_em": "2026-11-01T15:04:46.650428",
+  "versao": "DARK STUDIO AAA v1.4.0"
+}

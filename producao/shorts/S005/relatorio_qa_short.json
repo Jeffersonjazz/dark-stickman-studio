@@ -1,0 +1,34 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "short_id": "S005",
+  "canal": "Dark Natureza",
+  "timestamp": "2026-11-01T15:04:49.193327",
+  "checklist": {
+    "pacote_short_json": true,
+    "roteiro_short": true,
+    "prompts_sd_verticais": true,
+    "storyboard_cinematico": true,
+    "motion_graphics": true,
+    "identidade_visual": true,
+    "script_tts": true,
+    "script_montagem": true,
+    "pasta_imagens": true,
+    "pasta_audio": true,
+    "pasta_output": true,
+    "narracao_mp3": true,
+    "video_mp4": false
+  },
+  "score_qa": 92.3,
+  "status": "APROVADO",
+  "pendencias": [
+    "video_mp4"
+  ],
+  "proximos_passos": [
+    "1. Executar gerar_audio_short.py localmente",
+    "2. Gerar imagens SD com prompts_visuais_short_sd.md",
+    "3. Colocar imagens em imagens/ e rodar montar_short.py",
+    "4. Revisar storyboard e motion graphics",
+    "5. Upload para YouTube Shorts"
+  ]
+}

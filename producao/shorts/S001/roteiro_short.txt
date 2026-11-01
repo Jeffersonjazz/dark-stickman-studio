@@ -1,0 +1,45 @@
+# ROTEIRO DE NARRAÇÃO — SHORT S001
+## AGENTE AUDIO MASTER — DARK SHORTS FACTORY
+## Canal: Dark Psicologia · Duração alvo: 45s
+## Voz: pt-BR-AntonioNeural · rate=-5% · pitch=-3Hz
+
+ai_generated: True
+ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
+
+---
+
+## TOM E DIREÇÃO
+- **Velocidade:** -5% (mais dinâmico para Shorts)
+- **Tom:** Urgente, íntimo, como um segredo revelado
+- **Padrão de pausa:** Vírgulas = 0.3s · Pontos = 0.6s · [PAUSA] = 1.0s
+
+---
+
+## NARRAÇÃO COMPLETA
+
+[HOOK — 0:00]
+Você já sentiu um vazio que não consegue explicar?
+
+[PAUSA 0.8]
+
+[CORPO — 0:05]
+Pesquisadores chamam isso de vazio existencial — e não é fraqueza. É seu cérebro pedindo significado. Viktor Frankl sobreviveu ao Holocausto e descobriu: quem tem um 'por quê' suporta qualquer 'como'. Você também pode encontrar o seu.
+
+[PAUSA 0.5]
+
+[CTA — 0:45]
+Siga para mais verdades que a psicologia esconde.
+
+---
+
+## CONTAGEM ESTIMADA
+- Palavras totais: ~54
+- Duração estimada: 45s (a -5% speed)
+
+---
+
+## MARCADORES DE EDIÇÃO
+- 🔴 0:00 — Hook inicia (sobreposição texto OBRIGATÓRIA)
+- 🟡 0:05 — Corpo começa (iniciar B-roll)
+- 🟢 0:33 — CTA (texto CTA aparece)
+- ⬛ 0:45 — Fade out

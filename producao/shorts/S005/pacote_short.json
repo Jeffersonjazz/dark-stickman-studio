@@ -1,0 +1,77 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "short_id": "S005",
+  "video_ref": "V005",
+  "canal": "Dark Natureza",
+  "nicho": "natureza",
+  "titulo": "As Árvores Estão Conversando Agora #Shorts",
+  "formato": {
+    "resolucao": "1080x1920",
+    "proporcao": "9:16",
+    "fps": 30,
+    "duracao_max_s": 60,
+    "duracao_alvo_s": 55,
+    "codec_video": "H.264",
+    "codec_audio": "AAC 192kbps",
+    "plataforma": "YouTube Shorts"
+  },
+  "roteiro": {
+    "hook": "Enquanto você assiste isso, florestas inteiras estão se comunicando.",
+    "corpo": "Em 1997, Suzanne Simard descobriu que árvores compartilham nutrientes por redes de fungos. A 'internet das florestas'. Árvores-mãe alimentam as pequenas. Árvores moribundas transmitem recursos aos vizinhos. A floresta não é uma coleção de indivíduos. É um organismo.",
+    "cta": "Isso mudou como você vê uma floresta? 🌿",
+    "hashtags": "#Natureza #Floresta #Ciência #PlanetaTerra #Shorts",
+    "palavras_totais": 53
+  },
+  "producao": {
+    "color_grade": "forest_green_gold",
+    "estilo_visual": "forest green gold, raízes subterrâneas brilhantes, BBC nature",
+    "fonte_texto": "Lora Italic, dourado em verde escuro",
+    "musica_mood": "natureza contemplativa, sons ambientes, violoncelo, 60 BPM"
+  },
+  "audio": {
+    "voice": "pt-BR-AntonioNeural",
+    "rate": "-8%",
+    "pitch": "-2Hz",
+    "tts_engine": "edge_tts (fallback: gTTS → txt)"
+  },
+  "assets_necessarios": {
+    "imagens_sd": [
+      "imagens/S005_cena01_hook.png",
+      "imagens/S005_cena02_dev_a.png",
+      "imagens/S005_cena02_dev_b.png",
+      "imagens/S005_cena03_cta.png",
+      "imagens/S005_thumbnail.png"
+    ],
+    "audio_narracao": "audio/S005_short_narracao.mp3",
+    "musica_fundo": "musica/fundo_instrumental.mp3 (licença CC ou royalty-free)",
+    "srt_legendas": "audio/S005_short_legendas.srt"
+  },
+  "seo_youtube": {
+    "titulo": "As Árvores Estão Conversando Agora #Shorts",
+    "descricao": "Enquanto você assiste isso, florestas inteiras estão se comunicando.\n\nEm 1997, Suzanne Simard descobriu que árvores compartilham nutrientes por redes de fungos. A 'internet das florestas'. Árvores-mãe alimentam as pequenas. Árvores moribundas transmitem recursos aos viz...\n\n🔔 Siga o canal Dark Natureza para mais conteúdo!\n\nProduzido com DARK STUDIO AAA | Conteúdo com auxílio de IA\n\n#Natureza #Floresta #Ciência #PlanetaTerra #Shorts",
+    "tags": [
+      "Natureza",
+      "Floresta",
+      "Ciência",
+      "PlanetaTerra",
+      "Shorts"
+    ],
+    "categoria": "Education",
+    "idioma": "pt-BR",
+    "made_for_kids": false
+  },
+  "receita_estimada_mensal": "R$84/mês",
+  "agentes_utilizados": [
+    "IMAGE ENGINE",
+    "CINEMATIC DIRECTOR",
+    "AUDIO MASTER",
+    "MOTION GRAPHICS",
+    "VIDEO EDITOR PRO",
+    "VISUAL CONSISTENCY",
+    "ASSET MANAGER",
+    "CREATIVE QA"
+  ],
+  "gerado_em": "2026-11-01T15:04:48.588249",
+  "versao": "DARK STUDIO AAA v1.4.0"
+}
