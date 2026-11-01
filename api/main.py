@@ -840,6 +840,223 @@ async def listar_formatos():
     }
 
 
+# ─── DARK AUDIO STUDIO ──────────────────────────────────────────────────────
+
+@app.post("/audio/narrar", tags=["DARK Audio Studio"])
+async def audio_narrar(
+    texto: str = Body(..., description="Texto para narrar"),
+    voz: str = Body("feminino", description="feminino | masculino | feminino_alt | narrador"),
+    velocidade: float = Body(1.0),
+    nicho: str = Body("geral"),
+    output_path: Optional[str] = Body(None),
+):
+    """Sintetiza narração em pt-BR — cascade edge-tts → gTTS → espeak."""
+    try:
+        from core.dark_audio_studio import DarkAudioStudio
+        studio = DarkAudioStudio()
+        res = studio.narrar(texto=texto, voz=voz, velocidade=velocidade, nicho=nicho, output_path=output_path)
+        res["ai_generated"] = True
+        res["ai_disclosure"] = "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+        return res
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.post("/audio/tratar", tags=["DARK Audio Studio"])
+async def audio_tratar(
+    audio_path: str = Body(..., description="Caminho do arquivo de áudio"),
+    preset: str = Body("padrão", description="narração_documentario | narração_tecnologia | narração_misterio | narração_motivacao | narração_natureza | padrão"),
+    output_path: Optional[str] = Body(None),
+):
+    """Aplica tratamento profissional de áudio (EQ + Compressão + Normalização)."""
+    try:
+        from core.dark_audio_studio import DarkAudioStudio
+        studio = DarkAudioStudio()
+        res = studio.tratar_audio(audio_path=audio_path, preset=preset, output_path=output_path)
+        res["ai_generated"] = True
+        res["ai_disclosure"] = "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+        return res
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.post("/audio/mixar", tags=["DARK Audio Studio"])
+async def audio_mixar(
+    voz_path: str = Body(..., description="Caminho da narração"),
+    musica_path: str = Body(..., description="Caminho da trilha de fundo"),
+    vol_voz: float = Body(1.0, description="Volume da voz (0.0–2.0)"),
+    vol_musica: float = Body(0.15, description="Volume da música (0.0–1.0)"),
+    output_path: Optional[str] = Body(None),
+):
+    """Mixa narração com trilha musical — clone Audacity Mix."""
+    try:
+        from core.dark_audio_studio import DarkAudioStudio
+        studio = DarkAudioStudio()
+        res = studio.mixar(voz_path=voz_path, musica_path=musica_path, vol_voz=vol_voz, vol_musica=vol_musica, output_path=output_path)
+        res["ai_generated"] = True
+        res["ai_disclosure"] = "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+        return res
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.post("/audio/pipeline", tags=["DARK Audio Studio"])
+async def audio_pipeline(
+    texto: str = Body(...),
+    voz: str = Body("feminino"),
+    nicho: str = Body("geral"),
+    musica_path: Optional[str] = Body(None),
+    vol_musica: float = Body(0.15),
+):
+    """Pipeline completo: TTS → Tratar → Mixar (se música fornecida)."""
+    try:
+        from core.dark_audio_studio import DarkAudioStudio
+        studio = DarkAudioStudio()
+        # 1. Narrar
+        narr = studio.narrar(texto=texto, voz=voz, nicho=nicho)
+        if narr.get("status") != "ok":
+            return {**narr, "ai_generated": True, "etapa": "narração"}
+        # 2. Tratar
+        from core.dark_audio_studio import NICHO_PRESET
+        preset = NICHO_PRESET.get(nicho, "padrão")
+        narr_path = narr.get("arquivo") or narr.get("path") or narr.get("output")
+        tratado = studio.tratar_audio(audio_path=narr_path, preset=preset) if narr_path else narr
+        audio_final = tratado.get("arquivo") or tratado.get("path") or narr_path
+        # 3. Mixar (opcional)
+        if musica_path and audio_final:
+            mixado = studio.mixar(voz_path=audio_final, musica_path=musica_path, vol_musica=vol_musica)
+            audio_final = mixado.get("arquivo") or mixado.get("path") or audio_final
+        return {
+            "status": "ok",
+            "arquivo_final": audio_final,
+            "narração": narr,
+            "preset_usado": preset,
+            "custo_brl": 0.0,
+            "ai_generated": True,
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        }
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.get("/audio/vozes", tags=["DARK Audio Studio"])
+async def audio_vozes():
+    """Lista vozes disponíveis por backend."""
+    return {
+        "edge_tts": {
+            "feminino": "pt-BR-LeiaNeural",
+            "masculino": "pt-BR-AntonioNeural",
+            "feminino_alt": "pt-BR-FranciscaNeural",
+            "narrador": "pt-BR-AntonioNeural",
+        },
+        "piper": {
+            "feminino": "pt_BR-edresson_carvalho-low",
+            "masculino": "pt_BR-faber-medium",
+        },
+        "gtts": {"geral": "pt-BR (Google TTS)"},
+        "presets_audio": list(["narração_documentario","narração_tecnologia","narração_misterio","narração_motivacao","narração_natureza","padrão"]),
+        "custo_brl": 0.0,
+        "ai_generated": True,
+    }
+
+
+@app.get("/audio/status", tags=["DARK Audio Studio"])
+async def audio_status():
+    """Diagnóstico dos backends de áudio disponíveis."""
+    try:
+        from core.dark_audio_studio import DarkAudioStudio
+        studio = DarkAudioStudio()
+        return {
+            "backends": studio._backends,
+            "custo_brl": 0.0,
+            "ai_generated": True,
+        }
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+# ─── DARK MOTION LAB ────────────────────────────────────────────────────────
+
+@app.post("/motion/titulo", tags=["DARK Motion Lab"])
+async def motion_titulo(
+    texto: str = Body(..., description="Texto do título"),
+    duracao: float = Body(4.0),
+    animacao: str = Body("fade", description="fade | slide | typewriter | glow"),
+    nicho: str = Body("cinematico"),
+    resolucao: str = Body("1920x1080", description="LarguraxAltura"),
+    output_path: Optional[str] = Body(None),
+):
+    """Gera título animado — clone After Effects Text Animation."""
+    try:
+        from core.dark_motion_lab import DarkMotionLab
+        lab = DarkMotionLab()
+        w, h = (int(x) for x in resolucao.split("x"))
+        res = lab.titulo_animado(texto=texto, duracao=duracao, animacao=animacao, nicho=nicho, resolucao=(w, h), output_path=output_path)
+        res["ai_generated"] = True
+        res["ai_disclosure"] = "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+        return res
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.post("/motion/lower-third", tags=["DARK Motion Lab"])
+async def motion_lower_third(
+    video_path: str = Body(...),
+    titulo: str = Body(...),
+    subtitulo: str = Body(""),
+    tempo_ini: float = Body(1.0),
+    tempo_fim: float = Body(5.0),
+    nicho: str = Body("cinematico"),
+    output_path: Optional[str] = Body(None),
+):
+    """Adiciona lower third animado ao vídeo."""
+    try:
+        from core.dark_motion_lab import DarkMotionLab
+        lab = DarkMotionLab()
+        res = lab.lower_third(video_path=video_path, titulo=titulo, subtitulo=subtitulo, tempo_ini=tempo_ini, tempo_fim=tempo_fim, nicho=nicho, output_path=output_path)
+        res["ai_generated"] = True
+        res["ai_disclosure"] = "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+        return res
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.post("/motion/abertura", tags=["DARK Motion Lab"])
+async def motion_abertura(
+    titulo_canal: str = Body(...),
+    slogan: str = Body(""),
+    duracao: float = Body(5.0),
+    nicho: str = Body("cinematico"),
+    output_path: Optional[str] = Body(None),
+):
+    """Gera vídeo de abertura/intro do canal."""
+    try:
+        from core.dark_motion_lab import DarkMotionLab
+        lab = DarkMotionLab()
+        if hasattr(lab, 'abertura'):
+            res = lab.abertura(titulo_canal=titulo_canal, slogan=slogan, duracao=duracao, nicho=nicho, output_path=output_path)
+        else:
+            # fallback: gera título animado como abertura
+            res = lab.titulo_animado(texto=titulo_canal, duracao=duracao, animacao="glow", nicho=nicho, output_path=output_path)
+        res["ai_generated"] = True
+        res["ai_disclosure"] = "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+        return res
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.get("/motion/efeitos", tags=["DARK Motion Lab"])
+async def motion_efeitos():
+    """Lista efeitos de animação disponíveis."""
+    return {
+        "titulos": ["fade", "slide", "typewriter", "glow"],
+        "nichos": ["cinematico", "natureza", "historia", "tecnologia", "misterio", "motivacao", "geral"],
+        "resolucoes": ["1920x1080", "1080x1920", "1280x720", "1080x1080"],
+        "custo_brl": 0.0,
+        "ai_generated": True,
+    }
+
+
 @app.get("/painel/", tags=["Sistema"])
 async def painel_redirect():
     """Redireciona para o painel principal."""

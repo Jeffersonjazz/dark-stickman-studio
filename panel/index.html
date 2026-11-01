@@ -904,92 +904,435 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
 
       <!-- ════════ MOTION LAB ════════ -->
       <div id="panel-motion-lab" class="panel">
-        <div class="sec-hdr"><h2>✨ DARK MOTION LAB</h2><p>Animações, títulos e efeitos visuais</p></div>
-        <div class="grid2">
-          <div class="card">
-            <div class="card-header"><span class="card-icon">🎬</span><span class="card-title">Motor Manim CE</span><span class="pill pill-green">Ativo</span></div>
-            <div class="card-body">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--fg2)">
-                <span>✓ Títulos animados</span><span>✓ Legendas cinéticas</span>
-                <span>✓ Infográficos</span><span>✓ Gráficos explicativos</span>
-                <span>✓ Animação de logos</span><span>✓ Aberturas</span>
-                <span>✓ Encerramentos</span><span>✓ Elementos 2D</span>
-                <span>✓ Stickman physics</span><span>✓ Partículas</span>
+        <div class="sec-hdr"><h2>✨ DARK MOTION LAB</h2><p>Títulos animados · Lower Thirds · Aberturas — R$0,00 — FFmpeg + Pillow</p></div>
+
+        <!-- Título Animado -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">🎬</span><span class="card-title">Título Animado — Clone After Effects Text</span><span class="badge" style="background:var(--green);color:#000">FFMPEG</span></div>
+          <div class="card-body">
+            <div class="grid2">
+              <div>
+                <div class="form-group"><label>Texto do título</label>
+                  <input type="text" id="motion-titulo-texto" value="DARK STUDIO AAA" placeholder="Título principal">
+                </div>
+                <div class="form-group"><label>Animação</label>
+                  <select id="motion-titulo-anim">
+                    <option value="fade">✨ Fade In/Out</option>
+                    <option value="slide">➡️ Slide Entrada</option>
+                    <option value="typewriter">⌨️ Máquina de Escrever</option>
+                    <option value="glow">💫 Glow / Brilho</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <div class="form-group"><label>Nicho / Paleta</label>
+                  <select id="motion-titulo-nicho">
+                    <option value="cinematico" selected>🎬 Cinematográfico</option>
+                    <option value="historia">📜 História (sépia)</option>
+                    <option value="tecnologia">💡 Tecnologia (azul)</option>
+                    <option value="misterio">🔮 Mistério (roxo)</option>
+                    <option value="natureza">🌿 Natureza (verde)</option>
+                    <option value="motivacao">⚡ Motivação (laranja)</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Duração (s)</label>
+                  <input type="number" id="motion-titulo-dur" value="4" min="2" max="15" step="0.5">
+                </div>
+                <div class="form-group"><label>Resolução</label>
+                  <select id="motion-titulo-res">
+                    <option value="1920x1080" selected>1920×1080 (HD)</option>
+                    <option value="1080x1920">1080×1920 (Vertical)</option>
+                    <option value="1280x720">1280×720 (720p)</option>
+                    <option value="1080x1080">1080×1080 (Quadrado)</option>
+                  </select>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-header"><span class="card-icon">🎨</span><span class="card-title">Templates Prontos</span></div>
-            <div class="card-body">
-              <div style="display:flex;flex-direction:column;gap:8px">
-                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="toast('Template Dark Intro gerado via Manim','ok')">🌑 Dark Intro (3s)</button>
-                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="toast('Template YouTube Outro gerado','ok')">📺 YouTube Outro (5s)</button>
-                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="toast('Lower third animado criado','ok')">📝 Lower Third</button>
-                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="toast('Transition wipe gerada','ok')">↔️ Wipe Transition</button>
-                <button class="btn btn-ghost btn-sm" style="justify-content:flex-start" onclick="toast('Subscribe button animado','ok')">🔔 Subscribe Button</button>
-              </div>
-            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="motionTitulo()">✨ Gerar Título Animado</button>
+            <div id="motion-titulo-result" class="result-box" style="display:none"></div>
           </div>
         </div>
+
+        <!-- Lower Third -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">📝</span><span class="card-title">Lower Third — Barra de Identificação</span></div>
+          <div class="card-body">
+            <div class="grid2">
+              <div>
+                <div class="form-group"><label>Vídeo de entrada</label>
+                  <input type="text" id="motion-lt-video" placeholder="/tmp/dark-studio/video/cena.mp4">
+                </div>
+                <div class="form-group"><label>Título (nome / local)</label>
+                  <input type="text" id="motion-lt-titulo" value="DARK STUDIO" placeholder="Nome principal">
+                </div>
+                <div class="form-group"><label>Subtítulo (cargo / descrição)</label>
+                  <input type="text" id="motion-lt-sub" placeholder="Produtor Audiovisual">
+                </div>
+              </div>
+              <div>
+                <div class="form-group"><label>Nicho / Paleta</label>
+                  <select id="motion-lt-nicho">
+                    <option value="cinematico" selected>🎬 Cinematográfico</option>
+                    <option value="historia">📜 História</option>
+                    <option value="tecnologia">💡 Tecnologia</option>
+                    <option value="misterio">🔮 Mistério</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Início (s)</label>
+                  <input type="number" id="motion-lt-ini" value="1.0" min="0" step="0.5">
+                </div>
+                <div class="form-group"><label>Fim (s)</label>
+                  <input type="number" id="motion-lt-fim" value="5.0" min="1" step="0.5">
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="motionLowerThird()">📝 Adicionar Lower Third</button>
+            <div id="motion-lt-result" class="result-box" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- Abertura do Canal -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">🌑</span><span class="card-title">Abertura / Intro do Canal</span></div>
+          <div class="card-body">
+            <div class="grid2">
+              <div class="form-group"><label>Nome do canal</label>
+                <input type="text" id="motion-abr-canal" value="DARK STUDIO AAA" placeholder="Nome do canal">
+              </div>
+              <div class="form-group"><label>Slogan</label>
+                <input type="text" id="motion-abr-slogan" value="Produção Audiovisual Profissional" placeholder="Slogan ou descrição">
+              </div>
+              <div class="form-group"><label>Duração (s)</label>
+                <input type="number" id="motion-abr-dur" value="5" min="3" max="10">
+              </div>
+              <div class="form-group"><label>Nicho</label>
+                <select id="motion-abr-nicho">
+                  <option value="cinematico" selected>🎬 Cinematográfico</option>
+                  <option value="misterio">🔮 Mistério</option>
+                  <option value="tecnologia">💡 Tecnologia</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="motionAbertura()">🌑 Gerar Abertura</button>
+            <div id="motion-abr-result" class="result-box" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- Efeitos disponíveis -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">🎨</span><span class="card-title">Efeitos Disponíveis</span></div>
+          <div class="card-body">
+            <button class="btn btn-ghost btn-sm" onclick="motionEfeitos()">📋 Listar Efeitos</button>
+            <div id="motion-efeitos-result" class="result-box" style="display:none"></div>
+          </div>
+        </div>
+
+        <script>
+        async function motionTitulo() {
+          const texto = document.getElementById('motion-titulo-texto').value.trim();
+          if (!texto) { toast('Digite o texto do título','warn'); return; }
+          const body = {
+            texto,
+            duracao: parseFloat(document.getElementById('motion-titulo-dur').value),
+            animacao: document.getElementById('motion-titulo-anim').value,
+            nicho: document.getElementById('motion-titulo-nicho').value,
+            resolucao: document.getElementById('motion-titulo-res').value,
+          };
+          toast('✨ Gerando título animado...','ok');
+          const r = document.getElementById('motion-titulo-result');
+          r.style.display='block'; r.textContent='⏳ FFmpeg renderizando...';
+          try {
+            const res = await fetch('/motion/titulo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+            const d = await res.json();
+            r.textContent = JSON.stringify(d,null,2);
+            if(d.status==='ok') toast('✅ Título gerado: '+(d.arquivo||d.path||'ok'),'ok');
+            else toast('⚠️ '+d.mensagem,'warn');
+          } catch(e){r.textContent='Erro: '+e.message;}
+        }
+        async function motionLowerThird() {
+          const video = document.getElementById('motion-lt-video').value.trim();
+          const titulo = document.getElementById('motion-lt-titulo').value.trim();
+          if (!video||!titulo) { toast('Informe vídeo e título','warn'); return; }
+          const body = {
+            video_path: video,
+            titulo,
+            subtitulo: document.getElementById('motion-lt-sub').value,
+            tempo_ini: parseFloat(document.getElementById('motion-lt-ini').value),
+            tempo_fim: parseFloat(document.getElementById('motion-lt-fim').value),
+            nicho: document.getElementById('motion-lt-nicho').value,
+          };
+          toast('📝 Adicionando lower third...','ok');
+          const r = document.getElementById('motion-lt-result');
+          r.style.display='block'; r.textContent='⏳ Processando...';
+          try {
+            const res = await fetch('/motion/lower-third',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+            const d = await res.json();
+            r.textContent = JSON.stringify(d,null,2);
+            if(d.status==='ok') toast('✅ Lower third adicionado','ok');
+            else toast('⚠️ '+d.mensagem,'warn');
+          } catch(e){r.textContent='Erro: '+e.message;}
+        }
+        async function motionAbertura() {
+          const canal = document.getElementById('motion-abr-canal').value.trim();
+          if (!canal) { toast('Digite o nome do canal','warn'); return; }
+          const body = {
+            titulo_canal: canal,
+            slogan: document.getElementById('motion-abr-slogan').value,
+            duracao: parseFloat(document.getElementById('motion-abr-dur').value),
+            nicho: document.getElementById('motion-abr-nicho').value,
+          };
+          toast('🌑 Gerando abertura...','ok');
+          const r = document.getElementById('motion-abr-result');
+          r.style.display='block'; r.textContent='⏳ Renderizando abertura...';
+          try {
+            const res = await fetch('/motion/abertura',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+            const d = await res.json();
+            r.textContent = JSON.stringify(d,null,2);
+            if(d.status==='ok') toast('✅ Abertura gerada','ok');
+            else toast('⚠️ '+d.mensagem,'warn');
+          } catch(e){r.textContent='Erro: '+e.message;}
+        }
+        async function motionEfeitos() {
+          const r = document.getElementById('motion-efeitos-result');
+          r.style.display='block'; r.textContent='⏳ Carregando...';
+          try {
+            const res = await fetch('/motion/efeitos');
+            const d = await res.json();
+            r.textContent = JSON.stringify(d,null,2);
+          } catch(e){r.textContent='Erro: '+e.message;}
+        }
+        </script>
       </div>
 
       <!-- ════════ AUDIO STUDIO ════════ -->
       <div id="panel-audio-studio" class="panel">
-        <div class="sec-hdr"><h2>🎙️ DARK AUDIO STUDIO</h2><p>Narração PT-BR e pós-produção de áudio</p></div>
-        <div class="grid2">
-          <div class="card">
-            <div class="card-header"><span class="card-icon">🔊</span><span class="card-title">TTS Cascata</span></div>
-            <div class="card-body">
-              <div style="display:flex;flex-direction:column;gap:8px">
-                <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg3);border-radius:8px">
-                  <div class="agent-dot dot-green"></div>
-                  <div><div style="font-size:12px;font-weight:600">1. Kokoro Local</div><div style="font-size:10px;color:var(--fg3)">Alta qualidade — gratuito — offline</div></div>
-                  <span class="pill pill-green" style="margin-left:auto">Prioridade 1</span>
+        <div class="sec-hdr"><h2>🎙️ DARK AUDIO STUDIO</h2><p>Narração PT-BR · Tratamento · Mixagem — R$0,00 — edge-tts + FFmpeg</p></div>
+
+        <!-- Narração TTS -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">🎙️</span><span class="card-title">Narração TTS — PT-BR Neural</span><span class="badge" style="background:var(--green);color:#000">CASCATA GRATUITA</span></div>
+          <div class="card-body">
+            <div class="grid2">
+              <div>
+                <div class="form-group"><label>Texto para narrar</label>
+                  <textarea id="audio-texto" rows="5" placeholder="Digite o texto completo para narrar em PT-BR...">Bem-vindos ao DARK STUDIO. Produção audiovisual profissional com inteligência artificial.</textarea>
                 </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg3);border-radius:8px">
-                  <div class="agent-dot dot-green"></div>
-                  <div><div style="font-size:12px;font-weight:600">2. Piper Local</div><div style="font-size:10px;color:var(--fg3)">Rápido — offline — PT-BR nativo</div></div>
-                  <span class="pill pill-green" style="margin-left:auto">Fallback 1</span>
+                <div class="form-group"><label>Voz</label>
+                  <select id="audio-voz">
+                    <option value="feminino">🎙️ Feminino (Leia Neural)</option>
+                    <option value="masculino" selected>🎙️ Masculino (Antonio Neural)</option>
+                    <option value="feminino_alt">🎙️ Feminino Alt (Francisca Neural)</option>
+                    <option value="narrador">📻 Narrador (Documentary)</option>
+                  </select>
                 </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg3);border-radius:8px">
-                  <div class="agent-dot dot-grey"></div>
-                  <div><div style="font-size:12px;font-weight:600">3. Edge TTS</div><div style="font-size:10px;color:var(--fg3)">Microsoft — online — gratuito</div></div>
-                  <span class="pill pill-yellow" style="margin-left:auto">Fallback 2</span>
+              </div>
+              <div>
+                <div class="form-group"><label>Nicho / Preset de tratamento</label>
+                  <select id="audio-nicho">
+                    <option value="geral">🎯 Geral (padrão)</option>
+                    <option value="historia">📜 História (documentário)</option>
+                    <option value="misterio">🔮 Mistério (voz grave)</option>
+                    <option value="tecnologia">💡 Tecnologia (clara)</option>
+                    <option value="natureza">🌿 Natureza (suave)</option>
+                    <option value="motivacao">⚡ Motivação (energia)</option>
+                  </select>
                 </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg3);border-radius:8px">
-                  <div class="agent-dot dot-grey"></div>
-                  <div><div style="font-size:12px;font-weight:600">4. HF MMS</div><div style="font-size:10px;color:var(--fg3)">Meta — online — gratuito</div></div>
-                  <span class="pill pill-yellow" style="margin-left:auto">Fallback 3</span>
+                <div class="form-group"><label>Velocidade</label>
+                  <input type="number" id="audio-velocidade" value="1.0" min="0.5" max="2.0" step="0.1">
                 </div>
-                <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg3);border-radius:8px">
-                  <div class="agent-dot dot-grey"></div>
-                  <div><div style="font-size:12px;font-weight:600">5. gTTS</div><div style="font-size:10px;color:var(--fg3)">Google — online — gratuito</div></div>
-                  <span class="pill pill-grey" style="margin-left:auto">Fallback 4</span>
+                <div class="form-group"><label>Output (deixe vazio para automático)</label>
+                  <input type="text" id="audio-output" placeholder="/tmp/dark-studio/audio/narr.mp3">
                 </div>
               </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-header"><span class="card-icon">🎚️</span><span class="card-title">Pós-Produção</span></div>
-            <div class="card-body">
-              <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--fg2)">
-                <span>✓ Normalização de volume (-14 LUFS)</span>
-                <span>✓ Redução de ruído (RNNoise)</span>
-                <span>✓ Equalização automática</span>
-                <span>✓ Compressão dinâmica</span>
-                <span>✓ Mixagem narração + trilha</span>
-                <span>✓ Detecção de silêncio</span>
-                <span>✓ Sincronização com legendas</span>
-                <span>✓ Export WAV / MP3 / AAC</span>
-              </div>
-              <div class="divider"></div>
-              <div class="form-group"><label>Testar Narração</label>
-                <textarea id="tts-texto" rows="3" placeholder="Digite o texto para narrar...">Bem-vindos ao DARK STUDIO. Produção audiovisual profissional.</textarea>
-              </div>
-              <button class="btn btn-primary btn-sm" onclick="toast('TTS enviado ao AGENTE AUDIO MASTER — processando cascata...','ok')">🎙️ Narrar</button>
-            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="audioNarrar()">🎙️ Narrar Texto</button>
+            <div id="audio-narrar-result" class="result-box" style="display:none"></div>
           </div>
         </div>
+
+        <!-- Tratar Áudio -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">🎚️</span><span class="card-title">Tratar Áudio — EQ + Compressor + LUFS</span></div>
+          <div class="card-body">
+            <div class="grid2">
+              <div class="form-group"><label>Arquivo de áudio</label>
+                <input type="text" id="audio-tratar-path" placeholder="/tmp/dark-studio/audio/narr.mp3">
+              </div>
+              <div class="form-group"><label>Preset de tratamento</label>
+                <select id="audio-preset">
+                  <option value="padrão">🎯 Padrão (-18 LUFS)</option>
+                  <option value="narração_documentario">📜 Documentário (-18 LUFS)</option>
+                  <option value="narração_tecnologia">💡 Tecnologia (-16 LUFS)</option>
+                  <option value="narração_misterio">🔮 Mistério (-20 LUFS)</option>
+                  <option value="narração_motivacao">⚡ Motivação (-14 LUFS)</option>
+                  <option value="narração_natureza">🌿 Natureza (-18 LUFS)</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="audioTratar()">🎚️ Aplicar Tratamento</button>
+            <div id="audio-tratar-result" class="result-box" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- Mixar -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">🎵</span><span class="card-title">Mixar — Narração + Trilha Musical</span></div>
+          <div class="card-body">
+            <div class="grid2">
+              <div>
+                <div class="form-group"><label>Arquivo de voz / narração</label>
+                  <input type="text" id="audio-mix-voz" placeholder="/tmp/dark-studio/audio/narr.mp3">
+                </div>
+                <div class="form-group"><label>Arquivo de música de fundo</label>
+                  <input type="text" id="audio-mix-musica" placeholder="/tmp/dark-studio/assets/trilha.mp3">
+                </div>
+              </div>
+              <div>
+                <div class="form-group"><label>Volume da voz (0.0–2.0)</label>
+                  <input type="number" id="audio-mix-vol-voz" value="1.0" min="0.1" max="2.0" step="0.05">
+                </div>
+                <div class="form-group"><label>Volume da música (0.0–1.0)</label>
+                  <input type="number" id="audio-mix-vol-musica" value="0.15" min="0.0" max="1.0" step="0.01">
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="audioMixar()">🎵 Mixar Áudio</button>
+            <div id="audio-mix-result" class="result-box" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- Pipeline Completo -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">🚀</span><span class="card-title">Pipeline Completo — TTS → Tratar → Mixar</span><span class="badge" style="background:var(--accent);color:#000">AUTO</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>Texto</label>
+              <textarea id="audio-pipe-texto" rows="4" placeholder="Texto completo para narrar e tratar..."></textarea>
+            </div>
+            <div class="grid2">
+              <div class="form-group"><label>Voz</label>
+                <select id="audio-pipe-voz">
+                  <option value="feminino">Feminino (Leia)</option>
+                  <option value="masculino" selected>Masculino (Antonio)</option>
+                  <option value="narrador">Narrador</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Nicho</label>
+                <select id="audio-pipe-nicho">
+                  <option value="geral">Geral</option>
+                  <option value="historia">História</option>
+                  <option value="misterio">Mistério</option>
+                  <option value="tecnologia">Tecnologia</option>
+                  <option value="natureza">Natureza</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group"><label>Música de fundo (opcional)</label>
+              <input type="text" id="audio-pipe-musica" placeholder="/tmp/dark-studio/assets/trilha.mp3 (deixe vazio para só voz)">
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="audioPipeline()">🚀 Executar Pipeline Completo</button>
+            <div id="audio-pipe-result" class="result-box" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- Status backends -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">📊</span><span class="card-title">Status dos Backends de Áudio</span></div>
+          <div class="card-body">
+            <button class="btn btn-secondary btn-sm" onclick="audioStatus()">🔍 Verificar Backends</button>
+            <div id="audio-status-result" class="result-box" style="display:none"></div>
+          </div>
+        </div>
+
+        <script>
+        async function audioNarrar() {
+          const texto = document.getElementById('audio-texto').value.trim();
+          if (!texto) { toast('Digite o texto para narrar','warn'); return; }
+          const body = {
+            texto,
+            voz: document.getElementById('audio-voz').value,
+            velocidade: parseFloat(document.getElementById('audio-velocidade').value),
+            nicho: document.getElementById('audio-nicho').value,
+            output_path: document.getElementById('audio-output').value || null,
+          };
+          toast('🎙️ Gerando narração PT-BR...','ok');
+          const r = document.getElementById('audio-narrar-result');
+          r.style.display='block'; r.textContent='⏳ Processando TTS...';
+          try {
+            const res = await fetch('/audio/narrar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+            const d = await res.json();
+            r.textContent = JSON.stringify(d,null,2);
+            if(d.status==='ok') toast('✅ Narração gerada: '+( d.arquivo||d.path||d.output||'ok'),'ok');
+            else toast('⚠️ '+d.mensagem,'warn');
+          } catch(e){r.textContent='Erro: '+e.message;toast('Erro de conexão','warn');}
+        }
+        async function audioTratar() {
+          const p = document.getElementById('audio-tratar-path').value.trim();
+          if (!p) { toast('Informe o caminho do áudio','warn'); return; }
+          const body = { audio_path: p, preset: document.getElementById('audio-preset').value };
+          toast('🎚️ Aplicando tratamento de áudio...','ok');
+          const r = document.getElementById('audio-tratar-result');
+          r.style.display='block'; r.textContent='⏳ Processando...';
+          try {
+            const res = await fetch('/audio/tratar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+            const d = await res.json();
+            r.textContent = JSON.stringify(d,null,2);
+            if(d.status==='ok') toast('✅ Áudio tratado com sucesso','ok');
+            else toast('⚠️ '+d.mensagem,'warn');
+          } catch(e){r.textContent='Erro: '+e.message;}
+        }
+        async function audioMixar() {
+          const voz = document.getElementById('audio-mix-voz').value.trim();
+          const musica = document.getElementById('audio-mix-musica').value.trim();
+          if (!voz||!musica) { toast('Informe os caminhos de voz e música','warn'); return; }
+          const body = {
+            voz_path: voz, musica_path: musica,
+            vol_voz: parseFloat(document.getElementById('audio-mix-vol-voz').value),
+            vol_musica: parseFloat(document.getElementById('audio-mix-vol-musica').value),
+          };
+          toast('🎵 Mixando voz + trilha...','ok');
+          const r = document.getElementById('audio-mix-result');
+          r.style.display='block'; r.textContent='⏳ Mixando...';
+          try {
+            const res = await fetch('/audio/mixar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+            const d = await res.json();
+            r.textContent = JSON.stringify(d,null,2);
+            if(d.status==='ok') toast('✅ Mix concluído','ok');
+            else toast('⚠️ '+d.mensagem,'warn');
+          } catch(e){r.textContent='Erro: '+e.message;}
+        }
+        async function audioPipeline() {
+          const texto = document.getElementById('audio-pipe-texto').value.trim();
+          if (!texto) { toast('Digite o texto','warn'); return; }
+          const musica = document.getElementById('audio-pipe-musica').value.trim();
+          const body = {
+            texto,
+            voz: document.getElementById('audio-pipe-voz').value,
+            nicho: document.getElementById('audio-pipe-nicho').value,
+            musica_path: musica || null,
+            vol_musica: 0.15,
+          };
+          toast('🚀 Executando pipeline completo...','ok');
+          const r = document.getElementById('audio-pipe-result');
+          r.style.display='block'; r.textContent='⏳ Pipeline rodando (TTS → Tratar → Mixar)...';
+          try {
+            const res = await fetch('/audio/pipeline',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+            const d = await res.json();
+            r.textContent = JSON.stringify(d,null,2);
+            if(d.status==='ok') toast('✅ Pipeline concluído: '+( d.arquivo_final||'ok'),'ok');
+            else toast('⚠️ Erro no pipeline','warn');
+          } catch(e){r.textContent='Erro: '+e.message;}
+        }
+        async function audioStatus() {
+          const r = document.getElementById('audio-status-result');
+          r.style.display='block'; r.textContent='⏳ Verificando backends...';
+          try {
+            const res = await fetch('/audio/status');
+            const d = await res.json();
+            r.textContent = JSON.stringify(d,null,2);
+            toast('✅ Status atualizado','ok');
+          } catch(e){r.textContent='Erro: '+e.message;}
+        }
+        </script>
       </div>
 
       <!-- ════════ THUMBNAIL PRO ════════ -->
@@ -1667,8 +2010,8 @@ const titles = {
   'image-studio': ['Image Studio', 'AGENTE IMAGE ENGINE'],
   'video-studio': ['Video Studio', 'AGENTE VIDEO GENERATOR'],
   'cinema-editor':['Cinema Editor', 'AGENTE VIDEO EDITOR PRO'],
-  'motion-lab':   ['Motion Lab', 'AGENTE MOTION GRAPHICS'],
-  'audio-studio': ['Audio Studio', 'AGENTE AUDIO MASTER'],
+  'motion-lab':   ['Motion Lab', 'DARK MOTION LAB — Títulos · Lower Thirds · Aberturas — FFmpeg'],
+  'audio-studio': ['Audio Studio', 'DARK AUDIO STUDIO — TTS PT-BR · Tratamento · Mixagem — R$0,00'],
   'thumbnail-pro':['Thumbnail Pro', 'DARK THUMBNAIL PRO'],
   'scene-builder':['Scene Builder', 'AGENTE VISUAL CONSISTENCY + ASSET MANAGER'],
   'shorts-factory':['Shorts Factory', 'DARK SHORTS FACTORY — Vídeos 9:16 automatizados'],
