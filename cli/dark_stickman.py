@@ -120,11 +120,15 @@ def produzir(
                                    help="low_quality | medium_quality | high_quality"),
     formato: str = typer.Option("16:9", "--formato", "-f", help="16:9 | 9:16"),
     shorts: bool = typer.Option(False, "--shorts", help="Gerar versão Shorts (9:16)"),
+    modo: str = typer.Option("stickman", "--modo", "-m",
+                              help="stickman | realista — pipeline de produção"),
+    trilha: Optional[str] = typer.Option(None, "--trilha", help="Trilha sonora de fundo (MP3/WAV)"),
+    legendas: bool = typer.Option(True, "--legendas/--sem-legendas", help="Gerar legendas SRT"),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Diretório de saída"),
     roteiro_json: Optional[str] = typer.Option(None, "--roteiro", "-r",
                                                  help="Caminho para arquivo JSON do roteiro"),
 ):
-    """🎬 Produz um vídeo stickman completo."""
+    """🎬 Produz um vídeo completo (stickman ou imagem realista)."""
     _banner()
 
     canal_cfg = _carregar_canal(canal)
@@ -148,28 +152,56 @@ def produzir(
     console.print(f"[green]✓[/green] Saída: {out_dir}")
 
     # Pipeline
-    console.print("\n[bold]🚀 Iniciando pipeline de produção...[/bold]")
-    from pipeline.f01_producao import produzir_video
+    console.print(f"\n[bold]🚀 Iniciando pipeline [{modo.upper()}]...[/bold]")
 
-    with console.status("[bold blue]Produzindo vídeo...[/bold blue]", spinner="dots"):
-        resultado = produzir_video(
-            roteiro=roteiro,
-            canal_config=canal_cfg,
-            output_dir=out_dir,
-            qualidade=qualidade,
-            formato=formato,
-            gerar_shorts=shorts,
-        )
+    fmt_map = {"16:9": "horizontal", "9:16": "vertical", "1:1": "quadrado"}
+    fmt_real = fmt_map.get(formato, "horizontal")
+    if shorts:
+        fmt_real = "vertical"
+
+    if modo == "realista":
+        from pipeline.f02_imagem_realista import produzir_video_imagem_realista
+        with console.status("[bold blue]Produzindo vídeo realista...[/bold blue]", spinner="dots"):
+            resultado = produzir_video_imagem_realista(
+                roteiro=roteiro,
+                canal_config=canal_cfg,
+                output_dir=out_dir,
+                trilha_path=trilha,
+                formato=fmt_real,
+                incluir_legendas=legendas,
+                verbose=False,
+            )
+        status_ok = resultado.get("status") in ("ok", "partial")
+        video_key = "output_video"
+        thumb_key = "output_thumbnail"
+    else:
+        from pipeline.f01_producao import produzir_video
+        with console.status("[bold blue]Produzindo vídeo stickman...[/bold blue]", spinner="dots"):
+            resultado = produzir_video(
+                roteiro=roteiro,
+                canal_config=canal_cfg,
+                output_dir=out_dir,
+                qualidade=qualidade,
+                formato=formato,
+                gerar_shorts=shorts,
+            )
+        status_ok = resultado.get("status") == "concluido"
+        video_key = "output_path"
+        thumb_key = "thumbnail_path"
 
     # Resultado
-    if resultado.get("status") == "concluido":
-        console.print("\n[bold green]✅ Vídeo produzido com sucesso![/bold green]")
-        console.print(f"  📹 Vídeo: [cyan]{resultado.get('output_path', 'N/A')}[/cyan]")
-        console.print(f"  🖼  Thumbnail: [cyan]{resultado.get('thumbnail_path', 'N/A')}[/cyan]")
-        console.print(f"  ⏱  Duração: {resultado.get('duracao_s', 0):.1f}s")
+    if status_ok:
+        console.print(f"\n[bold green]✅ Vídeo produzido com sucesso! (modo={modo})[/bold green]")
+        console.print(f"  📹 Vídeo: [cyan]{resultado.get(video_key, 'N/A')}[/cyan]")
+        console.print(f"  🖼  Thumbnail: [cyan]{resultado.get(thumb_key, 'N/A')}[/cyan]")
+        if modo == "realista":
+            console.print(f"  🎬 Cenas: {resultado.get('etapas', {}).get('imagens', {}).get('geradas', '?')}")
+            console.print(f"  ⏱  Produção: {resultado.get('duracao_producao_s', 0):.1f}s")
+        else:
+            console.print(f"  ⏱  Duração: {resultado.get('duracao_s', 0):.1f}s")
         console.print(f"\n[dim]{AI_DISCLOSURE}[/dim]")
     else:
-        console.print(f"\n[red]✗ Erro: {resultado.get('erro', 'desconhecido')}[/red]")
+        console.print(f"\n[red]✗ Erro: {resultado.get('erro', resultado.get('etapas', {}))}[/red]")
         raise typer.Exit(1)
 
 

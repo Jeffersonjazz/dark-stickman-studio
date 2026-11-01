@@ -328,6 +328,100 @@ def _test_despacho_synthesize():
 teste("TASK_TYPES['narrar'] → AUDIO_MASTER", _test_despacho_synthesize)
 
 # ──────────────────────────────────────────────
+# 13. Pipeline F02 — Imagem Realista
+print("\n▶ PIPELINE F02 — IMAGEM REALISTA")
+
+def _test_f02_import():
+    from pipeline.f02_imagem_realista import (
+        produzir_video_imagem_realista,
+        check_pipeline_f02,
+        gerar_imagens_cenas,
+        animar_imagens_ken_burns,
+        gerar_narracoes,
+        gerar_legendas_srt,
+        gerar_thumbnail_video,
+    )
+    return True
+teste("Importação pipeline F02", _test_f02_import)
+
+def _test_f02_check():
+    from pipeline.f02_imagem_realista import check_pipeline_f02
+    r = check_pipeline_f02()
+    componentes_ok = sum(1 for v in r.get("componentes", {}).values() if v)
+    print(f"       {componentes_ok}/{len(r.get('componentes', {}))} componentes F02 ok")
+    return r.get("status") in ("ok", "degradado") and componentes_ok >= 4
+teste("check_pipeline_f02()", _test_f02_check)
+
+def _test_f02_planejar_cenas():
+    from pipeline.f02_imagem_realista import planejar_cenas
+    roteiro = {
+        "id": "teste_f02",
+        "titulo": "Teste F02",
+        "cenas": [
+            {"id": "c01", "narracao": "Texto de teste.", "duracao": 3.0, "descricao_visual": ""},
+            {"id": "c02", "narracao": "Segundo texto.", "duracao": 3.0, "descricao_visual": ""},
+        ]
+    }
+    canal = {"nicho": "psicologia", "nome": "Teste"}
+    r = planejar_cenas(roteiro, canal)
+    cenas = r.get("cenas", [])
+    return len(cenas) == 2 and "cinematografia" in cenas[0]
+teste("planejar_cenas() F02", _test_f02_planejar_cenas)
+
+def _test_f02_gerar_imagens():
+    from pipeline.f02_imagem_realista import gerar_imagens_cenas, planejar_cenas
+    roteiro = {
+        "id": "teste_img",
+        "titulo": "Teste Imagens",
+        "cenas": [{"id": "c01", "narracao": "Floresta ao amanhecer.", "duracao": 3.0, "descricao_visual": "dark forest"}]
+    }
+    canal = {"nicho": "natureza", "nome": "Teste"}
+    roteiro_cine = planejar_cenas(roteiro, canal)
+    with tempfile.TemporaryDirectory() as tmp:
+        imagens = gerar_imagens_cenas(roteiro_cine, Path(tmp) / "imgs", verbose=False)
+        return len(imagens) == 1 and imagens[0].get("status") == "ok"
+teste("gerar_imagens_cenas() F02 — fallback Pillow", _test_f02_gerar_imagens)
+
+def _test_f02_ken_burns():
+    from pipeline.f02_imagem_realista import gerar_imagens_cenas, animar_imagens_ken_burns, planejar_cenas
+    roteiro = {
+        "id": "teste_kb",
+        "titulo": "Teste Ken Burns",
+        "cenas": [{"id": "c01", "narracao": "Cena.", "duracao": 3.0, "descricao_visual": "test"}]
+    }
+    canal = {"nicho": "historia", "nome": "Teste"}
+    roteiro_cine = planejar_cenas(roteiro, canal)
+    with tempfile.TemporaryDirectory() as tmp:
+        imgs = gerar_imagens_cenas(roteiro_cine, Path(tmp) / "imgs", verbose=False)
+        clips = animar_imagens_ken_burns(imgs, roteiro_cine, Path(tmp) / "clips", verbose=False)
+        return len(clips) == 1 and clips[0].get("status") in ("ok", "placeholder")
+teste("animar_imagens_ken_burns() F02", _test_f02_ken_burns)
+
+def _test_f02_legendas():
+    from pipeline.f02_imagem_realista import gerar_legendas_srt
+    roteiro = {
+        "cenas": [
+            {"id": "c01", "narracao": "Texto um.", "duracao": 3.0},
+            {"id": "c02", "narracao": "Texto dois.", "duracao": 4.0},
+        ]
+    }
+    narracoes = [{"status": "ok"}, {"status": "silencio"}]
+    with tempfile.TemporaryDirectory() as tmp:
+        srt_path = Path(tmp) / "test.srt"
+        ok = gerar_legendas_srt(roteiro, narracoes, srt_path)
+        return ok and srt_path.exists() and "Texto um" in srt_path.read_text()
+teste("gerar_legendas_srt() F02", _test_f02_legendas)
+
+def _test_f02_roteiros_exemplo():
+    from pipeline.f02_imagem_realista import ROTEIROS_EXEMPLO, NICHO_PARA_PRESET
+    ok = (
+        len(ROTEIROS_EXEMPLO) >= 3
+        and all(n in NICHO_PARA_PRESET for n in ["psicologia", "historia", "natureza", "misterio"])
+    )
+    return ok
+teste("ROTEIROS_EXEMPLO e NICHO_PARA_PRESET", _test_f02_roteiros_exemplo)
+
+# ──────────────────────────────────────────────
 # RELATÓRIO FINAL
 print("\n═══ RELATÓRIO FINAL ═══")
 total = len(resultados)
