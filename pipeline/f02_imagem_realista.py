@@ -79,10 +79,13 @@ def gerar_imagens_cenas(
     output_dir: Path,
     formato: str = "horizontal",
     verbose: bool = True,
+    visual_bank=None,   # ProjetoVisualBank opcional
+    projeto_id: str = None,
 ) -> list[dict]:
     """
     Gera uma imagem fotorrealista para cada cena do roteiro.
     Chama AGENTE IMAGE ENGINE com prompt enriquecido pelo CINEMATIC DIRECTOR.
+    Integra ProjetoVisualBank para consistência visual entre cenas.
 
     Returns:
         Lista de dicts com {cena_id, prompt, imagem_path, status}
@@ -118,6 +121,17 @@ def gerar_imagens_cenas(
             prompt, enquadramento, color_temp, grain
         )
 
+        # Injetar contexto de consistência visual do banco do projeto
+        if visual_bank and projeto_id:
+            try:
+                prompt_enriquecido = visual_bank.gerar_prompt_consistente(
+                    projeto_id=projeto_id,
+                    cena=cena,
+                    prompt_base=prompt_enriquecido,
+                )
+            except Exception:
+                pass  # Fallback para prompt sem consistência
+
         img_path = output_dir / f"{cena_id}_img.png"
 
         if verbose:
@@ -131,17 +145,43 @@ def gerar_imagens_cenas(
             estilo="cinematografico",
         )
 
-        resultados.append({
+        img_ok = r.get("status") == "ok"
+        resultado = {
             "cena_id": cena_id,
             "cena_index": i,
             "prompt": prompt_enriquecido,
-            "imagem_path": str(img_path) if r.get("status") == "ok" else None,
+            "imagem_path": str(img_path) if img_ok else None,
             "status": r.get("status", "error"),
             "backend": r.get("backend", "unknown"),
             "duracao": float(cena.get("duracao", 5.0)),
-        })
+        }
+        resultados.append(resultado)
 
-        if r.get("status") != "ok":
+        # Registrar imagem gerada no banco visual (para continuidade futura)
+        if img_ok and visual_bank and projeto_id:
+            try:
+                visual_bank.registrar_cena_produzida(
+                    projeto_id=projeto_id,
+                    idx=i,
+                    imagem_path=str(img_path),
+                    prompt_usado=prompt_enriquecido,
+                    duracao_s=float(cena.get("duracao", 5.0)),
+                )
+                # Na primeira imagem bem-sucedida: extrair e salvar paleta
+                if i == 0:
+                    from core.visual_consistency import extrair_paleta_imagem
+                    paleta = extrair_paleta_imagem(img_path, n_cores=5)
+                    if paleta:
+                        dados = visual_bank.carregar_projeto(projeto_id)
+                        if dados:
+                            dados["paleta"] = paleta
+                            visual_bank.salvar_projeto(projeto_id, dados)
+                            if verbose:
+                                print(f"     🎨 Paleta extraída: {paleta}")
+            except Exception:
+                pass
+
+        if not img_ok:
             print(f"  ⚠️  Imagem falhou para {cena_id}: {r.get('erro', '')}")
 
     return resultados
@@ -864,6 +904,31 @@ def produzir_video_imagem_realista(
         "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
     }
 
+    # ── Banco Visual: inicializar consistência do projeto ──
+    visual_bank = None
+    try:
+        from core.visual_consistency import ProjetoVisualBank, PALETAS_POR_NICHO
+        nicho = canal_config.get("nicho", "default")
+        preset_nome = NICHO_PARA_PRESET.get(nicho, "documentario")
+        visual_bank = ProjetoVisualBank(output_dir)
+
+        # Criar ou atualizar projeto no banco
+        proj_existente = visual_bank.carregar_projeto(projeto_id)
+        if not proj_existente:
+            visual_bank.criar_projeto(
+                projeto_id=projeto_id,
+                titulo=titulo,
+                nicho=nicho,
+                preset=preset_nome,
+                descricao=roteiro.get("hook", ""),
+            )
+        if verbose:
+            print(f"  🎨 Banco visual inicializado: {projeto_id}")
+    except Exception as e:
+        if verbose:
+            print(f"  ⚠️  Banco visual não disponível: {e}")
+        visual_bank = None
+
     # ── Etapa 1: Planejamento cinematográfico ──
     if verbose:
         print("▶ ETAPA 1/7 — Planejamento Cinematográfico")
@@ -879,7 +944,12 @@ def produzir_video_imagem_realista(
         print("\n▶ ETAPA 2/7 — Geração de Imagens Realistas")
     imgs_dir = output_dir / "imagens"
     try:
-        imagens = gerar_imagens_cenas(roteiro_cine, imgs_dir, formato=formato, verbose=verbose)
+        imagens = gerar_imagens_cenas(
+            roteiro_cine, imgs_dir,
+            formato=formato, verbose=verbose,
+            visual_bank=visual_bank,
+            projeto_id=projeto_id,
+        )
         n_ok = sum(1 for img in imagens if img["status"] == "ok")
         relatorio["etapas"]["imagens"] = {"status": "ok", "geradas": n_ok, "total": len(imagens)}
         if verbose:

@@ -422,6 +422,179 @@ def _test_f02_roteiros_exemplo():
 teste("ROTEIROS_EXEMPLO e NICHO_PARA_PRESET", _test_f02_roteiros_exemplo)
 
 # ──────────────────────────────────────────────
+# FASE 8 — VISUAL CONSISTENCY / ProjetoVisualBank
+print("\n▶ FASE 8 — VISUAL CONSISTENCY")
+
+def _test_banco_import():
+    from core.visual_consistency import ProjetoVisualBank, PALETAS_POR_NICHO
+    return callable(ProjetoVisualBank) and len(PALETAS_POR_NICHO) >= 8
+teste("ProjetoVisualBank importação", _test_banco_import)
+
+def _test_banco_criar_projeto():
+    from core.visual_consistency import ProjetoVisualBank
+    with tempfile.TemporaryDirectory() as tmp:
+        bank = ProjetoVisualBank(Path(tmp))
+        dados = bank.criar_projeto(
+            projeto_id="proj_test_01",
+            titulo="Teste Natureza",
+            nicho="natureza",
+            preset="natureza",
+            descricao="Canal sobre natureza selvagem.",
+        )
+        return (
+            dados.get("projeto_id") == "proj_test_01"
+            and dados.get("nicho") == "natureza"
+            and isinstance(dados.get("personagens"), (list, dict))
+            and isinstance(dados.get("paleta"), list)
+            and dados.get("ai_generated") is True
+        )
+teste("criar_projeto() estrutura e ai_generated", _test_banco_criar_projeto)
+
+def _test_banco_carregar():
+    from core.visual_consistency import ProjetoVisualBank
+    with tempfile.TemporaryDirectory() as tmp:
+        bank = ProjetoVisualBank(Path(tmp))
+        bank.criar_projeto("p01", "Psicologia Dark", "psicologia")
+        dados = bank.carregar_projeto("p01")
+        return dados is not None and dados["titulo"] == "Psicologia Dark"
+teste("carregar_projeto() — round-trip JSON", _test_banco_carregar)
+
+def _test_banco_listar():
+    from core.visual_consistency import ProjetoVisualBank
+    with tempfile.TemporaryDirectory() as tmp:
+        bank = ProjetoVisualBank(Path(tmp))
+        bank.criar_projeto("a", "Alpha", "historia")
+        bank.criar_projeto("b", "Beta", "tecnologia")
+        lista = bank.listar_projetos()
+        return len(lista) == 2 and all("projeto_id" in p for p in lista)
+teste("listar_projetos() — múltiplos projetos", _test_banco_listar)
+
+def _test_banco_personagem():
+    from core.visual_consistency import ProjetoVisualBank
+    with tempfile.TemporaryDirectory() as tmp:
+        bank = ProjetoVisualBank(Path(tmp))
+        bank.criar_projeto("p1", "Teste", "misterio")
+        ok = bank.registrar_personagem("p1", "Detetive Silva",
+                                       "Homem 50 anos, terno cinza, cabelos brancos")
+        dados = bank.carregar_projeto("p1")
+        pers = dados["personagens"]
+        # Suporta dict {nome: {...}} ou lista [{nome: ...}]
+        if isinstance(pers, dict):
+            encontrado = "Detetive Silva" in pers
+        else:
+            encontrado = any(p.get("nome") == "Detetive Silva" for p in pers)
+        return ok and len(pers) == 1 and encontrado
+teste("registrar_personagem() — persistência", _test_banco_personagem)
+
+def _test_banco_cenario():
+    from core.visual_consistency import ProjetoVisualBank
+    with tempfile.TemporaryDirectory() as tmp:
+        bank = ProjetoVisualBank(Path(tmp))
+        bank.criar_projeto("p2", "Teste Cen", "historia")
+        ok = bank.registrar_cenario("p2", "Palácio Imperial",
+                                    "Arquitetura barroca, século XVIII",
+                                    iluminacao="velas", horario="noite", clima="frio")
+        dados = bank.carregar_projeto("p2")
+        cens = dados["cenarios"]
+        # Suporta dict {nome: {...}} ou lista
+        if isinstance(cens, dict):
+            iluminacao_ok = cens.get("Palácio Imperial", {}).get("iluminacao") == "velas"
+        else:
+            iluminacao_ok = any(c.get("iluminacao") == "velas" for c in cens)
+        return ok and iluminacao_ok
+teste("registrar_cenario() — atributos salvos", _test_banco_cenario)
+
+def _test_banco_cena_produzida():
+    from core.visual_consistency import ProjetoVisualBank
+    with tempfile.TemporaryDirectory() as tmp:
+        bank = ProjetoVisualBank(Path(tmp))
+        bank.criar_projeto("p3", "Teste Cenas", "ciencia")
+        ok = bank.registrar_cena_produzida(
+            projeto_id="p3", idx=0,
+            imagem_path="/tmp/fake_img.png",
+            prompt_usado="Laboratório futurista 8K",
+            duracao_s=5.0,
+        )
+        dados = bank.carregar_projeto("p3")
+        return ok and len(dados["historico_cenas"]) == 1
+teste("registrar_cena_produzida() — historico_cenas", _test_banco_cena_produzida)
+
+def _test_banco_prompt_consistente():
+    from core.visual_consistency import ProjetoVisualBank
+    with tempfile.TemporaryDirectory() as tmp:
+        bank = ProjetoVisualBank(Path(tmp))
+        bank.criar_projeto("p4", "Mistérios do Egito", "historia", preset="historia")
+        bank.registrar_personagem("p4", "Faraó Ramsés", "Homem alto, coroa dupla")
+        bank.registrar_cenario("p4", "Pirâmide", "Interior do templo", iluminacao="tochas")
+        # Passa personagem e cenário explicitamente na cena
+        cena = {
+            "id": "c01",
+            "descricao_visual": "Câmera aproximando da pirâmide",
+            "personagens": ["Faraó Ramsés"],
+            "cenario": "Pirâmide",
+        }
+        prompt = bank.gerar_prompt_consistente("p4", cena, prompt_base="Vista aérea noturna")
+        return (
+            isinstance(prompt, str)
+            and len(prompt) > 20
+            and "DARK STUDIO AAA" in prompt
+        )
+teste("gerar_prompt_consistente() — injeta disclosure e paleta", _test_banco_prompt_consistente)
+
+def _test_banco_relatorio():
+    from core.visual_consistency import ProjetoVisualBank
+    with tempfile.TemporaryDirectory() as tmp:
+        bank = ProjetoVisualBank(Path(tmp))
+        bank.criar_projeto("p5", "Financas Dark", "financas")
+        bank.registrar_personagem("p5", "Analista", "Terno azul")
+        rel = bank.exportar_relatorio("p5")
+        return (
+            "projeto" in rel
+            and "personagens" in rel
+            and "paleta" in rel
+            and rel["projeto"]["titulo"] == "Financas Dark"
+        )
+teste("exportar_relatorio() — estrutura completa", _test_banco_relatorio)
+
+def _test_banco_projeto_inexistente():
+    from core.visual_consistency import ProjetoVisualBank
+    with tempfile.TemporaryDirectory() as tmp:
+        bank = ProjetoVisualBank(Path(tmp))
+        dados = bank.carregar_projeto("nao_existe_xyz")
+        ok_none = dados is None
+        ok_personagem = not bank.registrar_personagem("nao_existe_xyz", "X", "Y")
+        rel = bank.exportar_relatorio("nao_existe_xyz")
+        ok_erro = "erro" in rel
+        return ok_none and ok_personagem and ok_erro
+teste("ProjetoVisualBank — projeto inexistente retorna None/False/erro", _test_banco_projeto_inexistente)
+
+def _test_banco_f02_integracao():
+    """Testa que gerar_imagens_cenas aceita visual_bank sem quebrar."""
+    from pipeline.f02_imagem_realista import gerar_imagens_cenas, planejar_cenas
+    from core.visual_consistency import ProjetoVisualBank
+    roteiro = {
+        "id": "f02_banco_test",
+        "titulo": "Integração Banco",
+        "cenas": [{"id": "c01", "narracao": "Teste.", "duracao": 3.0, "descricao_visual": "céu azul"}]
+    }
+    canal = {"nicho": "natureza", "nome": "Teste"}
+    roteiro_cine = planejar_cenas(roteiro, canal)
+    with tempfile.TemporaryDirectory() as tmp:
+        bank = ProjetoVisualBank(Path(tmp))
+        bank.criar_projeto("f02_test", "F02 Test", "natureza")
+        imagens = gerar_imagens_cenas(
+            roteiro_cine, Path(tmp) / "imgs", verbose=False,
+            visual_bank=bank, projeto_id="f02_test",
+        )
+        dados = bank.carregar_projeto("f02_test")
+        return (
+            len(imagens) == 1
+            and imagens[0].get("status") == "ok"
+            and len(dados.get("historico_cenas", [])) == 1
+        )
+teste("F02 + ProjetoVisualBank — cena registrada automaticamente", _test_banco_f02_integracao)
+
+# ──────────────────────────────────────────────
 # RELATÓRIO FINAL
 print("\n═══ RELATÓRIO FINAL ═══")
 total = len(resultados)

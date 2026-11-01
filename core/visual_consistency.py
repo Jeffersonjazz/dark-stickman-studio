@@ -312,6 +312,267 @@ def setup_projeto(
 
 
 # ─────────────────────────────────────────────────────────────────
+#  BANCO DE PROJETOS (multi-projeto)
+# ─────────────────────────────────────────────────────────────────
+
+class ProjetoVisualBank:
+    """
+    Gerenciador de banco visual para múltiplos projetos.
+
+    Persiste em: {base_dir}/visual_bank/{projeto_id}.json
+    Permite registrar, consultar e exportar referências visuais
+    por projeto de forma independente.
+    """
+
+    def __init__(self, base_dir: Path):
+        self.base_dir = Path(base_dir)
+        self.bank_dir = self.base_dir / "visual_bank"
+        self.bank_dir.mkdir(parents=True, exist_ok=True)
+
+    def _projeto_path(self, projeto_id: str) -> Path:
+        safe = hashlib.md5(projeto_id.encode()).hexdigest()[:8]
+        nome = projeto_id.replace(" ", "_").replace("/", "_")[:40]
+        return self.bank_dir / f"{nome}_{safe}.json"
+
+    def criar_projeto(
+        self,
+        projeto_id: str,
+        titulo: str,
+        nicho: str,
+        preset: str = None,
+        descricao: str = "",
+    ) -> dict:
+        """Cria novo projeto no banco visual."""
+        path = self._projeto_path(projeto_id)
+        dados = {
+            "projeto_id": projeto_id,
+            "titulo": titulo,
+            "nicho": nicho,
+            "descricao": descricao,
+            "preset_cinematografico": preset,
+            "paleta": PALETAS_POR_NICHO.get(nicho, PALETAS_POR_NICHO["default"]),
+            "personagens": {},
+            "cenarios": {},
+            "objetos": {},
+            "estilos_aprovados": [],
+            "imagens_referencia": [],
+            "historico_cenas": [],
+            "ai_generated": True,
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        }
+        path.write_text(json.dumps(dados, ensure_ascii=False, indent=2), encoding="utf-8")
+        return dados
+
+    def carregar_projeto(self, projeto_id: str) -> Optional[dict]:
+        path = self._projeto_path(projeto_id)
+        if not path.exists():
+            return None
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+
+    def salvar_projeto(self, projeto_id: str, dados: dict):
+        path = self._projeto_path(projeto_id)
+        path.write_text(json.dumps(dados, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    def listar_projetos(self) -> list[dict]:
+        """Lista todos os projetos no banco visual."""
+        projetos = []
+        for f in sorted(self.bank_dir.glob("*.json")):
+            try:
+                d = json.loads(f.read_text(encoding="utf-8"))
+                projetos.append({
+                    "projeto_id": d.get("projeto_id"),
+                    "titulo": d.get("titulo"),
+                    "nicho": d.get("nicho"),
+                    "preset": d.get("preset_cinematografico"),
+                    "personagens": len(d.get("personagens", {})),
+                    "cenarios": len(d.get("cenarios", {})),
+                    "cenas_registradas": len(d.get("historico_cenas", [])),
+                })
+            except Exception:
+                pass
+        return projetos
+
+    def registrar_personagem(
+        self,
+        projeto_id: str,
+        nome: str,
+        descricao: str,
+        atributos: dict = None,
+        imagem_ref: str = None,
+    ) -> bool:
+        """Registra ou atualiza personagem no projeto."""
+        dados = self.carregar_projeto(projeto_id)
+        if not dados:
+            return False
+        dados["personagens"][nome] = {
+            "descricao": descricao,
+            "atributos": atributos or {},
+            "imagem_ref": imagem_ref,
+            "aparicoes": dados.get("personagens", {}).get(nome, {}).get("aparicoes", 0),
+        }
+        self.salvar_projeto(projeto_id, dados)
+        return True
+
+    def registrar_cenario(
+        self,
+        projeto_id: str,
+        nome: str,
+        descricao: str,
+        iluminacao: str = "natural",
+        horario: str = "dia",
+        clima: str = "ensolarado",
+    ) -> bool:
+        dados = self.carregar_projeto(projeto_id)
+        if not dados:
+            return False
+        dados["cenarios"][nome] = {
+            "descricao": descricao,
+            "iluminacao": iluminacao,
+            "horario": horario,
+            "clima": clima,
+            "usos": 0,
+        }
+        self.salvar_projeto(projeto_id, dados)
+        return True
+
+    def registrar_imagem_referencia(
+        self,
+        projeto_id: str,
+        imagem_path: str,
+        descricao: str,
+        tipo: str = "cena",  # cena | personagem | cenario | estilo
+    ) -> bool:
+        """Registra imagem como referência visual aprovada."""
+        dados = self.carregar_projeto(projeto_id)
+        if not dados:
+            return False
+        ref = {
+            "path": str(imagem_path),
+            "descricao": descricao,
+            "tipo": tipo,
+        }
+        # Extrai paleta se for imagem de cena/estilo
+        if tipo in ("cena", "estilo"):
+            p = Path(imagem_path)
+            if p.exists():
+                paleta = extrair_paleta_imagem(p, n_cores=5)
+                if paleta:
+                    ref["paleta"] = paleta
+                    dados["paleta"] = paleta  # Atualiza paleta do projeto
+        dados["imagens_referencia"].append(ref)
+        self.salvar_projeto(projeto_id, dados)
+        return True
+
+    def registrar_cena_produzida(
+        self,
+        projeto_id: str,
+        idx: int,
+        imagem_path: str,
+        prompt_usado: str,
+        duracao_s: float,
+    ) -> bool:
+        dados = self.carregar_projeto(projeto_id)
+        if not dados:
+            return False
+        dados["historico_cenas"].append({
+            "idx": idx,
+            "imagem_path": str(imagem_path),
+            "prompt_usado": prompt_usado,
+            "duracao_s": duracao_s,
+        })
+        self.salvar_projeto(projeto_id, dados)
+        return True
+
+    def gerar_prompt_consistente(
+        self,
+        projeto_id: str,
+        cena: dict,
+        prompt_base: str = "",
+    ) -> str:
+        """
+        Gera prompt enriquecido com contexto de consistência do projeto.
+        Injeta: preset, personagens registrados, cenário, paleta de cores.
+        """
+        dados = self.carregar_projeto(projeto_id)
+        if not dados:
+            return prompt_base
+
+        partes = []
+
+        preset = dados.get("preset_cinematografico")
+        if preset:
+            partes.append(f"cinematic style: {preset} preset")
+
+        # Personagens da cena
+        for nome in cena.get("personagens", []):
+            pers = dados["personagens"].get(nome)
+            if pers:
+                partes.append(f"character '{nome}': {pers['descricao']}")
+                # Incrementa aparições
+                dados["personagens"][nome]["aparicoes"] = pers.get("aparicoes", 0) + 1
+
+        # Cenário
+        cenario_nome = cena.get("cenario", "")
+        if cenario_nome:
+            cen = dados["cenarios"].get(cenario_nome)
+            if cen:
+                partes.append(
+                    f"setting: {cen['descricao']}, "
+                    f"lighting: {cen['iluminacao']}, "
+                    f"time: {cen['horario']}, "
+                    f"weather: {cen['clima']}"
+                )
+                dados["cenarios"][cenario_nome]["usos"] = cen.get("usos", 0) + 1
+
+        # Paleta de cores
+        paleta = dados.get("paleta", [])
+        if paleta:
+            partes.append(f"color palette: {', '.join(paleta[:4])}")
+
+        # Histórico da última cena (continuidade)
+        hist = dados.get("historico_cenas", [])
+        if hist:
+            ultima = hist[-1]
+            if ultima.get("prompt_usado"):
+                # Extrai apenas o estilo, não o conteúdo completo
+                partes.append("visual continuity with previous scene")
+
+        if prompt_base:
+            partes.append(prompt_base)
+
+        partes.append("photorealistic, 8K, cinematic photography")
+        partes.append("AI-generated — DARK STUDIO AAA")
+
+        self.salvar_projeto(projeto_id, dados)
+        return ", ".join(p for p in partes if p)
+
+    def exportar_relatorio(self, projeto_id: str) -> dict:
+        """Exporta relatório completo do banco visual do projeto."""
+        dados = self.carregar_projeto(projeto_id)
+        if not dados:
+            return {"erro": f"Projeto '{projeto_id}' não encontrado"}
+
+        return {
+            "projeto": {
+                "id": dados.get("projeto_id"),
+                "titulo": dados.get("titulo"),
+                "nicho": dados.get("nicho"),
+                "preset": dados.get("preset_cinematografico"),
+            },
+            "personagens": list(dados.get("personagens", {}).keys()),
+            "cenarios": list(dados.get("cenarios", {}).keys()),
+            "paleta": dados.get("paleta", []),
+            "imagens_referencia": len(dados.get("imagens_referencia", [])),
+            "cenas_produzidas": len(dados.get("historico_cenas", [])),
+            "ai_generated": True,
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        }
+
+
+# ─────────────────────────────────────────────────────────────────
 #  DIAGNÓSTICO
 # ─────────────────────────────────────────────────────────────────
 

@@ -400,6 +400,112 @@ def canais():
     console.print(table)
 
 
+# ─── Comando: banco ──────────────────────────────────────────────────────────
+
+@app.command("banco")
+def banco(
+    acao: str = typer.Argument("listar", help="listar | criar | personagem | cenario | relatorio"),
+    projeto: Optional[str] = typer.Option(None, "--projeto", "-p", help="ID do projeto"),
+    titulo: Optional[str] = typer.Option(None, "--titulo", "-t"),
+    nicho: Optional[str] = typer.Option(None, "--nicho", "-n"),
+    nome: Optional[str] = typer.Option(None, "--nome", help="Nome do personagem ou cenário"),
+    descricao: Optional[str] = typer.Option(None, "--descricao", "-d"),
+    iluminacao: str = typer.Option("natural", "--iluminacao"),
+    horario: str = typer.Option("dia", "--horario"),
+    base_dir: Optional[str] = typer.Option(None, "--dir", help="Diretório base do banco visual"),
+):
+    """🎨 Gerencia banco de referências visuais por projeto (Fase 8)."""
+    _banner()
+
+    from core.visual_consistency import ProjetoVisualBank
+    base = Path(base_dir) if base_dir else OUTPUT_ROOT / "_visual_bank"
+    base.mkdir(parents=True, exist_ok=True)
+    bank = ProjetoVisualBank(base)
+
+    if acao == "listar":
+        projetos = bank.listar_projetos()
+        if not projetos:
+            console.print("[yellow]Nenhum projeto no banco visual.[/yellow]")
+        else:
+            table = Table(title="Banco Visual — Projetos")
+            table.add_column("ID", style="cyan")
+            table.add_column("Título", style="bold")
+            table.add_column("Nicho", style="yellow")
+            table.add_column("Preset")
+            table.add_column("Personagens", justify="right")
+            table.add_column("Cenários", justify="right")
+            table.add_column("Cenas", justify="right")
+            for p in projetos:
+                table.add_row(
+                    p.get("projeto_id", "?"),
+                    p.get("titulo", "?"),
+                    p.get("nicho", "?"),
+                    p.get("preset", "?"),
+                    str(p.get("personagens", 0)),
+                    str(p.get("cenarios", 0)),
+                    str(p.get("cenas_registradas", 0)),
+                )
+            console.print(table)
+
+    elif acao == "criar":
+        if not projeto or not titulo or not nicho:
+            console.print("[red]✗ --projeto, --titulo e --nicho são obrigatórios.[/red]")
+            raise typer.Exit(1)
+        dados = bank.criar_projeto(projeto, titulo, nicho, descricao=descricao or "")
+        console.print(f"[green]✓[/green] Projeto criado: [bold]{projeto}[/bold] ({nicho})")
+        console.print(f"  Paleta inicial: {dados.get('paleta', [])}")
+
+    elif acao == "personagem":
+        if not projeto or not nome or not descricao:
+            console.print("[red]✗ --projeto, --nome e --descricao são obrigatórios.[/red]")
+            raise typer.Exit(1)
+        ok = bank.registrar_personagem(projeto, nome, descricao)
+        if ok:
+            console.print(f"[green]✓[/green] Personagem '{nome}' registrado em '{projeto}'.")
+        else:
+            console.print(f"[red]✗ Projeto '{projeto}' não encontrado. Use: banco criar[/red]")
+            raise typer.Exit(1)
+
+    elif acao == "cenario":
+        if not projeto or not nome or not descricao:
+            console.print("[red]✗ --projeto, --nome e --descricao são obrigatórios.[/red]")
+            raise typer.Exit(1)
+        ok = bank.registrar_cenario(projeto, nome, descricao, iluminacao=iluminacao, horario=horario)
+        if ok:
+            console.print(f"[green]✓[/green] Cenário '{nome}' registrado em '{projeto}'.")
+        else:
+            console.print(f"[red]✗ Projeto '{projeto}' não encontrado.[/red]")
+            raise typer.Exit(1)
+
+    elif acao == "relatorio":
+        if not projeto:
+            console.print("[red]✗ --projeto é obrigatório.[/red]")
+            raise typer.Exit(1)
+        rel = bank.exportar_relatorio(projeto)
+        if "erro" in rel:
+            console.print(f"[red]✗ {rel['erro']}[/red]")
+            raise typer.Exit(1)
+        console.print(Panel.fit(
+            f"[bold]Projeto:[/bold] {rel['projeto']['titulo']}\n"
+            f"[bold]Nicho:[/bold] {rel['projeto']['nicho']}\n"
+            f"[bold]Preset:[/bold] {rel['projeto']['preset']}\n"
+            f"[bold]Personagens:[/bold] {', '.join(rel['personagens']) or '(nenhum)'}\n"
+            f"[bold]Cenários:[/bold]   {', '.join(rel['cenarios']) or '(nenhum)'}\n"
+            f"[bold]Paleta:[/bold]     {' '.join(rel['paleta'])}\n"
+            f"[bold]Imgs ref:[/bold]   {rel['imagens_referencia']}\n"
+            f"[bold]Cenas prod.:[/bold]{rel['cenas_produzidas']}",
+            title=f"[blue]Banco Visual — {projeto}[/blue]",
+            border_style="blue",
+        ))
+
+    else:
+        console.print(f"[red]✗ Ação desconhecida: {acao!r}[/red]")
+        console.print("[dim]Ações: listar | criar | personagem | cenario | relatorio[/dim]")
+        raise typer.Exit(1)
+
+    console.print(f"\n[dim]{AI_DISCLOSURE}[/dim]")
+
+
 # ─── Entry point ─────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
