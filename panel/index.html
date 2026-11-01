@@ -1087,21 +1087,175 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
 
       <!-- ════════ SHORTS FACTORY ════════ -->
       <div id="panel-shorts-factory" class="panel">
-        <div class="sec-hdr"><h2>📱 DARK SHORTS FACTORY</h2><p>Produção automatizada de vídeos 9:16 verticais</p></div>
+        <div class="sec-hdr"><h2>📱 DARK SHORTS FACTORY</h2><p>Produção automatizada de vídeos 9:16 — YouTube Shorts · Reels · TikTok · Story</p></div>
+
+        <!-- Gerar Short completo -->
         <div class="card">
-          <div class="card-header"><span class="card-icon">⚡</span><span class="card-title">Status — Em Desenvolvimento</span></div>
+          <div class="card-header"><span class="card-icon">🚀</span><span class="card-title">Gerar Short Completo</span><span class="badge" style="background:var(--green);color:#000">ATIVO</span></div>
           <div class="card-body">
-            <p style="font-size:13px;color:var(--fg2);line-height:1.7;margin-bottom:16px">O DARK SHORTS FACTORY será entregue na Fase 9 como extensão do pipeline F02. Ele automatizará a criação de vídeos verticais 9:16 para YouTube Shorts, Reels e TikTok.</p>
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--fg2)">
-              <span>◆ Conversão automática 16:9 → 9:16 com reframe inteligente</span>
-              <span>◆ Cortes automáticos por segmento (60s max)</span>
-              <span>◆ Legendas grandes para mobile</span>
-              <span>◆ Trilha sonora de 60 segundos sincronizada</span>
-              <span>◆ Publicação direta via API YouTube</span>
+            <div class="form-group">
+              <label class="form-label">Roteiro / Descrição do Short</label>
+              <textarea id="sf-roteiro" class="form-input" rows="4" placeholder="Descreva o conteúdo do Short cena por cena, uma por linha...&#10;Ex: Floresta densa ao amanhecer, névoa entre as árvores&#10;Close em pássaro decolando da árvore&#10;Vista aérea da floresta ao nascer do sol"></textarea>
             </div>
-            <button class="btn btn-ghost btn-sm" style="margin-top:16px" onclick="nav('produzir')">Produzir Short (usar formato 9:16 em Produzir) →</button>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="form-group">
+                <label class="form-label">Título (aparece no Short)</label>
+                <input id="sf-titulo" class="form-input" type="text" placeholder="Ex: A Floresta Secreta">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Formato</label>
+                <select id="sf-formato" class="form-input">
+                  <option value="shorts">YouTube Shorts (60s · 60fps)</option>
+                  <option value="reels">Instagram Reels (90s · 30fps)</option>
+                  <option value="tiktok">TikTok (60s · 30fps)</option>
+                  <option value="story">Story (15s · 30fps)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nicho</label>
+              <select id="sf-nicho" class="form-input">
+                <option value="natureza">Natureza</option>
+                <option value="historia">História</option>
+                <option value="misterio">Mistério e Suspense</option>
+                <option value="tecnologia">Tecnologia e IA</option>
+                <option value="educacao">Educação</option>
+                <option value="relaxamento">Relaxamento</option>
+                <option value="dark_storytelling">Storytelling Dark</option>
+                <option value="geral">Geral</option>
+              </select>
+            </div>
+            <button class="btn" onclick="gerarShort()">📱 Gerar Short (R$0,00)</button>
+            <div id="sf-resultado" style="margin-top:12px;display:none"></div>
           </div>
         </div>
+
+        <!-- Converter Vídeo para Vertical -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">↕️</span><span class="card-title">Converter 16:9 → 9:16</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Caminho do Vídeo (local)</label>
+              <input id="sf-video-path" class="form-input" type="text" placeholder="/tmp/dark-studio/output/video.mp4">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="form-group">
+                <label class="form-label">Modo de Conversão</label>
+                <select id="sf-modo" class="form-input">
+                  <option value="crop_center">Crop Centro (sem bordas)</option>
+                  <option value="blur_sides">Fundo Desfocado</option>
+                  <option value="pillarbox">Barras Pretas</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Formato Alvo</label>
+                <select id="sf-conv-formato" class="form-input">
+                  <option value="shorts">Shorts (1080×1920)</option>
+                  <option value="reels">Reels (1080×1920)</option>
+                  <option value="tiktok">TikTok (1080×1920)</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-ghost" onclick="converterVertical()">↕️ Converter para Vertical</button>
+            <div id="sf-conv-resultado" style="margin-top:12px;display:none"></div>
+          </div>
+        </div>
+
+        <!-- Specs dos formatos -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">📐</span><span class="card-title">Especificações dos Formatos Verticais</span></div>
+          <div class="card-body">
+            <div id="sf-formatos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+              <div class="stat-card" style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center">
+                <div style="font-size:22px;margin-bottom:6px">🔴</div>
+                <div style="font-size:11px;color:var(--fg2);font-weight:600;letter-spacing:.08em">YOUTUBE SHORTS</div>
+                <div style="font-size:13px;color:var(--fg);margin-top:4px">1080 × 1920</div>
+                <div style="font-size:11px;color:var(--green);margin-top:2px">60 fps · máx 60s</div>
+              </div>
+              <div class="stat-card" style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center">
+                <div style="font-size:22px;margin-bottom:6px">🟣</div>
+                <div style="font-size:11px;color:var(--fg2);font-weight:600;letter-spacing:.08em">INSTAGRAM REELS</div>
+                <div style="font-size:13px;color:var(--fg);margin-top:4px">1080 × 1920</div>
+                <div style="font-size:11px;color:var(--accent);margin-top:2px">30 fps · máx 90s</div>
+              </div>
+              <div class="stat-card" style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center">
+                <div style="font-size:22px;margin-bottom:6px">⚫</div>
+                <div style="font-size:11px;color:var(--fg2);font-weight:600;letter-spacing:.08em">TIKTOK</div>
+                <div style="font-size:13px;color:var(--fg);margin-top:4px">1080 × 1920</div>
+                <div style="font-size:11px;color:var(--pink);margin-top:2px">30 fps · máx 60s</div>
+              </div>
+              <div class="stat-card" style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center">
+                <div style="font-size:22px;margin-bottom:6px">🟡</div>
+                <div style="font-size:11px;color:var(--fg2);font-weight:600;letter-spacing:.08em">STORY</div>
+                <div style="font-size:13px;color:var(--fg);margin-top:4px">1080 × 1920</div>
+                <div style="font-size:11px;color:var(--yellow);margin-top:2px">30 fps · máx 15s</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- JS dos Shorts -->
+        <script>
+        async function gerarShort() {
+          const roteiro = document.getElementById('sf-roteiro').value.trim();
+          if (!roteiro) { alert('Digite o roteiro do Short.'); return; }
+          const titulo  = document.getElementById('sf-titulo').value.trim();
+          const formato = document.getElementById('sf-formato').value;
+          const nicho   = document.getElementById('sf-nicho').value;
+
+          const res = document.getElementById('sf-resultado');
+          res.style.display = 'block';
+          res.innerHTML = '<div class="log-box" style="color:var(--yellow)">⏳ Gerando Short... aguarde.</div>';
+
+          try {
+            const params = new URLSearchParams({ roteiro, titulo, formato, nicho });
+            const r = await fetch('/shorts?' + params, { method: 'POST' });
+            const d = await r.json();
+            if (d.status === 'ok') {
+              res.innerHTML = `<div class="log-box" style="color:var(--green)">
+                ✅ Short gerado!<br>
+                📁 <b>${d.output_path || ''}</b><br>
+                📐 ${d.resolucao || '1080x1920'} · ${d.formato || formato}<br>
+                ⏱️ ${d.tempo_s || '?'}s · 💰 R$${(d.custo_brl||0).toFixed(2)}<br>
+                ${d.ai_disclosure ? '<span style="font-size:11px;color:var(--fg3)">🤖 ' + d.ai_disclosure + '</span>' : ''}
+              </div>`;
+            } else {
+              res.innerHTML = `<div class="log-box" style="color:var(--red)">❌ ${d.mensagem || JSON.stringify(d)}</div>`;
+            }
+          } catch(e) {
+            res.innerHTML = `<div class="log-box" style="color:var(--red)">❌ Erro: ${e.message}</div>`;
+          }
+        }
+
+        async function converterVertical() {
+          const videoPath = document.getElementById('sf-video-path').value.trim();
+          if (!videoPath) { alert('Informe o caminho do vídeo.'); return; }
+          const modo    = document.getElementById('sf-modo').value;
+          const formato = document.getElementById('sf-conv-formato').value;
+
+          const res = document.getElementById('sf-conv-resultado');
+          res.style.display = 'block';
+          res.innerHTML = '<div class="log-box" style="color:var(--yellow)">⏳ Convertendo para vertical...</div>';
+
+          try {
+            const params = new URLSearchParams({ video_path: videoPath, modo, formato });
+            const r = await fetch('/shorts/converter?' + params, { method: 'POST' });
+            const d = await r.json();
+            if (d.status === 'ok') {
+              res.innerHTML = `<div class="log-box" style="color:var(--green)">
+                ✅ Convertido!<br>
+                📁 <b>${d.output_path || ''}</b><br>
+                📐 ${d.resolucao || '1080x1920'} · ${d.fps || 30}fps<br>
+                ⏱️ ${d.tempo_s || '?'}s · 💰 R$0,00
+              </div>`;
+            } else {
+              res.innerHTML = `<div class="log-box" style="color:var(--red)">❌ ${d.mensagem || JSON.stringify(d)}</div>`;
+            }
+          } catch(e) {
+            res.innerHTML = `<div class="log-box" style="color:var(--red)">❌ Erro: ${e.message}</div>`;
+          }
+        }
+        </script>
       </div>
 
       <!-- ════════ AGENTES ════════ -->

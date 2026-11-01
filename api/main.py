@@ -665,6 +665,106 @@ async def listar_projetos():
         return {"status": "erro", "mensagem": str(e), "ai_generated": True}
 
 
+@app.post("/shorts", tags=["DARK Shorts Factory"])
+async def gerar_short(
+    roteiro: str,
+    titulo: str = "",
+    formato: str = "shorts",
+    nicho: str = "geral",
+    background_tasks: BackgroundTasks = None,
+):
+    """
+    DARK SHORTS FACTORY — Produção automatizada de vídeos verticais 9:16.
+    Formatos: shorts (YouTube), reels (Instagram), tiktok, story.
+    Custo: R$0,00
+    """
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_shorts_factory import DarkShortsFactory
+        factory = DarkShortsFactory()
+        result = factory.produzir_short_completo(
+            roteiro=roteiro,
+            formato=formato,
+            nicho=nicho,
+            titulo=titulo,
+        )
+        return result
+    except Exception as e:
+        return {
+            "status": "erro",
+            "mensagem": str(e),
+            "custo_brl": 0.0,
+            "ai_generated": True,
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        }
+
+
+@app.post("/shorts/converter", tags=["DARK Shorts Factory"])
+async def converter_video_para_vertical(
+    video_path: str,
+    formato: str = "shorts",
+    modo: str = "crop_center",
+):
+    """
+    Converte vídeo horizontal 16:9 para vertical 9:16.
+    Modos: crop_center | blur_sides | pillarbox
+    """
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_shorts_factory import DarkShortsFactory
+        factory = DarkShortsFactory()
+        return factory.converter_para_vertical(
+            video_path=video_path,
+            formato=formato,
+            modo=modo,
+        )
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.post("/shorts/slideshow", tags=["DARK Shorts Factory"])
+async def slideshow_vertical(
+    imagens: str,  # paths separados por vírgula
+    formato: str = "shorts",
+    nicho: str = "geral",
+    titulo: str = "",
+    duracao_por_imagem: float = 4.0,
+):
+    """Gera vídeo vertical 9:16 a partir de lista de imagens (paths separados por vírgula)."""
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_shorts_factory import DarkShortsFactory
+        factory = DarkShortsFactory()
+        lista_imgs = [p.strip() for p in imagens.split(",") if p.strip()]
+        return factory.gerar_slideshow_vertical(
+            imagens=lista_imgs,
+            formato=formato,
+            nicho=nicho,
+            titulo=titulo,
+            duracao_por_imagem=duracao_por_imagem,
+        )
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.get("/shorts/formatos", tags=["DARK Shorts Factory"])
+async def listar_formatos():
+    """Lista formatos verticais disponíveis."""
+    return {
+        "formatos": {
+            "shorts":  {"resolucao": "1080x1920", "fps": 60, "dur_max_s": 60,  "plataforma": "YouTube Shorts"},
+            "reels":   {"resolucao": "1080x1920", "fps": 30, "dur_max_s": 90,  "plataforma": "Instagram Reels"},
+            "tiktok":  {"resolucao": "1080x1920", "fps": 30, "dur_max_s": 60,  "plataforma": "TikTok"},
+            "story":   {"resolucao": "1080x1920", "fps": 30, "dur_max_s": 15,  "plataforma": "Stories"},
+        },
+        "custo_brl": 0.0,
+        "ai_generated": True,
+    }
+
+
 @app.get("/painel/", tags=["Sistema"])
 async def painel_redirect():
     """Redireciona para o painel principal."""
