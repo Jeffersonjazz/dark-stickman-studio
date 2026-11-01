@@ -68,7 +68,12 @@ def _carregar_fonte(tamanho: int, bold: bool = True) -> Optional["ImageFont.Free
             return ImageFont.truetype(path, tamanho)
         except (IOError, OSError):
             continue
-    return ImageFont.load_default()
+    # BUG #82 FIX: load_default() sem size retorna fonte bitmap minúscula (~10px).
+    # Pillow >= 10.0 aceita size=; versões anteriores ignoram e retornam bitmap.
+    try:
+        return ImageFont.load_default(size=tamanho)  # Pillow >= 10.0
+    except TypeError:
+        return ImageFont.load_default()  # Pillow < 10.0 — bitmap; instale fonte do sistema
 
 
 def _quebrar_texto(texto: str, max_chars: int = 22) -> list:

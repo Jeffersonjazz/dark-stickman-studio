@@ -242,8 +242,7 @@ def concat_videos(clips: List[Path], output_path: Path, transition: str = "fade"
         str(output_path),
     ]
     _run(cmd)
-    return output_path
-    return output_path
+    return output_path  # BUG #83 FIX: linha duplicada removida
 
 
 def add_audio(video_path: Path, audio_path: Path, output_path: Path, vol_video: float = 1.0) -> Path:
