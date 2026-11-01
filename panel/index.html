@@ -462,6 +462,9 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
     <button class="nav-item" onclick="nav('shorts-factory')">
       <span class="nav-icon">📱</span><span class="nav-text">Shorts Factory</span>
     </button>
+    <button class="nav-item" onclick="nav('subtitles')">
+      <span class="nav-icon">📝</span><span class="nav-text">Subtitle Engine</span>
+    </button>
 
     <div class="sidebar-section">SISTEMA</div>
     <button class="nav-item" onclick="nav('agentes')">
@@ -1024,6 +1027,181 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
         </div>
       </div>
 
+      <!-- ════════ DARK SUBTITLE ENGINE ════════ -->
+      <div id="panel-subtitles" class="panel">
+        <div class="sec-hdr"><h2>📝 DARK SUBTITLE ENGINE</h2><p>Legendas automáticas com Whisper — SRT · VTT · Hardsub — R$0,00</p></div>
+
+        <!-- Pipeline completo -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">🎯</span><span class="card-title">Pipeline Completo — Transcrever + Legendar</span><span class="badge" style="background:var(--green);color:#000">WHISPER OFFLINE</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Caminho do Vídeo / Áudio</label>
+              <input id="sub-media" class="form-input" type="text" placeholder="/tmp/dark-studio/output/video_final.mp4">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+              <div class="form-group">
+                <label class="form-label">Idioma</label>
+                <select id="sub-idioma" class="form-input">
+                  <option value="pt">Português</option>
+                  <option value="en">Inglês</option>
+                  <option value="es">Espanhol</option>
+                  <option value="fr">Francês</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Modelo Whisper</label>
+                <select id="sub-modelo" class="form-input">
+                  <option value="tiny">Tiny (rápido)</option>
+                  <option value="base" selected>Base (recomendado)</option>
+                  <option value="small">Small (melhor)</option>
+                  <option value="medium">Medium (GPU)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Estilo de Legenda</label>
+                <select id="sub-estilo" class="form-input">
+                  <option value="padrao">Padrão</option>
+                  <option value="cinematico">Cinematográfico</option>
+                  <option value="mobile">Mobile (grande)</option>
+                  <option value="karaoke">Karaoke (colorido)</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn" onclick="subtitlePipeline()">📝 Transcrever e Legendar (R$0,00)</button>
+            <div id="sub-pipeline-res" style="margin-top:12px;display:none"></div>
+          </div>
+        </div>
+
+        <!-- Gerar SRT de roteiro -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">📄</span><span class="card-title">Gerar SRT de Roteiro</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Roteiro / Narração</label>
+              <textarea id="sub-roteiro" class="form-input" rows="4" placeholder="Cole aqui a narração do vídeo. Cada frase será uma legenda..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duração total do vídeo (segundos)</label>
+              <input id="sub-duracao" class="form-input" type="number" value="60" min="5" max="3600">
+            </div>
+            <button class="btn btn-ghost" onclick="gerarSrtRoteiro()">📄 Gerar arquivo SRT</button>
+            <div id="sub-srt-res" style="margin-top:12px;display:none"></div>
+          </div>
+        </div>
+
+        <!-- Queimar legendas em vídeo existente -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">🔥</span><span class="card-title">Queimar Legendas em Vídeo</span></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="form-group">
+                <label class="form-label">Vídeo (MP4)</label>
+                <input id="sub-qvideo" class="form-input" type="text" placeholder="/tmp/dark-studio/output/video.mp4">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Arquivo SRT</label>
+                <input id="sub-qsrt" class="form-input" type="text" placeholder="/tmp/dark-studio/subtitles/legendas.srt">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estilo</label>
+              <select id="sub-qestilo" class="form-input">
+                <option value="padrao">Padrão</option>
+                <option value="cinematico">Cinematográfico</option>
+                <option value="mobile">Mobile</option>
+                <option value="karaoke">Karaoke</option>
+              </select>
+            </div>
+            <button class="btn btn-ghost" onclick="queimarLegendas()">🔥 Queimar Legendas</button>
+            <div id="sub-queimar-res" style="margin-top:12px;display:none"></div>
+          </div>
+        </div>
+
+        <script>
+        async function subtitlePipeline() {
+          const media = document.getElementById('sub-media').value.trim();
+          if (!media) { alert('Informe o caminho do vídeo/áudio.'); return; }
+          const idioma = document.getElementById('sub-idioma').value;
+          const modelo = document.getElementById('sub-modelo').value;
+          const estilo = document.getElementById('sub-estilo').value;
+          const res = document.getElementById('sub-pipeline-res');
+          res.style.display = 'block';
+          res.innerHTML = '<div class="log-box" style="color:var(--yellow)">⏳ Transcrevendo com Whisper... pode levar alguns minutos.</div>';
+          try {
+            const p = new URLSearchParams({ media_path: media, idioma, modelo, estilo });
+            const r = await fetch('/subtitles/pipeline?' + p, { method: 'POST' });
+            const d = await r.json();
+            if (d.status === 'ok') {
+              res.innerHTML = `<div class="log-box" style="color:var(--green)">
+                ✅ Pipeline concluído!<br>
+                📝 SRT: <b>${d.srt_path || '—'}</b><br>
+                🌐 VTT: <b>${d.vtt_path || '—'}</b><br>
+                🎬 Vídeo legendado: <b>${d.video_legendado || 'somente SRT gerado'}</b><br>
+                🗣️ Segmentos: ${d.total_segmentos || 0} · Idioma: ${d.idioma_detectado || '—'}<br>
+                ⏱️ ${d.tempo_s || '?'}s · 💰 R$0,00
+              </div>`;
+            } else {
+              res.innerHTML = `<div class="log-box" style="color:var(--red)">❌ ${d.mensagem || JSON.stringify(d)}</div>`;
+            }
+          } catch(e) {
+            res.innerHTML = `<div class="log-box" style="color:var(--red)">❌ ${e.message}</div>`;
+          }
+        }
+
+        async function gerarSrtRoteiro() {
+          const roteiro = document.getElementById('sub-roteiro').value.trim();
+          if (!roteiro) { alert('Digite o roteiro.'); return; }
+          const duracao = document.getElementById('sub-duracao').value;
+          const res = document.getElementById('sub-srt-res');
+          res.style.display = 'block';
+          res.innerHTML = '<div class="log-box" style="color:var(--yellow)">⏳ Gerando SRT...</div>';
+          try {
+            const p = new URLSearchParams({ roteiro, duracao_total_s: duracao });
+            const r = await fetch('/subtitles/srt?' + p, { method: 'POST' });
+            const d = await r.json();
+            if (d.status === 'ok') {
+              res.innerHTML = `<div class="log-box" style="color:var(--green)">
+                ✅ SRT gerado!<br>📁 <b>${d.srt_path}</b><br>
+                📊 ${d.total_legendas} legendas · ⏱️ ${d.tempo_s}s
+              </div>`;
+            } else {
+              res.innerHTML = `<div class="log-box" style="color:var(--red)">❌ ${d.mensagem}</div>`;
+            }
+          } catch(e) {
+            res.innerHTML = `<div class="log-box" style="color:var(--red)">❌ ${e.message}</div>`;
+          }
+        }
+
+        async function queimarLegendas() {
+          const video = document.getElementById('sub-qvideo').value.trim();
+          const srt = document.getElementById('sub-qsrt').value.trim();
+          if (!video || !srt) { alert('Informe o vídeo e o arquivo SRT.'); return; }
+          const estilo = document.getElementById('sub-qestilo').value;
+          const res = document.getElementById('sub-queimar-res');
+          res.style.display = 'block';
+          res.innerHTML = '<div class="log-box" style="color:var(--yellow)">⏳ Queimando legendas no vídeo...</div>';
+          try {
+            const p = new URLSearchParams({ video_path: video, srt_path: srt, estilo });
+            const r = await fetch('/subtitles/queimar?' + p, { method: 'POST' });
+            const d = await r.json();
+            if (d.status === 'ok') {
+              res.innerHTML = `<div class="log-box" style="color:var(--green)">
+                ✅ Legendas queimadas!<br>
+                📁 <b>${d.output_path}</b><br>
+                🎨 Estilo: ${d.estilo} · Tipo: ${d.tipo}<br>
+                ⏱️ ${d.tempo_s}s · 💰 R$0,00
+              </div>`;
+            } else {
+              res.innerHTML = `<div class="log-box" style="color:var(--red)">❌ ${d.mensagem}</div>`;
+            }
+          } catch(e) {
+            res.innerHTML = `<div class="log-box" style="color:var(--red)">❌ ${e.message}</div>`;
+          }
+        }
+        </script>
+      </div>
+
       <!-- ════════ SCENE BUILDER ════════ -->
       <div id="panel-scene-builder" class="panel">
         <div class="sec-hdr"><h2>🎭 DARK SCENE BUILDER</h2><p>Banco Visual e Consistência Cinematográfica (Fase 8)</p></div>
@@ -1083,6 +1261,176 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
             </div>
           </div>
         </div>
+        <div class="divider"></div>
+        <div class="sec-hdr"><h2>🎬 Storyboard de Cenas</h2><p>Organize, ordene e exporte o roteiro visual do projeto</p></div>
+
+        <!-- Adicionar cena -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">➕</span><span class="card-title">Adicionar Cena ao Storyboard</span></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+              <div class="form-group">
+                <label class="form-label">Projeto</label>
+                <input id="sb-proj" class="form-input" type="text" placeholder="ID do projeto">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Número da Cena</label>
+                <input id="sb-num" class="form-input" type="number" placeholder="1" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Duração (seg)</label>
+                <input id="sb-dur" class="form-input" type="number" placeholder="5" min="1" max="120">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Descrição Visual da Cena</label>
+              <textarea id="sb-desc" class="form-input" rows="2" placeholder="O que acontece visualmente nesta cena..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Prompt para Geração de Imagem/Vídeo</label>
+              <textarea id="sb-prompt" class="form-input" rows="2" placeholder="cinematic shot, dramatic lighting, 8K — descreva a cena para IA..."></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+              <div class="form-group">
+                <label class="form-label">Ângulo de Câmera</label>
+                <select id="sb-cam" class="form-input">
+                  <option value="close-up">Close-up</option>
+                  <option value="medio">Plano Médio</option>
+                  <option value="aberto">Plano Aberto</option>
+                  <option value="aereo">Aéreo (drone)</option>
+                  <option value="subjetivo">Subjetivo (POV)</option>
+                  <option value="contra-plongee">Contra-plongée</option>
+                  <option value="plongee">Plongée</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Movimento</label>
+                <select id="sb-mov" class="form-input">
+                  <option value="static">Estático</option>
+                  <option value="pan">Pan (panorâmica)</option>
+                  <option value="tilt">Tilt (vertical)</option>
+                  <option value="zoom-in">Zoom In</option>
+                  <option value="zoom-out">Zoom Out</option>
+                  <option value="travelling">Travelling</option>
+                  <option value="ken-burns">Ken Burns</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tipo de Mídia</label>
+                <select id="sb-tipo" class="form-input">
+                  <option value="imagem">Imagem estática</option>
+                  <option value="video">Vídeo gerado</option>
+                  <option value="broll">B-roll</option>
+                  <option value="animado">Ken Burns animado</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Narração desta cena</label>
+              <textarea id="sb-narracao" class="form-input" rows="2" placeholder="Texto narrado enquanto a cena passa..."></textarea>
+            </div>
+            <button class="btn" onclick="adicionarCena()">➕ Adicionar Cena</button>
+            <div id="sb-add-res" style="margin-top:12px;display:none"></div>
+          </div>
+        </div>
+
+        <!-- Storyboard visual -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">📋</span><span class="card-title">Storyboard do Projeto</span>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <input id="sb-load-proj" class="form-input" type="text" placeholder="ID do projeto" style="width:160px;padding:4px 8px;font-size:12px">
+              <button class="btn btn-ghost btn-sm" onclick="carregarStoryboard()">Carregar</button>
+              <button class="btn btn-ghost btn-sm" onclick="exportarStoryboard()">📥 Exportar JSON</button>
+            </div>
+          </div>
+          <div class="card-body" id="storyboard-lista">
+            <div class="empty"><div class="empty-icon">🎬</div><p>Digite o ID do projeto e clique em Carregar</p></div>
+          </div>
+        </div>
+
+        <script>
+        let storyboardLocal = {};
+
+        function adicionarCena() {
+          const proj = document.getElementById('sb-proj').value.trim();
+          const num = parseInt(document.getElementById('sb-num').value) || 1;
+          const dur = parseInt(document.getElementById('sb-dur').value) || 5;
+          const desc = document.getElementById('sb-desc').value.trim();
+          const prompt = document.getElementById('sb-prompt').value.trim();
+          const cam = document.getElementById('sb-cam').value;
+          const mov = document.getElementById('sb-mov').value;
+          const tipo = document.getElementById('sb-tipo').value;
+          const narracao = document.getElementById('sb-narracao').value.trim();
+          const res = document.getElementById('sb-add-res');
+          if (!proj || !desc) { alert('Informe o ID do projeto e a descrição da cena.'); return; }
+          if (!storyboardLocal[proj]) storyboardLocal[proj] = [];
+          const cena = { num, dur, desc, prompt, cam, mov, tipo, narracao, criado_em: new Date().toISOString() };
+          storyboardLocal[proj].push(cena);
+          storyboardLocal[proj].sort((a,b) => a.num - b.num);
+          try { localStorage.setItem('dark_storyboard', JSON.stringify(storyboardLocal)); } catch(e) {}
+          res.style.display = 'block';
+          res.innerHTML = `<div class="log-box" style="color:var(--green)">✅ Cena ${num} adicionada ao projeto <b>${proj}</b>. Total: ${storyboardLocal[proj].length} cenas.</div>`;
+          document.getElementById('sb-num').value = num + 1;
+          document.getElementById('sb-desc').value = '';
+          document.getElementById('sb-prompt').value = '';
+          document.getElementById('sb-narracao').value = '';
+          document.getElementById('sb-load-proj').value = proj;
+        }
+
+        function carregarStoryboard() {
+          const proj = document.getElementById('sb-load-proj').value.trim();
+          const lista = document.getElementById('storyboard-lista');
+          try { const saved = localStorage.getItem('dark_storyboard'); if (saved) storyboardLocal = JSON.parse(saved); } catch(e) {}
+          const cenas = storyboardLocal[proj] || [];
+          if (!cenas.length) {
+            lista.innerHTML = '<div class="empty"><div class="empty-icon">🎬</div><p>Nenhuma cena encontrada para este projeto.</p></div>';
+            return;
+          }
+          let html = `<div style="margin-bottom:8px;color:var(--fg-dim);font-size:12px">📋 ${cenas.length} cenas · duração total: ${cenas.reduce((a,c)=>a+c.dur,0)}s</div>`;
+          cenas.forEach((c,i) => {
+            html += `<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:start">
+              <div style="background:var(--accent);color:#000;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">${c.num}</div>
+              <div>
+                <div style="font-weight:600;margin-bottom:4px">${c.desc}</div>
+                ${c.prompt ? `<div style="font-size:11px;color:var(--fg-dim);margin-bottom:4px">🎨 ${c.prompt}</div>` : ''}
+                <div style="font-size:11px;display:flex;gap:12px;flex-wrap:wrap">
+                  <span>📷 ${c.cam}</span><span>🎬 ${c.mov}</span><span>🖼 ${c.tipo}</span><span>⏱️ ${c.dur}s</span>
+                </div>
+                ${c.narracao ? `<div style="font-size:11px;color:var(--yellow);margin-top:4px">🗣️ ${c.narracao}</div>` : ''}
+              </div>
+              <button onclick="removerCena('${proj}',${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px" title="Remover">✕</button>
+            </div>`;
+          });
+          lista.innerHTML = html;
+        }
+
+        function removerCena(proj, idx) {
+          if (!storyboardLocal[proj]) return;
+          storyboardLocal[proj].splice(idx, 1);
+          try { localStorage.setItem('dark_storyboard', JSON.stringify(storyboardLocal)); } catch(e) {}
+          carregarStoryboard();
+        }
+
+        function exportarStoryboard() {
+          const proj = document.getElementById('sb-load-proj').value.trim();
+          try { const saved = localStorage.getItem('dark_storyboard'); if (saved) storyboardLocal = JSON.parse(saved); } catch(e) {}
+          const cenas = storyboardLocal[proj] || [];
+          if (!cenas.length) { alert('Nenhuma cena para exportar. Carregue o projeto primeiro.'); return; }
+          const dados = { projeto: proj, total_cenas: cenas.length, duracao_total_s: cenas.reduce((a,c)=>a+c.dur,0), ai_generated: true, ai_disclosure: 'Produzido com DARK STUDIO AAA — DARK CREATIVE LAB', cenas };
+          const blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = `storyboard_${proj}.json`;
+          a.click();
+        }
+
+        // Carregar storyboard do localStorage ao iniciar
+        try {
+          const saved = localStorage.getItem('dark_storyboard');
+          if (saved) storyboardLocal = JSON.parse(saved);
+        } catch(e) {}
+        </script>
       </div>
 
       <!-- ════════ SHORTS FACTORY ════════ -->
@@ -1323,7 +1671,8 @@ const titles = {
   'audio-studio': ['Audio Studio', 'AGENTE AUDIO MASTER'],
   'thumbnail-pro':['Thumbnail Pro', 'DARK THUMBNAIL PRO'],
   'scene-builder':['Scene Builder', 'AGENTE VISUAL CONSISTENCY + ASSET MANAGER'],
-  'shorts-factory':['Shorts Factory', 'DARK SHORTS FACTORY — Em desenvolvimento'],
+  'shorts-factory':['Shorts Factory', 'DARK SHORTS FACTORY — Vídeos 9:16 automatizados'],
+  'subtitles':     ['Subtitle Engine', 'DARK SUBTITLE ENGINE — Whisper + FFmpeg Hardsub'],
   agentes:        ['Agentes', 'DARK MANAGER — Orquestrador de 9 agentes'],
   banco:          ['Banco Visual', 'ProjetoVisualBank — Fase 8'],
   canais:         ['Canais', '12 canais YouTube configurados'],

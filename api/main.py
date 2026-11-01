@@ -750,6 +750,81 @@ async def slideshow_vertical(
         return {"status": "erro", "mensagem": str(e), "ai_generated": True}
 
 
+@app.post("/subtitles/transcrever", tags=["DARK Subtitle Engine"])
+async def transcrever_audio(
+    media_path: str,
+    idioma: str = "pt",
+    modelo: str = "base",
+):
+    """
+    Transcreve áudio/vídeo com Whisper (offline).
+    Modelos: tiny | base | small | medium | large
+    Custo: R$0,00
+    """
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_subtitle_engine import DarkSubtitleEngine
+        engine = DarkSubtitleEngine()
+        return engine.transcrever(media_path, idioma=idioma, modelo=modelo)
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.post("/subtitles/srt", tags=["DARK Subtitle Engine"])
+async def roteiro_para_srt(
+    roteiro: str,
+    duracao_total_s: float = 60.0,
+):
+    """Gera arquivo SRT a partir de roteiro texto e duração total."""
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_subtitle_engine import DarkSubtitleEngine
+        engine = DarkSubtitleEngine()
+        return engine.srt_de_roteiro(roteiro, duracao_total_s=duracao_total_s)
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.post("/subtitles/queimar", tags=["DARK Subtitle Engine"])
+async def queimar_legendas_video(
+    video_path: str,
+    srt_path: str,
+    estilo: str = "padrao",
+):
+    """
+    Queima legendas .srt no vídeo (hardsub).
+    Estilos: padrao | cinematico | mobile | karaoke
+    """
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_subtitle_engine import DarkSubtitleEngine
+        engine = DarkSubtitleEngine()
+        return engine.queimar_legendas(video_path, srt_path, estilo=estilo)
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.post("/subtitles/pipeline", tags=["DARK Subtitle Engine"])
+async def pipeline_legendas(
+    media_path: str,
+    idioma: str = "pt",
+    modelo: str = "base",
+    estilo: str = "padrao",
+):
+    """Pipeline completo: vídeo → Whisper → SRT → vídeo legendado."""
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_subtitle_engine import DarkSubtitleEngine
+        engine = DarkSubtitleEngine()
+        return engine.pipeline_completo(media_path, idioma=idioma, modelo_whisper=modelo, estilo_legenda=estilo)
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
 @app.get("/shorts/formatos", tags=["DARK Shorts Factory"])
 async def listar_formatos():
     """Lista formatos verticais disponíveis."""
