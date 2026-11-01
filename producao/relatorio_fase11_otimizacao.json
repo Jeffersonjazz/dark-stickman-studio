@@ -1,0 +1,154 @@
+{
+  "fase": "FASE 11 — Otimização de Custos e Desempenho",
+  "hardware": {
+    "sistema": "Linux",
+    "versao_os": "#1 SMP PREEMPT_DYNAMIC @0",
+    "arquitetura": "x86_64",
+    "processador": "x86_64",
+    "python": "3.13.18",
+    "ram_total_gb": 8.4,
+    "ram_disponivel_gb": 7.8,
+    "cpu_cores": 2,
+    "cpu_fisicos": 2,
+    "disco_total_gb": 270.6,
+    "disco_livre_gb": 22.1,
+    "gpu": "sem GPU detectada",
+    "cuda": false,
+    "vram_gb": 0,
+    "ffmpeg": true,
+    "piper": true,
+    "python_ok": true
+  },
+  "benchmark": {
+    "status": "ok",
+    "profiler_ok": true,
+    "cache_ok": true,
+    "ffmpeg_presets": [
+      "ultra_fast",
+      "fast",
+      "balanced",
+      "quality",
+      "youtube_hd",
+      "shorts"
+    ],
+    "recursos_custo": [
+      "tts_edge",
+      "tts_gtts",
+      "tts_piper",
+      "tts_kokoro",
+      "tts_elevenlabs",
+      "imagen_local",
+      "imagen_openai",
+      "imagen_replicate",
+      "video_runway",
+      "video_kling",
+      "ffmpeg_render",
+      "storage_gb"
+    ],
+    "funcoes": [
+      "PipelineProfiler",
+      "AssetCache",
+      "CustoEstimador",
+      "ffmpeg_params_otimizados",
+      "sugerir_perfil_ffmpeg",
+      "gerar_relatorio_performance"
+    ],
+    "ai_generated": true,
+    "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+  },
+  "custo_por_video": {
+    "local": {
+      "custo_total_brl": 0.0005,
+      "itens_gratuitos": 3,
+      "itens_pagos": 1,
+      "itens": [
+        {
+          "recurso": "tts_piper",
+          "quantidade": 5,
+          "custo_unitario": 0.0,
+          "custo_total": 0.0,
+          "descricao": ""
+        },
+        {
+          "recurso": "imagen_local",
+          "quantidade": 5,
+          "custo_unitario": 0.0,
+          "custo_total": 0.0,
+          "descricao": ""
+        },
+        {
+          "recurso": "ffmpeg_render",
+          "quantidade": 1,
+          "custo_unitario": 0.0,
+          "custo_total": 0.0,
+          "descricao": ""
+        },
+        {
+          "recurso": "storage_gb",
+          "quantidade": 0.02,
+          "custo_unitario": 0.025,
+          "custo_total": 0.0005,
+          "descricao": ""
+        }
+      ],
+      "resumo": {
+        "tts": 0.0,
+        "imagem": 0.0,
+        "video": 0,
+        "render": 0.0
+      },
+      "ai_generated": true
+    },
+    "hibrido": {
+      "custo_total_brl": 0.3505,
+      "itens_gratuitos": 1,
+      "itens_pagos": 3,
+      "itens": [
+        {
+          "recurso": "tts_elevenlabs",
+          "quantidade": 5,
+          "custo_unitario": 0.03,
+          "custo_total": 0.15,
+          "descricao": ""
+        },
+        {
+          "recurso": "imagen_openai",
+          "quantidade": 5,
+          "custo_unitario": 0.04,
+          "custo_total": 0.2,
+          "descricao": ""
+        },
+        {
+          "recurso": "ffmpeg_render",
+          "quantidade": 1,
+          "custo_unitario": 0.0,
+          "custo_total": 0.0,
+          "descricao": ""
+        },
+        {
+          "recurso": "storage_gb",
+          "quantidade": 0.02,
+          "custo_unitario": 0.025,
+          "custo_total": 0.0005,
+          "descricao": ""
+        }
+      ],
+      "resumo": {
+        "tts": 0.15,
+        "imagem": 0.2,
+        "video": 0,
+        "render": 0.0
+      },
+      "ai_generated": true
+    }
+  },
+  "recomendacoes": {
+    "perfil_padrao": "youtube_hd",
+    "tts_preferido": "piper_local",
+    "imagem_preferida": "pillow_local_ou_sd_local",
+    "video_preferido": "ffmpeg_kenburns_local",
+    "custo_alvo_por_video_brl": 0.0
+  },
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

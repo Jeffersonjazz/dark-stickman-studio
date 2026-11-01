@@ -380,7 +380,14 @@ def ffmpeg_params_otimizados(perfil: str = "balanced") -> list[str]:
     return params
 
 
-def sugerir_perfil_ffmpeg(duracao_s: float, resolucao: str = "1080p") -> str:
+def sugerir_perfil_ffmpeg(duracao_s, resolucao: str = "1080p") -> str:
+    # Aceita dict de contexto ou float direto
+    if isinstance(duracao_s, dict):
+        ctx = duracao_s
+        duracao_s = ctx.get("duracao_total", ctx.get("duracao_s", 60))
+        resolucao = ctx.get("resolucao", resolucao)
+        if ctx.get("gpu_disponivel"):
+            resolucao = resolucao  # GPU futuro: manter perfil
     """
     Sugere o melhor perfil FFmpeg baseado na situação.
 

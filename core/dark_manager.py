@@ -110,6 +110,51 @@ TASK_TYPES = {
 #  DISPATCHER PRINCIPAL
 # ─────────────────────────────────────────────────────────────────
 
+def _normalizar_params(tarefa: str, params: dict) -> dict:
+    """
+    Adapta params modernos (nicho, preset, titulo) para o formato legado
+    que os agentes originais esperam (canal_config dict).
+    Garante compatibilidade sem quebrar a API antiga.
+    """
+    p = dict(params)
+
+    # Se já tem canal_config, não mexe
+    if "canal_config" not in p:
+        nicho  = p.get("nicho", "documentario")
+        preset = p.get("preset", p.get("estilo_cinematico", "documentario"))
+        titulo = p.get("titulo", "Vídeo DARK STUDIO")
+        projeto_id = p.get("projeto_id", p.get("nome", "projeto_default"))
+
+        p["canal_config"] = {
+            "id": projeto_id,
+            "nome": titulo,
+            "nicho": nicho,
+            "preset": preset,
+            "estilo_cinematico": preset,
+            "resolucao": p.get("resolucao", "1920x1080"),
+            "orientacao": p.get("orientacao", "horizontal"),
+        }
+
+    # setup_projeto precisa de campos específicos
+    if tarefa == "setup_projeto":
+        p.setdefault("nome", p["canal_config"]["id"])
+        p.setdefault("nicho", p["canal_config"]["nicho"])
+        p.setdefault("estilo_cinematico", p["canal_config"].get("preset", "documentario"))
+        p.setdefault("paleta_descricao", "tons escuros, alto contraste")
+        p.setdefault("resolucao", "1920x1080")
+
+    # organizar_projeto: precisa de projeto_dir
+    if tarefa == "organizar_projeto":
+        if "projeto_dir" not in p:
+            import os
+            base = "/tmp/dark-studio/projetos"
+            os.makedirs(base, exist_ok=True)
+            p["projeto_dir"] = f"{base}/{p['canal_config']['id']}"
+            os.makedirs(p["projeto_dir"], exist_ok=True)
+
+    return p
+
+
 def executar(tarefa: str, params: dict, verbose: bool = True) -> dict:
     """
     DARK MANAGER — Roteia tarefa para o agente especializado correto.
@@ -140,6 +185,7 @@ def executar(tarefa: str, params: dict, verbose: bool = True) -> dict:
         print(f"[DARK MANAGER] Tarefa={tarefa} → Agente={agente_nome}")
 
     try:
+        params = _normalizar_params(tarefa, params)
         resultado = _despachar(tarefa, agente_nome, params)
         status = "ok"
     except Exception as e:
@@ -172,7 +218,13 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
             check_cinematic_director,
         )
         if tarefa == "plano_cenas":
-            return criar_plano_cenas(params["roteiro"], params["canal_config"])
+            canal_cfg = params.get("canal_config", {
+                "nicho": params.get("nicho", "documentario"),
+                "preset": params.get("preset", "documentario"),
+                "id": "projeto",
+                "nome": params.get("titulo", "Vídeo"),
+            })
+            return criar_plano_cenas(params["roteiro"], canal_cfg)
         if tarefa == "prompt_visual":
             return gerar_prompt_visual(params["cena"], params.get("preset", "documentario"))
         if tarefa == "filtro_zoompan":
@@ -216,12 +268,31 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
             gerar_prompt_com_continuidade, VisualConsistencyDB,
         )
         if tarefa == "setup_projeto":
-            db = setup_projeto(
-                Path(params["output_dir"]),
-                params["canal_config"],
-                preset_nome=params.get("preset"),
-            )
-            return {"db_path": str(db.db_path)}
+            # Suporte ao novo endpoint dark_visual_consistency
+            try:
+                from core.dark_visual_consistency import DarkVisualConsistency
+                vc = DarkVisualConsistency()
+                proj = vc.criar_projeto(
+                    nome=params.get("nome", params["canal_config"]["id"]),
+                    nicho=params.get("nicho", params["canal_config"]["nicho"]),
+                    estilo_cinematico=params.get("estilo_cinematico",
+                        params["canal_config"].get("preset", "documentario")),
+                    paleta_descricao=params.get("paleta_descricao", "tons escuros"),
+                    resolucao=params.get("resolucao", "1920x1080"),
+                )
+                return proj
+            except Exception as e_new:
+                # fallback para legacy
+                import os
+                out_dir = params.get("output_dir",
+                    f"/tmp/dark-studio/projetos/{params['canal_config']['id']}")
+                os.makedirs(out_dir, exist_ok=True)
+                db = setup_projeto(
+                    Path(out_dir),
+                    params["canal_config"],
+                    preset_nome=params.get("preset"),
+                )
+                return {"db_path": str(db.db_path)}
         if tarefa == "validar_consistencia":
             db = VisualConsistencyDB(Path(params["output_dir"]))
             return validar_consistencia_roteiro(params["cenas"], db)
@@ -295,9 +366,12 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
             gerar_intro, gerar_outro, gerar_pacote_canal, gerar_contador,
         )
         if tarefa == "titulo_animado":
+            import os
+            out = params.get("output", params.get("output_path", "/tmp/dark-studio/titulo.mp4"))
+            os.makedirs(os.path.dirname(out) if os.path.dirname(out) else ".", exist_ok=True)
             return gerar_titulo_animado(
-                params["texto"],
-                Path(params["output"]),
+                params.get("texto", params.get("titulo", "Título")),
+                Path(out),
                 duracao=params.get("duracao", 4.0),
                 animacao=params.get("animacao", "fade"),
                 resolucao=params.get("resolucao", "1920x1080"),
@@ -320,10 +394,13 @@ def _despachar(tarefa: str, agente: str, params: dict) -> Any:
                 resolucao=params.get("resolucao", "1920x1080"),
             )
         if tarefa == "gerar_intro":
+            import os
+            out = params.get("output", params.get("output_path", "/tmp/dark-studio/intro.mp4"))
+            os.makedirs(os.path.dirname(out) if os.path.dirname(out) else ".", exist_ok=True)
             return gerar_intro(
                 params["canal_config"],
-                Path(params["output"]),
-                estilo=params.get("estilo", "documentario"),
+                Path(out),
+                estilo=params.get("estilo", params.get("preset", "documentario")),
                 resolucao=params.get("resolucao", "1920x1080"),
             )
         if tarefa == "gerar_outro":
