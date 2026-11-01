@@ -1131,9 +1131,13 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
 
       <!-- ════════ BANCO VISUAL ════════ -->
       <div id="panel-banco" class="panel">
-        <div class="sec-hdr"><h2>🎨 Banco Visual de Referências</h2><p>ProjetoVisualBank — Fase 8 completa</p></div>
+        <div class="sec-hdr">
+          <h2>🎨 Banco Visual de Referências</h2>
+          <p>DARK VISUAL CONSISTENCY — Sistema de continuidade audiovisual entre cenas</p>
+          <button class="btn" onclick="loadBanco()" style="margin-top:8px">↺ Atualizar</button>
+        </div>
         <div id="banco-full-view">
-          <div class="empty"><div class="empty-icon">🎨</div><p>Carregando banco visual…</p></div>
+          <div class="empty"><div class="empty-icon">🎨</div><p>Carregando projetos…</p></div>
         </div>
       </div>
 
@@ -1291,17 +1295,86 @@ function renderAgentesSmall() {
   document.getElementById('dash-agents').innerHTML = AGENTES.map(agentCard).join('');
 }
 
-function renderAgentes() {
-  document.getElementById('agents-grid').innerHTML = AGENTES.map(a => `
-    <div class="agent-card" style="flex-direction:column;gap:8px;padding:16px">
+async function renderAgentes() {
+  const grid = document.getElementById('agents-grid');
+  grid.innerHTML = '<div style="color:var(--fg3);padding:20px">Carregando status dos agentes…</div>';
+
+  // Buscar status real da API
+  const st = await api('/agentes/status');
+  const apiAgentes = (st && st.agentes) ? st.agentes : {};
+
+  // Mapa engine key → info do painel
+  const ENGINE_MAP = {
+    image:       { nome:'IMAGE ENGINE',      icon:'🖼️', role:'Geração e tratamento de imagens', clone:'FLUX/Midjourney/SD' },
+    video:       { nome:'VIDEO GENERATOR',   icon:'🎥', role:'Geração de vídeos e animações',  clone:'Runway/Kling/CogVideoX' },
+    editor:      { nome:'VIDEO EDITOR PRO',  icon:'✂️', role:'Montagem e renderização',          clone:'DaVinci/Premiere' },
+    audio:       { nome:'AUDIO MASTER',      icon:'🎙️', role:'Narração, mixagem e masterização', clone:'ElevenLabs/XTTS/Audacity' },
+    motion:      { nome:'MOTION GRAPHICS',   icon:'✨', role:'Títulos, efeitos e infográficos',  clone:'After Effects/Blender' },
+    consistency: { nome:'VISUAL CONSISTENCY',icon:'🎨', role:'Identidade visual entre cenas',    clone:'Adobe Sensei Consistency' },
+  };
+
+  const cards = Object.entries(ENGINE_MAP).map(([key, info]) => {
+    const ag = apiAgentes[key] || {};
+    const ok = ag.status !== 'indisponivel' && ag.status !== 'erro';
+    const custo = ag.custo_mensal_brl ?? ag.custo_mensal ?? '0.00';
+    const tts   = ag.tts_ativo || ag.tts || '';
+    const fb    = ag.fallback || ag.backend || '';
+    const extras = [
+      tts  ? `<span class="pill pill-blue" style="font-size:10px">${tts}</span>` : '',
+      fb   ? `<span class="pill pill-grey" style="font-size:10px">${fb}</span>` : '',
+    ].filter(Boolean).join(' ');
+    return `
+    <div class="agent-card" style="flex-direction:column;gap:10px;padding:16px;border:1px solid ${ok?'rgba(45,212,160,.25)':'var(--border)'}">
       <div style="display:flex;align-items:center;gap:10px">
-        <div class="agent-dot ${a.ativo ? 'dot-green' : 'dot-grey'}"></div>
-        <div class="agent-name" style="font-size:13px">${a.icon} ${a.nome}</div>
+        <div class="agent-dot ${ok?'dot-green':'dot-grey'}"></div>
+        <div>
+          <div class="agent-name" style="font-size:13px">${info.icon} ${info.nome}</div>
+          <div style="font-size:10px;color:var(--fg3);margin-top:2px">clone: ${info.clone}</div>
+        </div>
+      </div>
+      <div class="agent-role">${info.role}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <span class="pill ${ok?'pill-green':'pill-red'}" style="font-size:10px">${ok?'● Operacional':'○ Indisponível'}</span>
+        <span class="pill pill-green" style="font-size:10px">R$${custo}/mês</span>
+        ${extras}
+      </div>
+    </div>`;
+  });
+
+  // Agentes de controle (sem engine própria ainda — listagem simples)
+  const EXTRA = [
+    { nome:'CINEMATIC DIRECTOR',icon:'🎬', role:'Direção, luz e composição visual',     clone:'DaVinci Resolve Color' },
+    { nome:'ASSET MANAGER',     icon:'📦', role:'Imagens, vídeos, fontes e licenças',    clone:'Adobe Bridge/DAM' },
+    { nome:'CREATIVE QA',       icon:'✅', role:'Qualidade visual, áudio e conformidade', clone:'QA integrado' },
+  ];
+  const extraCards = EXTRA.map(a => `
+    <div class="agent-card" style="flex-direction:column;gap:10px;padding:16px;opacity:.7">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="agent-dot dot-yellow"></div>
+        <div>
+          <div class="agent-name" style="font-size:13px">${a.icon} ${a.nome}</div>
+          <div style="font-size:10px;color:var(--fg3);margin-top:2px">clone: ${a.clone}</div>
+        </div>
       </div>
       <div class="agent-role">${a.role}</div>
-      <div class="pill ${a.ativo ? 'pill-green' : 'pill-grey'}" style="align-self:flex-start">${a.ativo ? '● Operacional' : '○ Inativo'}</div>
-    </div>`
-  ).join('');
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="pill pill-yellow" style="font-size:10px">◆ Em desenvolvimento</span>
+        <span class="pill pill-green" style="font-size:10px">R$0.00/mês</span>
+      </div>
+    </div>`).join('');
+
+  // Custo total
+  const custo_total = (st && st.custo_total_mensal_brl !== undefined) ? st.custo_total_mensal_brl : 0;
+  grid.innerHTML = cards.join('') + extraCards;
+
+  // Rodapé de custo total
+  const footer = document.createElement('div');
+  footer.style = 'margin-top:16px;padding:12px 16px;background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2);border-radius:8px;display:flex;justify-content:space-between;align-items:center';
+  footer.innerHTML = `
+    <span style="color:var(--fg2);font-size:13px">💰 Custo total mensal do DARK CREATIVE LAB</span>
+    <span style="color:var(--green);font-weight:700;font-size:16px">R$ ${custo_total.toFixed(2)}/mês</span>
+  `;
+  grid.parentElement.insertBefore(footer, grid.nextSibling);
 }
 
 // ── Jobs ──────────────────────────────────────────────────────────────
@@ -1385,7 +1458,26 @@ async function gerarThumbnail() {
 
 // ── Banco Visual ──────────────────────────────────────────────────────
 async function loadBanco() {
-  const res = await api('/banco/projetos');
+  // Tenta endpoint legado, fallback para DARK CREATIVE LAB
+  let res = await api('/banco/projetos');
+  if (!res || !res.projetos) {
+    // Tentar via DARK VISUAL CONSISTENCY
+    const res2 = await api('/agentes/projetos');
+    if (res2 && res2.projetos) {
+      // Adaptar formato
+      res = {
+        projetos: res2.projetos.map(p => ({
+          projeto_id: p.id,
+          titulo: p.nome,
+          nicho: p.nicho,
+          n_personagens: p.personagens,
+          n_cenarios: p.cenarios,
+          n_cenas: 0,
+          paleta: [],
+        }))
+      };
+    }
+  }
   const NICHO_ICONS = { psicologia:'🧠', misterio:'🔮', historia:'📜', natureza:'🌿', tecnologia:'💡', batalhas:'⚔️', educacao:'📚', relaxamento:'🌙' };
 
   const renderGrid = (projetos, containerId) => {

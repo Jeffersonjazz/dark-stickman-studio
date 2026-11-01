@@ -589,6 +589,82 @@ async def banco_relatorio(projeto_id: str):
 # ─── Painel ───────────────────────────────────────────────────────────────────
 
 @app.get("/painel", tags=["Sistema"])
+
+# ─── DARK CREATIVE LAB — Agentes ─────────────────────────────────────────────
+
+@app.get("/agentes/status", tags=["DARK Creative Lab"])
+async def status_agentes():
+    """Status de todos os 6 agentes do DARK CREATIVE LAB."""
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_orchestrator import DarkOrchestrator
+        orch = DarkOrchestrator()
+        return orch.status_agentes()
+    except Exception as e:
+        return {
+            "status": "erro",
+            "mensagem": str(e),
+            "agentes": {},
+            "custo_total_mensal_brl": 0.00,
+            "ai_generated": True,
+        }
+
+
+@app.post("/agentes/produzir", tags=["DARK Creative Lab"])
+async def produzir_cinematico(
+    roteiro: str,
+    titulo: str,
+    nicho: str = "geral",
+    orientacao: str = "horizontal",
+    canal_nome: str = "DARK STUDIO",
+    background_tasks: BackgroundTasks = None,
+):
+    """Pipeline cinematográfico completo via DARK ORCHESTRATOR."""
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_orchestrator import DarkOrchestrator
+        job_id = uuid.uuid4().hex[:12]
+        orch = DarkOrchestrator()
+        result = orch.produzir_video_completo(
+            roteiro=roteiro,
+            titulo=titulo,
+            nicho=nicho,
+            orientacao=orientacao,
+            canal_nome=canal_nome,
+        )
+        return {"job_id": job_id, **result}
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.get("/agentes/projeto/{projeto_id}", tags=["DARK Creative Lab"])
+async def carregar_projeto(projeto_id: str):
+    """Carrega banco visual de um projeto."""
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_visual_consistency import DarkVisualConsistency
+        vc = DarkVisualConsistency()
+        return vc.carregar_projeto(projeto_id)
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
+@app.get("/agentes/projetos", tags=["DARK Creative Lab"])
+async def listar_projetos():
+    """Lista projetos do banco visual."""
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from core.dark_visual_consistency import DarkVisualConsistency
+        vc = DarkVisualConsistency()
+        return vc.listar_projetos()
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e), "ai_generated": True}
+
+
 @app.get("/painel/", tags=["Sistema"])
 async def painel_redirect():
     """Redireciona para o painel principal."""
