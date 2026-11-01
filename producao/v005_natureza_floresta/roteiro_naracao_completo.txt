@@ -1,0 +1,166 @@
+DARK STUDIO AAA — ROTEIRO COMPLETO DE NARRAÇÃO
+V005 — A Floresta Que Respira
+Agente: AUDIO MASTER | Voz: pt-BR-AntonioNeural
+ai_generated: True | ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
+
+===============================================================
+Tom: Lento, contemplativo, reverente — como David Attenborough
+Velocidade: -10% | Pitch: -3Hz
+Referência: BBC Planet Earth, narração suave e impressionante
+===============================================================
+
+--- CENA C01_HOOK (0:00 — 1:20) ---
+
+Em 1997, [PAUSA 0.8s] uma cientista canadense publicou uma descoberta [PAUSA 0.5s] que a maioria dos biólogos achou impossível.
+
+[PAUSA 1.0s]
+
+As árvores de uma floresta [PAUSA 0.5s] não apenas vivem lado a lado.
+
+[PAUSA 0.7s]
+
+Elas se comunicam.
+
+[PAUSA 1.0s]
+
+Compartilham recursos.
+
+[PAUSA 0.8s]
+
+Cuidam umas das outras.
+
+[PAUSA 1.2s]
+
+E a rede que as conecta [PAUSA 0.5s] é mais complexa que o cérebro humano.
+
+[PAUSA 2.0s]
+
+--- CENA C02_SIMARD (1:20 — 3:00) ---
+
+Suzanne Simard era pesquisadora florestal [PAUSA 0.7s] quando notou algo estranho.
+
+[PAUSA 0.8s]
+
+Quando árvores de uma espécie eram removidas, [PAUSA 0.5s] árvores de outras espécies nas proximidades adoeciam — [PAUSA 0.4s] mesmo sem competição por luz [PAUSA 0.3s] ou água.
+
+[PAUSA 1.0s]
+
+Ela passou anos investigando o solo.
+
+[PAUSA 0.8s]
+
+O que encontrou [PAUSA 0.8s] foi uma rede subterrânea de fungos micorrizais [PAUSA 0.5s] que conectava as raízes de centenas de árvores.
+
+[PAUSA 1.5s]
+
+--- CENA C03_REDE (3:00 — 4:30) ---
+
+A rede micelial funciona como um sistema nervoso subterrâneo.
+
+[PAUSA 1.0s]
+
+Árvores maiores — [PAUSA 0.4s] as árvores-mãe — [PAUSA 0.4s] enviam carbono e nutrientes [PAUSA 0.4s] para mudas menores que crescem à sua sombra.
+
+[PAUSA 0.8s]
+
+Mas vai além.
+
+[PAUSA 1.0s]
+
+Quando uma árvore é atacada por insetos, [PAUSA 0.5s] ela emite compostos químicos pela rede [PAUSA 0.4s] que alertam outras árvores — [PAUSA 0.4s] que então produzem toxinas defensivas [PAUSA 0.4s] antes de serem atacadas.
+
+[PAUSA 1.5s]
+
+--- CENA C04_MAE (4:30 — 6:00) ---
+
+As árvores-mãe — [PAUSA 0.5s] geralmente os indivíduos mais velhos e maiores da floresta — [PAUSA 0.5s] mantêm conexões com centenas de outras árvores simultaneamente.
+
+[PAUSA 1.0s]
+
+Estudos mostram que quando uma árvore-mãe está morrendo, [PAUSA 0.6s] ela deliberadamente aumenta [PAUSA 0.3s] o envio de carbono e sinais químicos para seus filhos.
+
+[PAUSA 0.8s]
+
+Como se passasse um testamento biológico [PAUSA 0.4s] para a próxima geração.
+
+[PAUSA 1.5s]
+
+--- CENA C05_SINAIS (6:00 — 7:20) ---
+
+Em 2016, pesquisadores descobriram que a rede [PAUSA 0.4s] não é apenas de nutrição — [PAUSA 0.4s] é de comunicação ativa.
+
+[PAUSA 0.8s]
+
+Quando uma árvore sofre estresse hídrico, [PAUSA 0.5s] ela emite sinais elétricos [PAUSA 0.4s] pela rede micelial.
+
+[PAUSA 0.8s]
+
+Outras árvores, [PAUSA 0.3s] a metros de distância, [PAUSA 0.4s] fecham seus estômatos em resposta — [PAUSA 0.5s] conservando água [PAUSA 0.3s] antes de precisar.
+
+[PAUSA 1.5s]
+
+--- CENA C06_IMPLICACOES (7:20 — 9:00) ---
+
+Simard hoje afirma [PAUSA 0.5s] que a floresta funciona como um organismo único.
+
+[PAUSA 0.8s]
+
+Não uma coleção de indivíduos competindo por recursos, [PAUSA 0.5s] mas uma comunidade que evolui em cooperação.
+
+[PAUSA 1.0s]
+
+Essa descoberta está mudando como gerenciamos florestas.
+
+[PAUSA 0.8s]
+
+Remover árvores-mãe idosas, [PAUSA 0.4s] como se fazia em manejo florestal convencional, [PAUSA 0.4s] pode colapsar a rede inteira.
+
+[PAUSA 1.5s]
+
+--- CENA C07_TEMPO (9:00 — 10:30) ---
+
+A floresta que parece silenciosa [PAUSA 0.6s] está em constante conversa.
+
+[PAUSA 1.0s]
+
+E essa conversa [PAUSA 0.5s] começou muito antes dos humanos.
+
+[PAUSA 1.0s]
+
+Os fungos micorrizais existem há 450 milhões de anos — [PAUSA 0.6s] eles ajudaram as primeiras plantas [PAUSA 0.4s] a colonizar a terra.
+
+[PAUSA 1.0s]
+
+Somos jovens demais [PAUSA 0.6s] para entender completamente [PAUSA 0.4s] o que estamos destruindo.
+
+[PAUSA 2.0s]
+
+--- CTA (10:30 — 12:00) ---
+
+A próxima vez que você estiver numa floresta, [PAUSA 0.7s] lembre:
+
+[PAUSA 1.0s]
+
+Você está caminhando sobre uma internet [PAUSA 0.4s] que tem 450 milhões de anos.
+
+[PAUSA 1.0s]
+
+E ela está conversando.
+
+[PAUSA 1.5s]
+
+Se esse vídeo abriu seus olhos [PAUSA 0.4s] para a inteligência da natureza, [PAUSA 0.4s] compartilhe.
+
+[PAUSA 0.8s]
+
+Até o próximo.
+
+[PAUSA 3.0s — fade out lento]
+
+===============================================================
+DURAÇÃO ESTIMADA: ~12 minutos
+PALAVRAS TOTAIS: ~320 (vídeo mais contemplativo, mais silêncio)
+CENAS: 8 | SEO: floresta, rede micelial, Simard, wood wide web
+TOM: mais lento e poético que V001-V004
+===============================================================
+*ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB*

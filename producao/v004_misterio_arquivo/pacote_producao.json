@@ -1,0 +1,45 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "id": "V004",
+  "titulo": "O Arquivo Que o Governo Apagou",
+  "nicho": "misterio",
+  "duracao_alvo": "12 minutos",
+  "formato": "1920x1080 horizontal",
+  "color_grading": "shadow_conspiracy_green",
+  "preset_cinematografico": "misterio_conspiracao",
+  "voice": "pt-BR-AntonioNeural",
+  "voice_params": {"rate": "-8%", "pitch": "-5Hz"},
+  "cenas": [
+    {"id": "C01_hook", "titulo": "O Arquivo de 847 Páginas", "duracao": "80s", "prompt_visual": "Government server room with classified document alert on screen, timestamp 14:37, document marked classified being digitally deleted, shadow green conspiracy aesthetic, photorealistic documentary", "movimento": "zoom_tela_computador"},
+    {"id": "C02_conteudo", "titulo": "O Conteúdo", "duracao": "90s", "prompt_visual": "Classified surveillance report pages, redacted document aesthetic, mass surveillance visualization concept, shadow green tones, investigative journalism documentary style, photorealistic", "movimento": "pan_documentos"},
+    {"id": "C03_vazamento", "titulo": "O Vazamento Controlado", "duracao": "90s", "prompt_visual": "Anonymous person at computer in dark room, fragments of classified document appearing on forums, mysterious figure controlling information release, green monitor glow, conspiracy thriller aesthetic, photorealistic", "movimento": "travelling_sombras"},
+    {"id": "C04_revelacoes", "titulo": "As Três Revelações", "duracao": "100s", "prompt_visual": "Investigative board with three major revelations highlighted, string connecting dots on evidence wall, redacted documents with key phrases highlighted, shadow conspiracy aesthetic, documentary style, photorealistic", "movimento": "zoom_revelacao"},
+    {"id": "C05_streisand", "titulo": "Paradoxo de Streisand", "duracao": "80s", "prompt_visual": "Viral information spread visualization, one document becoming millions of copies across internet, Streisand effect concept art, green digital aesthetic, documentary infographic style, photorealistic", "movimento": "expansao_viralidade"},
+    {"id": "C06_historico", "titulo": "Padrão Histórico", "duracao": "90s", "prompt_visual": "Historical classified documents montage, Pentagon Papers 1971, CIA Chile files 1998, DNC emails 2016, investigative journalism archives, shadow green tones, documentary style, photorealistic", "movimento": "montagem_historica"},
+    {"id": "C07_destinos", "titulo": "As Três Pessoas", "duracao": "80s", "prompt_visual": "Three anonymous silhouettes in separate locations, one journalist signing NDA, one academic visited by federal agents, one unknown figure in shadow, mystery conspiracy aesthetic, green tones, photorealistic", "movimento": "split_screen_misterio"},
+    {"id": "CTA", "titulo": "Informação Quer Ser Livre", "duracao": "60s", "prompt_visual": "Information freedom concept, light breaking through dark government building, subtle hope in conspiracy aesthetic, green tones warming to light, cinematic documentary, photorealistic", "movimento": "fade_out_esperanca"}
+  ],
+  "visual_consistency": {
+    "paleta_primaria": "#050f05",
+    "paleta_secundaria": "#1a3a1a",
+    "paleta_acento": "#3aff5a",
+    "estilo_foto": "conspiracy_documentary_green",
+    "grain": "vhs_digital_mixed",
+    "aspect_ratio": "2.35:1 simulado"
+  },
+  "thumbnail": {
+    "conceito": "Documento com CLASSIFIED marcado, sendo deletado digitalmente com temporizador",
+    "prompt_ia": "Classified government document being digitally erased, redacted text, deletion timer countdown, shadow and green tones, conspiracy thriller style, dramatic lighting, space for text overlay, photorealistic",
+    "texto_sobreposicao": "APAGADO EM 4 HORAS",
+    "cor_destaque": "#3aff5a"
+  },
+  "seo": {
+    "titulo_youtube": "O Arquivo Que o Governo Apagou em 4 Horas | Documentário Mistério",
+    "descricao": "Em 2013, um arquivo de 847 páginas foi publicado por engano no servidor do Departamento de Justiça dos EUA. Em 4 horas, foi removido. Mas três pessoas já tinham feito cópias.",
+    "tags": ["arquivo secreto", "conspiração", "vigilância em massa", "governo", "vazamento", "paradoxo streisand", "mistério real", "documentário", "casos inexplicáveis"]
+  },
+  "pipeline_status": "PRONTO_PARA_PRODUCAO",
+  "etapas_executadas": ["roteiro", "narracao_script", "pacote_producao"],
+  "etapas_pendentes": ["tts_audio", "imagens_sd", "montagem_video", "thumbnail", "upload_youtube"]
+}

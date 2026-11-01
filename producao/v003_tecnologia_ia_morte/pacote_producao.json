@@ -1,0 +1,45 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "id": "V003",
+  "titulo": "A IA Que Previu Sua Morte",
+  "nicho": "tecnologia",
+  "duracao_alvo": "12 minutos",
+  "formato": "1920x1080 horizontal",
+  "color_grading": "tech_blue_clinical",
+  "preset_cinematografico": "tecnologia_ia",
+  "voice": "pt-BR-AntonioNeural",
+  "voice_params": {"rate": "-8%", "pitch": "-5Hz"},
+  "cenas": [
+    {"id": "C01_hook", "titulo": "A IA Hospitalar", "duracao": "80s", "prompt_visual": "Hospital ICU with AI monitoring screens displaying vital signs and prediction algorithms, blue clinical lighting, futuristic medical technology, 2019 aesthetic, photorealistic cinematic documentary", "movimento": "zoom_lento_telas"},
+    {"id": "C02_como_funciona", "titulo": "Reconhecimento de Padrões", "duracao": "90s", "prompt_visual": "Abstract visualization of AI pattern recognition, medical data streams, neural network nodes glowing blue, clinical blue aesthetic, data visualization art, photorealistic", "movimento": "pan_abstrato_dados"},
+    {"id": "C03_estudo", "titulo": "Nature Medicine 2019", "duracao": "90s", "prompt_visual": "Medical research paper visualization, UC campus research lab, data charts showing 216k patient analysis, clinical blue and white, documentary style, photorealistic", "movimento": "zoom_documentos"},
+    {"id": "C04_deepmind", "titulo": "DeepMind e Rins", "duracao": "90s", "prompt_visual": "DeepMind AI concept visualization, kidney failure prediction algorithm, medical scan imagery, Google research aesthetics, blue clinical documentary, photorealistic", "movimento": "travelling_laboratorio"},
+    {"id": "C05_dilema", "titulo": "O Dilema Ético", "duracao": "100s", "prompt_visual": "Hospital room with conscious patient, monitor showing ominous AI prediction, doctor looking at screen with moral dilemma, dramatic blue lighting, ethical tension visualization, photorealistic", "movimento": "zoom_dramatico"},
+    {"id": "C06_china", "titulo": "China: Score Social", "duracao": "90s", "prompt_visual": "Chinese city surveillance cameras, social credit score visualization, wearable health data streams, dystopian yet real documentary style, blue and red tones, photorealistic", "movimento": "pan_cidade"},
+    {"id": "C07_brasil", "titulo": "Brasil: Hospitais", "duracao": "90s", "prompt_visual": "Brazilian hospital Albert Einstein modern facility, AI medical screens, Brazilian doctors and technology, warm yet clinical lighting, documentary style, photorealistic", "movimento": "tracking_hospital"},
+    {"id": "C08_cta", "titulo": "A Pergunta Final", "duracao": "70s", "prompt_visual": "Lone figure in hospital corridor looking at data screen in distance, existential question visualization, blue light fading to warm, cinematic depth, photorealistic masterpiece", "movimento": "fade_reflexivo"}
+  ],
+  "visual_consistency": {
+    "paleta_primaria": "#051020",
+    "paleta_secundaria": "#1a4a8a",
+    "paleta_acento": "#4ab8ff",
+    "estilo_foto": "clinical_documentary_futurist",
+    "grain": "digital_subtle",
+    "aspect_ratio": "2.35:1 simulado"
+  },
+  "thumbnail": {
+    "conceito": "Tela hospitalar mostrando contagem regressiva/previsão sobre rosto humano",
+    "prompt_ia": "Hospital AI monitoring screen overlaid on human face profile, death prediction countdown visualization, clinical blue light, dramatic chiaroscuro, futuristic medical documentary, high contrast, space for text",
+    "texto_sobreposicao": "ELA SABIA QUANDO VOCÊ MORRERIA",
+    "cor_destaque": "#4ab8ff"
+  },
+  "seo": {
+    "titulo_youtube": "A Inteligência Artificial Que Consegue Prever Sua Morte | Documentário",
+    "descricao": "Em 2019, hospitais programaram uma IA para prever quais pacientes morreriam nas próximas 24 horas. Ela acertou 90% das vezes. O que fazer com essa informação?",
+    "tags": ["inteligência artificial", "ia hospitalar", "medicina do futuro", "deepmind", "previsão de morte", "tecnologia", "ética ia", "nature medicine", "documentário tecnologia"]
+  },
+  "pipeline_status": "PRONTO_PARA_PRODUCAO",
+  "etapas_executadas": ["roteiro", "narracao_script", "pacote_producao"],
+  "etapas_pendentes": ["tts_audio", "imagens_sd", "montagem_video", "thumbnail", "upload_youtube"]
+}

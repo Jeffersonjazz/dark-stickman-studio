@@ -1,0 +1,109 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "id": "V002",
+  "titulo": "O Homem Que Fingiu Ser Morto Por 35 Anos",
+  "nicho": "historia",
+  "duracao_alvo": "12 minutos",
+  "formato": "1920x1080 horizontal",
+  "color_grading": "sepia_vintage_noir",
+  "preset_cinematografico": "documentario_historico",
+  "voice": "pt-BR-AntonioNeural",
+  "voice_params": {"rate": "-8%", "pitch": "-5Hz"},
+  "cenas": [
+    {
+      "id": "C01_hook",
+      "titulo": "A Praia de Miami",
+      "duracao": "90s",
+      "narracao": "Em novembro de 1974, um homem deixou suas roupas numa praia em Miami e desapareceu. O mundo inteiro acreditou que ele tinha se afogado. Mas John Stonehouse estava vivo — e havia planejado cada detalhe da sua própria morte.",
+      "prompt_visual": "Dramatic wide shot of Miami beach at sunset, abandoned clothes neatly folded on sand near waterline, police tape in background, 1970s film grain, sepia-tinted documentary style, 16mm aesthetic, golden hour light",
+      "movimento": "zoom_lento_aproximacao",
+      "som_ambiente": "ondas, vento suave"
+    },
+    {
+      "id": "C02_perfil",
+      "titulo": "O Parlamentar",
+      "duracao": "90s",
+      "narracao": "John Stonehouse era membro do Parlamento britânico. Ministro do governo Wilson. Um homem de poder, influência e aparente sucesso. Mas por trás da fachada impecável, havia dívidas, uma amante, investigações que se aproximavam — e uma psique à beira do colapso.",
+      "prompt_visual": "Vintage 1970s British Parliament interior, formal portrait style of a serious politician in suit, Westminster architecture, warm tungsten lighting, documentary photography, sepia tone",
+      "movimento": "pan_horizontal_lento",
+      "som_ambiente": "murmúrio parlamentar distante"
+    },
+    {
+      "id": "C03_dissociacao",
+      "titulo": "Fuga Dissociativa",
+      "duracao": "100s",
+      "narracao": "A psicologia tem nome para o que Stonehouse fez: fuga dissociativa. Em situações de pressão extrema, o cérebro pode criar uma nova identidade como mecanismo de defesa. Ele passou meses preparando documentos falsos, contas bancárias no exterior, e uma nova vida. Uma nova pessoa.",
+      "prompt_visual": "Split identity concept — reflection in mirror showing two different faces, one formal British politician, one ordinary citizen, psychological tension, dark expressionist lighting, 1970s cinema style",
+      "movimento": "dissolve_dupla_exposicao",
+      "som_ambiente": "batimentos cardíacos acelerados"
+    },
+    {
+      "id": "C04_fuga",
+      "titulo": "20 de Novembro de 1974",
+      "duracao": "100s",
+      "narracao": "No dia 20 de novembro de 1974, Stonehouse voou para Miami, deixou suas roupas na praia, e embarcou num avião para a Austrália sob identidade falsa. A polícia britânica concluiu: afogamento acidental. A imprensa publicou necrológios. A família chorou.",
+      "prompt_visual": "1970s airport departure hall, lone figure with hat and sunglasses carrying single briefcase, dramatic perspective from behind, film noir style, sepia tones, sense of escape and anonymity",
+      "movimento": "travelling_afastamento",
+      "som_ambiente": "anúncios de aeroporto, motor de avião"
+    },
+    {
+      "id": "C05_captura",
+      "titulo": "Encontrado em Melbourne",
+      "duracao": "90s",
+      "narracao": "Seis semanas depois, a polícia australiana, investigando uma fraude diferente, encontrou um homem usando identidade falsa em Melbourne. Era Stonehouse. A descoberta virou escândalo internacional. Ele foi extraditado, julgado, e condenado a 7 anos de prisão.",
+      "prompt_visual": "Australian police station, 1974, man being fingerprinted and identified, shocked expression, international newspaper headlines surrounding scene, documentary reconstruction style",
+      "movimento": "zoom_dramatico_revelacao",
+      "som_ambiente": "flash de câmeras, papel de jornal"
+    },
+    {
+      "id": "C06_casos",
+      "titulo": "Pseudocídio",
+      "duracao": "90s",
+      "narracao": "O caso Stonehouse não foi único. Em 1987, Ken Kesey desapareceu fingindo suicídio no México. Em 2002, John Darwin, um professor britânico, passou 5 anos morto para sua própria família enquanto vivia numa casa ao lado. A psicologia chama esses casos de pseudocídio — e eles são mais comuns do que imaginamos.",
+      "prompt_visual": "Collage of newspaper headlines about faked deaths across decades, documentary montage style, black and white archive photographs, timestamps 1974-2002, investigative journalism aesthetic",
+      "movimento": "montagem_rapida_cortes",
+      "som_ambiente": "música de suspense suave"
+    },
+    {
+      "id": "C07_psicologia",
+      "titulo": "O Sistema de Emergência",
+      "duracao": "90s",
+      "narracao": "O que leva um ser humano a apagar a própria existência? Segundo a psiquiatra Elizabeth Howell, especialista em dissociação, a resposta está em pressão insustentável combinada com a incapacidade de pedir ajuda. A fuga não é fraqueza — é um sistema de emergência que o cérebro ativa quando não vê outra saída.",
+      "prompt_visual": "Medical brain scan imagery, psychological concept visualization, person under immense invisible pressure, abstract representation of mental burden, clinical documentary style with warm humanizing tones",
+      "movimento": "zoom_lento_saida",
+      "som_ambiente": "silêncio crescente"
+    },
+    {
+      "id": "C08_cta",
+      "titulo": "CTA Final",
+      "duracao": "60s",
+      "narracao": "A história de John Stonehouse é um lembrete de que as pressões invisíveis podem ser as mais destrutivas. Se você conhece alguém sob pressão extrema, às vezes a coisa mais importante é simplesmente perguntar: como você está de verdade? Se esse vídeo te fez pensar, compartilhe. Até o próximo.",
+      "prompt_visual": "Soft warm light on silhouette of person looking at horizon, hopeful despite darkness behind, redemption and human connection theme, cinematic golden hour, sepia warming",
+      "movimento": "fade_out_suave",
+      "som_ambiente": "música suave de encerramento"
+    }
+  ],
+  "visual_consistency": {
+    "paleta_primaria": "#1a0e05",
+    "paleta_secundaria": "#8b6914",
+    "paleta_acento": "#c9a84c",
+    "estilo_foto": "documentary_sepia_vintage",
+    "grain": "16mm_heavy",
+    "aspect_ratio": "1.85:1 simulado"
+  },
+  "thumbnail": {
+    "conceito": "Rosto dividido — metade político formal, metade homem anônimo",
+    "prompt_ia": "Dramatic split face portrait, half British politician in 1970s suit, half ordinary civilian, strong chiaroscuro lighting, sepia and gold tones, text space at bottom, high impact documentary style",
+    "texto_sobreposicao": "ELE FINGIU SUA PRÓPRIA MORTE",
+    "cor_destaque": "#c9a84c"
+  },
+  "seo": {
+    "titulo_youtube": "O Homem Que Fingiu Ser Morto Por 35 Anos | Caso John Stonehouse",
+    "descricao": "Em 1974, um ministro britânico desapareceu numa praia de Miami. O mundo acreditou que havia morrido afogado. John Stonehouse estava vivo — e havia planejado tudo.",
+    "tags": ["john stonehouse", "pseudocídio", "fuga dissociativa", "casos reais", "história bizarra", "psicologia", "mistério histórico", "documentário", "casos inexplicáveis"]
+  },
+  "pipeline_status": "PRONTO_PARA_PRODUCAO",
+  "etapas_executadas": ["roteiro", "narracao_script", "pacote_producao"],
+  "etapas_pendentes": ["tts_audio", "imagens_sd", "montagem_video", "thumbnail", "upload_youtube"]
+}

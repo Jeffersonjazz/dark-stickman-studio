@@ -1,0 +1,45 @@
+{
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "id": "V005",
+  "titulo": "A Floresta Que Respira",
+  "nicho": "natureza",
+  "duracao_alvo": "12 minutos",
+  "formato": "1920x1080 horizontal",
+  "color_grading": "forest_green_gold",
+  "preset_cinematografico": "natureza_vida_selvagem",
+  "voice": "pt-BR-AntonioNeural",
+  "voice_params": {"rate": "-10%", "pitch": "-3Hz"},
+  "cenas": [
+    {"id": "C01_hook", "titulo": "Simard 1997", "duracao": "80s", "prompt_visual": "Dense forest overhead canopy looking up, light filtering through leaves, mycorrhizal network visualization underground, 1997 research concept, nature documentary BBC style, forest green gold aesthetic, photorealistic", "movimento": "zoom_copa_arvores"},
+    {"id": "C02_simard", "titulo": "Suzanne Simard", "duracao": "100s", "prompt_visual": "Forest research scientist examining tree roots in dense Canadian forest, scientific discovery moment, soil and fungal network visible, nature documentary photography, Suzanne Simard inspired scene, forest green golden light, photorealistic", "movimento": "tracking_cientista"},
+    {"id": "C03_rede", "titulo": "Rede Micelial", "duracao": "90s", "prompt_visual": "Underground mycorrhizal fungal network visualization, tree roots connected by glowing fungal threads, wood wide web concept, nature science documentary, forest green and gold bioluminescent glow, photorealistic cinematic", "movimento": "zoom_subterraneo"},
+    {"id": "C04_mae", "titulo": "Árvores-Mãe", "duracao": "90s", "prompt_visual": "Ancient massive old growth tree mother tree with visible root system, dozens of smaller trees connected to it underground, family tree of forest concept, nature documentary cinematography, dappled forest light gold and green, photorealistic", "movimento": "reveal_arvore_mae"},
+    {"id": "C05_sinais", "titulo": "Comunicação Elétrica", "duracao": "80s", "prompt_visual": "Forest trees sending electrical signals through roots and fungal network, stress signal visualization, scientific concept that looks organic and natural, nature documentary BBC Planet Earth style, forest green aesthetic, photorealistic", "movimento": "pan_sinais_rede"},
+    {"id": "C06_implicacoes", "titulo": "Floresta como Organismo", "duracao": "90s", "prompt_visual": "Aerial view of forest as single breathing organism, cooperative community not individual trees, forest management implications, nature documentary wide shot, green and gold cinematic, photorealistic masterpiece", "movimento": "drone_floresta"},
+    {"id": "C07_tempo", "titulo": "450 Milhões de Anos", "duracao": "90s", "prompt_visual": "Ancient forest timeline visualization, mycorrhizal fungi 450 million years ago first land plants, geological time scale nature concept, BBC nature documentary aesthetic, deep forest green and ancient gold, photorealistic", "movimento": "time_lapse_conceitual"},
+    {"id": "CTA", "titulo": "Internet de 450M Anos", "duracao": "60s", "prompt_visual": "Person walking through ancient forest, light filtering through canopy as forest internet concept, wonder and contemplation, nature documentary golden hour, healing green forest atmosphere, photorealistic masterpiece", "movimento": "caminhada_floresta"}
+  ],
+  "visual_consistency": {
+    "paleta_primaria": "#051a05",
+    "paleta_secundaria": "#2a5c2a",
+    "paleta_acento": "#c8a040",
+    "estilo_foto": "nature_documentary_bbc",
+    "grain": "35mm_fine_nature",
+    "aspect_ratio": "2.39:1 simulado (IMAX nature)"
+  },
+  "thumbnail": {
+    "conceito": "Raízes de árvore com rede micelial brilhante conectando floresta",
+    "prompt_ia": "Dramatic underground tree roots with glowing mycorrhizal fungal network connecting multiple trees, bioluminescent threads, dark soil background with forest floor above, BBC Planet Earth style, green and gold tones, cinematic wide angle, photorealistic masterpiece",
+    "texto_sobreposicao": "A FLORESTA ESTÁ CONVERSANDO",
+    "cor_destaque": "#c8a040"
+  },
+  "seo": {
+    "titulo_youtube": "A Floresta Está Conversando: A Rede Subterrânea das Árvores | Documentário Natureza",
+    "descricao": "Em 1997, Suzanne Simard descobriu que árvores se comunicam por uma rede de fungos subterrânea. A floresta não é uma coleção de indivíduos — é um organismo único.",
+    "tags": ["floresta", "rede micelial", "comunicação árvores", "suzanne simard", "wood wide web", "natureza", "documentário natureza", "fungos", "meio ambiente", "ciência"]
+  },
+  "pipeline_status": "PRONTO_PARA_PRODUCAO",
+  "etapas_executadas": ["roteiro", "narracao_script", "pacote_producao"],
+  "etapas_pendentes": ["tts_audio", "imagens_sd", "montagem_video", "thumbnail", "upload_youtube"]
+}

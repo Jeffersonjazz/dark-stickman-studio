@@ -1,0 +1,155 @@
+DARK STUDIO AAA — ROTEIRO COMPLETO DE NARRAÇÃO
+V004 — O Arquivo Que o Governo Apagou
+Agente: AUDIO MASTER | Voz: pt-BR-AntonioNeural
+ai_generated: True | ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
+
+===============================================================
+Tom: Jornalístico investigativo, urgente, sussurrado em momentos-chave
+Velocidade: -8% | Pitch: -5Hz
+Referência: narrador de documentário investigativo, tipo Frontline/Al Jazeera
+===============================================================
+
+--- CENA C01_HOOK (0:00 — 1:20) ---
+
+Em 2013, [PAUSA 0.5s] às 14 horas e 37 minutos de uma terça-feira, [PAUSA 0.4s] um arquivo de 847 páginas [PAUSA 0.3s] foi publicado acidentalmente no servidor público [PAUSA 0.3s] do Departamento de Justiça dos Estados Unidos.
+
+[PAUSA 0.7s]
+
+Em 4 horas, [PAUSA 0.4s] foi removido.
+
+[PAUSA 0.8s]
+
+Mas três pessoas [PAUSA 0.3s] já tinham feito cópias completas.
+
+[PAUSA 1.0s]
+
+--- CENA C02_CONTEUDO (1:20 — 2:50) ---
+
+O documento era um relatório interno [PAUSA 0.3s] sobre operações de vigilância em massa [PAUSA 0.3s] realizadas entre 2001 e 2013.
+
+[PAUSA 0.6s]
+
+Não era o Programa PRISM — [PAUSA 0.4s] esse viria a público com Snowden no mesmo ano. [PAUSA 0.4s] Era algo diferente:
+
+[PAUSA 0.5s]
+
+Detalhava acordos secretos [PAUSA 0.3s] com 23 corporações privadas [PAUSA 0.3s] para acesso irrestrito a dados de comunicação [PAUSA 0.3s] de cidadãos americanos.
+
+[PAUSA 1.0s]
+
+--- CENA C03_VAZAMENTO (2:50 — 4:20) ---
+
+As três pessoas que baixaram o arquivo [PAUSA 0.4s] permaneceram anônimas por semanas.
+
+[PAUSA 0.6s]
+
+Então, [PAUSA 0.3s] gradualmente, [PAUSA 0.3s] fragmentos começaram a aparecer [PAUSA 0.3s] em fóruns, [PAUSA 0.2s] blogs [PAUSA 0.2s] e publicações independentes — [PAUSA 0.4s] nunca o documento completo, [PAUSA 0.3s] sempre partes calculadas.
+
+[PAUSA 0.6s]
+
+Alguém estava controlando a revelação.
+
+[PAUSA 1.0s]
+
+--- CENA C04_REVELACOES (4:20 — 6:00) ---
+
+O que as cópias revelaram [PAUSA 0.4s] mudou a percepção sobre privacidade digital.
+
+[PAUSA 0.5s]
+
+Três descobertas principais.
+
+[PAUSA 0.5s]
+
+Primeiro: [PAUSA 0.3s] acordos de acesso a metadados com empresas de telefonia e internet [PAUSA 0.3s] firmados antes de qualquer autorização judicial conhecida.
+
+[PAUSA 0.5s]
+
+Segundo: [PAUSA 0.3s] operações de infiltração em fóruns privados de jornalistas.
+
+[PAUSA 0.5s]
+
+Terceiro: [PAUSA 0.3s] um programa de pontuação de risco social para cidadãos americanos — [PAUSA 0.4s] semelhante ao que a China formalizaria anos depois.
+
+[PAUSA 1.0s]
+
+--- CENA C05_STREISAND (6:00 — 7:20) ---
+
+Isso nos leva ao Paradoxo de Streisand.
+
+[PAUSA 0.6s]
+
+Em 1994, [PAUSA 0.3s] Barbara Streisand processou um fotógrafo [PAUSA 0.3s] para remover uma foto de sua mansão da internet. [PAUSA 0.4s]
+
+Resultado? [PAUSA 0.5s]
+
+A foto, [PAUSA 0.2s] que tinha tido 6 visualizações, [PAUSA 0.3s] foi vista por 400 mil pessoas [PAUSA 0.3s] em um mês.
+
+[PAUSA 0.6s]
+
+Toda tentativa de apagar informação na era digital [PAUSA 0.4s] tende a amplificá-la.
+
+[PAUSA 1.0s]
+
+--- CENA C06_HISTORICO (7:20 — 9:00) ---
+
+Três casos históricos provam esse padrão.
+
+[PAUSA 0.5s]
+
+O Pentágono Papers, [PAUSA 0.3s] vazado pelo analista Daniel Ellsberg em 1971 — [PAUSA 0.3s] o governo Nixon obteve ordem judicial para suprimir. [PAUSA 0.4s] O New York Times publicou [PAUSA 0.3s] na mesma semana.
+
+[PAUSA 0.6s]
+
+Os Arquivos da CIA sobre Chile, [PAUSA 0.3s] publicados em 1998 — [PAUSA 0.3s] cada tentativa de redação criou mais interesse [PAUSA 0.3s] nas partes censuradas.
+
+[PAUSA 0.5s]
+
+E os e-mails do DNC em 2016 — [PAUSA 0.3s] a tentativa de suprimir [PAUSA 0.3s] criou o maior escândalo político do ano.
+
+[PAUSA 1.0s]
+
+--- CENA C07_DESTINOS (9:00 — 10:20) ---
+
+Quanto às três pessoas que copiaram o documento original de 2013 — [PAUSA 0.4s] o que aconteceu com elas?
+
+[PAUSA 0.6s]
+
+Uma identificada posteriormente era jornalista freelancer [PAUSA 0.3s] que assinou acordo de não divulgação.
+
+[PAUSA 0.5s]
+
+Uma segunda era pesquisadora acadêmica [PAUSA 0.3s] que recebeu visita de agentes federais [PAUSA 0.3s] e optou por não publicar.
+
+[PAUSA 0.5s]
+
+A terceira [PAUSA 0.5s] permanece desconhecida.
+
+[PAUSA 0.6s]
+
+Mas os fragmentos que ela liberou [PAUSA 0.3s] ainda circulam — [PAUSA 0.4s] e continuam sendo verificados.
+
+[PAUSA 1.0s]
+
+--- CTA (10:20 — 12:00) ---
+
+A internet não esquece. [PAUSA 0.8s]
+
+E talvez seja exatamente isso [PAUSA 0.3s] que o poder mais teme.
+
+[PAUSA 0.8s]
+
+Se esse vídeo abriu seus olhos para algo, [PAUSA 0.4s] compartilhe — [PAUSA 0.4s] porque informação suprimida [PAUSA 0.3s] ainda quer ser livre.
+
+[PAUSA 0.6s]
+
+Até o próximo.
+
+[PAUSA 2.0s — fade out]
+
+===============================================================
+DURAÇÃO ESTIMADA: ~12 minutos
+PALAVRAS TOTAIS: ~410
+CENAS: 8 | SEO: arquivo secreto, governo, conspiração, vigilância
+===============================================================
+*ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB*

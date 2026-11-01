@@ -1,0 +1,125 @@
+DARK STUDIO AAA — ROTEIRO COMPLETO DE NARRAÇÃO
+V003 — A IA Que Previu Sua Morte
+Agente: AUDIO MASTER | Voz: pt-BR-AntonioNeural
+ai_generated: True | ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
+
+===============================================================
+Tom: Jornalístico, preciso, levemente perturbador
+Velocidade: -8% | Pitch: -5Hz
+Referência: documentário Netflix/Frontline sobre tecnologia
+===============================================================
+
+--- CENA C01_HOOK (0:00 — 1:20) ---
+
+Em 2019, [PAUSA 0.5s] um hospital programou uma inteligência artificial [PAUSA 0.3s] para prever quais pacientes morreriam nas próximas 24 horas.
+
+[PAUSA 0.7s]
+
+Ela acertou [PAUSA 0.4s] 90% das vezes.
+
+[PAUSA 1.0s]
+
+Mas a pergunta que ninguém conseguia responder era: [PAUSA 0.5s] o que fazer com essa informação?
+
+[PAUSA 1.0s]
+
+--- CENA C02_COMO_FUNCIONA (1:20 — 2:50) ---
+
+A IA hospitalar funciona como um sistema de reconhecimento de padrões em tempo real. [PAUSA 0.5s]
+
+Ela analisa simultaneamente centenas de variáveis: [PAUSA 0.4s] pressão arterial, [PAUSA 0.2s] frequência cardíaca, [PAUSA 0.2s] níveis de oxigênio, [PAUSA 0.2s] resultados de exames, [PAUSA 0.2s] histórico médico, [PAUSA 0.2s] medicações administradas — [PAUSA 0.4s] e identifica combinações invisíveis ao olho humano [PAUSA 0.3s] que precedem o colapso.
+
+[PAUSA 1.0s]
+
+--- CENA C03_ESTUDO (2:50 — 4:20) ---
+
+O estudo que mudou tudo [PAUSA 0.3s] foi publicado na Nature Medicine [PAUSA 0.3s] em 2019 [PAUSA 0.3s] por pesquisadores da Universidade da Califórnia.
+
+[PAUSA 0.6s]
+
+O sistema analisou registros de 216 mil pacientes [PAUSA 0.3s] ao longo de 10 anos.
+
+[PAUSA 0.5s]
+
+Resultado: [PAUSA 0.4s] a IA identificou deterioração clínica significativa [PAUSA 0.3s] com 24 a 48 horas de antecedência — [PAUSA 0.4s] antes de qualquer sintoma visível.
+
+[PAUSA 1.0s]
+
+--- CENA C04_DEEPMIND (4:20 — 5:50) ---
+
+A DeepMind, [PAUSA 0.3s] divisão de IA do Google, [PAUSA 0.3s] foi além.
+
+[PAUSA 0.5s]
+
+Em 2020, [PAUSA 0.3s] desenvolveu um sistema capaz de prever insuficiência renal aguda [PAUSA 0.3s] até 48 horas antes dos exames convencionais [PAUSA 0.3s] detectarem qualquer anomalia.
+
+[PAUSA 0.6s]
+
+Em testes, [PAUSA 0.3s] o sistema teria prevenido 50% dos casos graves — [PAUSA 0.4s] se médicos tivessem agido com base em suas previsões.
+
+[PAUSA 1.0s]
+
+--- CENA C05_DILEMA (5:50 — 7:30) ---
+
+Mas aqui surge o dilema [PAUSA 0.4s] que a medicina nunca enfrentou.
+
+[PAUSA 0.6s]
+
+Se uma IA prevê que um paciente morrerá nas próximas 12 horas, [PAUSA 0.4s] com 90% de certeza — [PAUSA 0.4s] mas o paciente está consciente [PAUSA 0.2s] e aparentemente estável — [PAUSA 0.5s] você conta a ele? [PAUSA 0.4s] Você conta à família?
+
+[PAUSA 0.6s]
+
+Qual é a obrigação ética [PAUSA 0.3s] de um algoritmo?
+
+[PAUSA 1.0s]
+
+--- CENA C06_CHINA (7:30 — 9:00) ---
+
+Na China, [PAUSA 0.4s] o governo implementou um sistema de score de saúde social [PAUSA 0.3s] que usa dados de wearables, [PAUSA 0.2s] histórico médico [PAUSA 0.2s] e comportamento [PAUSA 0.3s] para prever doenças [PAUSA 0.3s] e até expectativa de vida.
+
+[PAUSA 0.6s]
+
+O sistema é usado por seguradoras, [PAUSA 0.2s] empregadores [PAUSA 0.2s] e bancos. [PAUSA 0.5s]
+
+Se seu score de saúde for baixo, [PAUSA 0.4s] seu crédito pode ser negado.
+
+[PAUSA 1.0s]
+
+--- CENA C07_BRASIL (9:00 — 10:30) ---
+
+No Brasil, [PAUSA 0.4s] os hospitais Albert Einstein e Sírio-Libanês [PAUSA 0.3s] já utilizam sistemas de IA para triagem de risco.
+
+[PAUSA 0.5s]
+
+O Hospital das Clínicas de São Paulo [PAUSA 0.3s] testa algoritmos para predição de sepse — [PAUSA 0.4s] uma das principais causas de morte hospitalar.
+
+[PAUSA 0.6s]
+
+Estamos na transição — [PAUSA 0.4s] e a velocidade dessa mudança [PAUSA 0.3s] vai nos surpreender.
+
+[PAUSA 1.0s]
+
+--- CENA C08_CTA (10:30 — 12:00) ---
+
+A pergunta que vai definir a medicina dos próximos 20 anos [PAUSA 0.4s] não é se a IA pode prever doenças melhor que médicos.
+
+[PAUSA 0.5s]
+
+Ela já pode. [PAUSA 0.8s]
+
+A pergunta é: [PAUSA 0.5s] quando uma máquina sabe quando você vai morrer — [PAUSA 0.5s] com que direito ela guarda esse segredo de você?
+
+[PAUSA 1.0s]
+
+Se esse vídeo abriu sua mente para algo novo, [PAUSA 0.3s] compartilhe. [PAUSA 0.5s]
+
+Até o próximo.
+
+[PAUSA 2.0s — fade out]
+
+===============================================================
+DURAÇÃO ESTIMADA: ~12 minutos
+PALAVRAS TOTAIS: ~380
+CENAS: 8 | SEO: IA médica, DeepMind, previsão morte, medicina futuro
+===============================================================
+*ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB*
