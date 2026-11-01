@@ -16,6 +16,8 @@ from datetime import datetime
 try:
     from fastapi import FastAPI, HTTPException, BackgroundTasks, Query
     from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.staticfiles import StaticFiles
+    from fastapi.responses import FileResponse
     import uvicorn
     FASTAPI_OK = True
 except ImportError:
@@ -75,6 +77,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ─── Static files (painel) ────────────────────────────────────────────────────
+PANEL_DIR = Path(__file__).parent.parent / "panel"
+if PANEL_DIR.exists():
+    app.mount("/panel", StaticFiles(directory=str(PANEL_DIR), html=True), name="panel")
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -449,6 +456,149 @@ async def estatisticas():
         }
     except Exception as e:
         return {"erro": str(e), "ai_generated": True}
+
+
+# ─── Banco Visual ────────────────────────────────────────────────────────────
+
+@app.get("/banco/projetos", tags=["Banco Visual"])
+async def banco_listar_projetos():
+    """Lista todos os projetos do banco visual de referências."""
+    try:
+        from core.visual_consistency import ProjetoVisualBank
+        bank = ProjetoVisualBank()
+        projetos = bank.listar_projetos()
+        resumo = []
+        for proj_id in projetos:
+            try:
+                p = bank.carregar_projeto(proj_id)
+                personagens = p.get("personagens", {})
+                cenarios = p.get("cenarios", {})
+                cenas = p.get("historico_cenas", [])
+                resumo.append({
+                    "projeto_id": proj_id,
+                    "titulo": p.get("titulo", proj_id),
+                    "nicho": p.get("nicho", ""),
+                    "preset_cinematografico": p.get("preset_cinematografico", ""),
+                    "paleta": p.get("paleta", []),
+                    "n_personagens": len(personagens) if isinstance(personagens, dict) else 0,
+                    "n_cenarios": len(cenarios) if isinstance(cenarios, dict) else 0,
+                    "n_cenas": len(cenas),
+                    "ai_generated": True,
+                    "ai_disclosure": AI_DISCLOSURE,
+                })
+            except Exception:
+                resumo.append({"projeto_id": proj_id, "erro": "não carregável"})
+        return {"total": len(resumo), "projetos": resumo, "ai_generated": True}
+    except Exception as e:
+        return {"total": 0, "projetos": [], "erro": str(e), "ai_generated": True}
+
+
+@app.post("/banco/projetos", tags=["Banco Visual"])
+async def banco_criar_projeto(body: dict):
+    """Cria um novo projeto no banco visual."""
+    try:
+        from core.visual_consistency import ProjetoVisualBank
+        bank = ProjetoVisualBank()
+        projeto_id = body.get("projeto_id") or str(uuid.uuid4())[:12]
+        titulo = body.get("titulo", projeto_id)
+        nicho = body.get("nicho", "geral")
+        descricao = body.get("descricao", "")
+        dados = bank.criar_projeto(projeto_id, titulo, nicho, descricao=descricao)
+        return {**dados, "mensagem": f"Projeto '{projeto_id}' criado com sucesso"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/banco/projetos/{projeto_id}", tags=["Banco Visual"])
+async def banco_get_projeto(projeto_id: str):
+    """Retorna dados completos de um projeto do banco visual."""
+    try:
+        from core.visual_consistency import ProjetoVisualBank
+        bank = ProjetoVisualBank()
+        dados = bank.carregar_projeto(projeto_id)
+        if not dados:
+            raise HTTPException(status_code=404, detail=f"Projeto '{projeto_id}' não encontrado")
+        return {**dados, "ai_generated": True, "ai_disclosure": AI_DISCLOSURE}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/banco/projetos/{projeto_id}/personagens", tags=["Banco Visual"])
+async def banco_registrar_personagem(projeto_id: str, body: dict):
+    """Registra personagem no banco visual do projeto."""
+    try:
+        from core.visual_consistency import ProjetoVisualBank
+        bank = ProjetoVisualBank()
+        nome = body.get("nome", "")
+        if not nome:
+            raise HTTPException(status_code=400, detail="Campo 'nome' é obrigatório")
+        dados = bank.registrar_personagem(
+            projeto_id=projeto_id,
+            nome=nome,
+            descricao_visual=body.get("descricao_visual", ""),
+            roupas=body.get("roupas", ""),
+            expressao_padrao=body.get("expressao_padrao", "neutro"),
+            prompt_base=body.get("prompt_base", ""),
+        )
+        return {**dados, "mensagem": f"Personagem '{nome}' registrado"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/banco/projetos/{projeto_id}/cenarios", tags=["Banco Visual"])
+async def banco_registrar_cenario(projeto_id: str, body: dict):
+    """Registra cenário no banco visual do projeto."""
+    try:
+        from core.visual_consistency import ProjetoVisualBank
+        bank = ProjetoVisualBank()
+        nome = body.get("nome", "")
+        if not nome:
+            raise HTTPException(status_code=400, detail="Campo 'nome' é obrigatório")
+        dados = bank.registrar_cenario(
+            projeto_id=projeto_id,
+            nome=nome,
+            descricao=body.get("descricao", ""),
+            iluminacao=body.get("iluminacao", "natural"),
+            horario=body.get("horario", "dia"),
+            clima=body.get("clima", "claro"),
+            prompt_base=body.get("prompt_base", ""),
+        )
+        return {**dados, "mensagem": f"Cenário '{nome}' registrado"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/banco/projetos/{projeto_id}/relatorio", tags=["Banco Visual"])
+async def banco_relatorio(projeto_id: str):
+    """Exporta relatório de consistência visual do projeto."""
+    try:
+        from core.visual_consistency import ProjetoVisualBank
+        bank = ProjetoVisualBank()
+        relatorio = bank.exportar_relatorio(projeto_id)
+        return {**relatorio, "ai_generated": True, "ai_disclosure": AI_DISCLOSURE}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Painel ───────────────────────────────────────────────────────────────────
+
+@app.get("/painel", tags=["Sistema"])
+@app.get("/painel/", tags=["Sistema"])
+async def painel_redirect():
+    """Redireciona para o painel principal."""
+    panel_index = PANEL_DIR / "index.html"
+    if panel_index.exists():
+        return FileResponse(str(panel_index))
+    return {
+        "mensagem": "Painel não encontrado. Acesse /panel/index.html",
+        "url_panel": "/panel/",
+    }
 
 
 # ─── Entrada ─────────────────────────────────────────────────────────────────
