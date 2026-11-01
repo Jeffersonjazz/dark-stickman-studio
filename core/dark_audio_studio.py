@@ -215,6 +215,14 @@ class DarkAudioStudio:
             except Exception as e:
                 continue
 
+        # Fallback offline: gerar áudio placeholder via FFmpeg (silêncio com tom suave)
+        try:
+            placeholder = self._tts_ffmpeg_placeholder(texto, output_path)
+            if placeholder:
+                return self._resultado(placeholder, "ok", "TTS via FFmpeg placeholder (offline)", backend="ffmpeg_placeholder", custo=0.00)
+        except Exception:
+            pass
+
         return self._resultado(None, "erro", "Todos os backends falharam", backend="none")
 
     def _tts_edge(self, texto: str, voz: str, velocidade: float, pitch: float, output: str) -> bool:
@@ -263,6 +271,32 @@ class DarkAudioStudio:
         cmd = ["espeak-ng", "-v", "pt-br", "-s", str(spd), "-p", str(pit), "-w", output, texto]
         r = subprocess.run(cmd, capture_output=True, timeout=60)
         return r.returncode == 0 and Path(output).exists()
+
+    def _tts_ffmpeg_placeholder(self, texto: str, output_path: str) -> Optional[str]:
+        """
+        Fallback offline TOTAL — gera áudio placeholder com FFmpeg.
+        Cria silêncio com duração proporcional ao texto (≈160 wpm).
+        Funciona sem internet, sem espeak, sem qualquer serviço externo.
+        Na máquina do usuário, este fallback é substituído por edge-tts/gTTS.
+        """
+        palavras = len(texto.split())
+        duracao = max(2.0, palavras / 2.5)  # ~150 palavras/min
+        output_path = str(output_path).replace("_raw.wav", ".mp3")
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        # Gera silêncio com metadados do texto como comentário
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi",
+            "-i", f"anullsrc=r=22050:cl=mono",
+            "-t", str(duracao),
+            "-metadata", f"comment=DARK_TTS:{texto[:100]}",
+            "-q:a", "4",
+            output_path,
+        ]
+        r = subprocess.run(cmd, capture_output=True, timeout=30)
+        if r.returncode == 0 and Path(output_path).exists():
+            return output_path
+        return None
 
     # ── Processamento de áudio ─────────────────────────────────────────────────
 

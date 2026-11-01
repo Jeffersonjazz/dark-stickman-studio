@@ -15,9 +15,13 @@ Agentes disponíveis:
 """
 
 import json
+import sys
 import time
 from pathlib import Path
 from typing import Optional
+
+# Garantir que o diretório raiz esteja no path para imports relativos
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 OUTPUT_DIR = Path("/tmp/dark-studio/projetos")
 
@@ -149,19 +153,31 @@ class DarkOrchestrator:
                     nicho=nicho,
                     output_path=str(Path(output_dir) / f"cena_{i:03d}.png")
                 )
-                if res_img.get("path"):
-                    imagem_paths.append(res_img["path"])
+                # ImageEngine retorna "image_path" (não "path")
+                img_path = res_img.get("image_path") or res_img.get("path")
+                if img_path:
+                    imagem_paths.append(img_path)
 
             log.append({"passo": 4, "acao": "gerar_imagens", "total": len(imagem_paths)})
 
         # ── Passo 5: Animar imagens (Ken Burns) ───────────────────────────
         clip_paths = []
         if imagem_paths and self._agentes.get("video"):
+            # animar_lote espera lista de dicts com "imagem_path"
+            imagens_dicts = [
+                {"imagem_path": p, "duracao_s": 6.0, "id": f"cena_{i:03d}"}
+                for i, p in enumerate(imagem_paths)
+            ]
             anims = self._agentes["video"].animar_lote(
-                imagem_paths, nicho=nicho,
+                imagens_dicts, nicho=nicho,
                 output_dir=str(Path(output_dir) / "clips")
             )
-            clip_paths = [r.get("path") for r in anims if r.get("path")]
+            # VideoEngine retorna "path" ou "clip_path"
+            clip_paths = [
+                r.get("path") or r.get("clip_path")
+                for r in anims
+                if r.get("path") or r.get("clip_path")
+            ]
             log.append({"passo": 5, "acao": "animar_clips", "total": len(clip_paths)})
 
         # ── Passo 6: Montar abertura e encerramento ────────────────────────
@@ -189,6 +205,12 @@ class DarkOrchestrator:
         if enc_path:
             todos_clips.append(enc_path)
 
+        # Filtrar clips vazios ou inexistentes antes de montar
+        todos_clips = [
+            c for c in todos_clips
+            if c and Path(c).exists() and Path(c).stat().st_size > 100
+        ]
+
         video_final = None
         if todos_clips and self._agentes.get("editor"):
             narr_final = audio_paths[0] if audio_paths else None
@@ -198,7 +220,12 @@ class DarkOrchestrator:
                 nicho=nicho,
                 output_path=str(Path(output_dir) / "video_final.mp4")
             )
-            video_final = res_mont.get("path")
+            # CinemaEditor retorna "output_path" ou "video_path" (não "path")
+            video_final = (
+                res_mont.get("output_path")
+                or res_mont.get("video_path")
+                or res_mont.get("path")
+            )
             log.append({"passo": 7, "acao": "montar_video", "path": video_final})
 
         # ── Passo 8: Exportar em formatos ─────────────────────────────────
