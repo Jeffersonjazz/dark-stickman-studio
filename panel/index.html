@@ -1234,6 +1234,16 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
           </div>
         </div>
 
+        <!-- Vozes disponíveis -->
+        <div class="card">
+          <div class="card-header"><span class="card-icon">🎙️</span><span class="card-title">Vozes Disponíveis (PT-BR)</span></div>
+          <div class="card-body">
+            <p style="color:var(--muted);font-size:13px;margin-bottom:8px">Lista todas as vozes disponíveis nos backends edge-tts, Piper e gTTS</p>
+            <button class="btn btn-secondary btn-sm" onclick="audioVozes()">🎙️ Listar Vozes</button>
+            <div id="audio-vozes-result" class="result-box" style="display:none"></div>
+          </div>
+        </div>
+
         <!-- Status backends -->
         <div class="card">
           <div class="card-header"><span class="card-icon">📊</span><span class="card-title">Status dos Backends de Áudio</span></div>
@@ -1330,6 +1340,25 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--fg); }
             const d = await res.json();
             r.textContent = JSON.stringify(d,null,2);
             toast('✅ Status atualizado','ok');
+          } catch(e){r.textContent='Erro: '+e.message;}
+        }
+        async function audioVozes() {
+          const r = document.getElementById('audio-vozes-result');
+          r.style.display='block'; r.textContent='⏳ Carregando vozes disponíveis...';
+          try {
+            const res = await fetch('/audio/vozes');
+            const d = await res.json();
+            if(d.vozes && Array.isArray(d.vozes)){
+              let txt = `🎙️ ${d.total||d.vozes.length} vozes disponíveis\n\n`;
+              d.vozes.slice(0,20).forEach(v=>{
+                txt += `• ${v.nome||v.id||v} — ${v.genero||''} ${v.idioma||''}\n`;
+              });
+              if((d.total||d.vozes.length)>20) txt += `\n... e mais ${(d.total||d.vozes.length)-20} vozes`;
+              r.textContent = txt;
+            } else {
+              r.textContent = JSON.stringify(d,null,2);
+            }
+            toast('✅ Vozes carregadas','ok');
           } catch(e){r.textContent='Erro: '+e.message;}
         }
         </script>
