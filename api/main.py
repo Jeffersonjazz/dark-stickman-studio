@@ -14,7 +14,7 @@ from typing import Optional, List
 from datetime import datetime
 
 try:
-    from fastapi import FastAPI, HTTPException, BackgroundTasks, Query
+    from fastapi import FastAPI, HTTPException, BackgroundTasks, Query, Body
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.staticfiles import StaticFiles
     from fastapi.responses import FileResponse

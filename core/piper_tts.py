@@ -305,3 +305,8 @@ if __name__ == "__main__":
     synthesize(text, out)
     dur = get_audio_duration(out)
     print(f"\nÁudio gerado: {out} ({dur:.1f}s)")
+
+
+def check_piper() -> dict:
+    """Verifica disponibilidade dos engines TTS."""
+    return check_tts_engines()
