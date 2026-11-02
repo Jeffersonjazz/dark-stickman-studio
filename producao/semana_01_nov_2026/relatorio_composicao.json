@@ -1,0 +1,65 @@
+{
+  "gerado_em": "2026-11-02T20:57:47.806597",
+  "total": 5,
+  "compostos": 5,
+  "videos": [
+    {
+      "id": "short1",
+      "canal": "Mente_de_Aco",
+      "dur": 32,
+      "arquivo": "outputs/videos/short1_Mente_de_Aco.mp4",
+      "mb": 0.61,
+      "status": "COMPOSTO",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+      "nota_upload": "Título YouTube: Por Que Voce Nunca Executa Seus Planos"
+    },
+    {
+      "id": "short2",
+      "canal": "Intelligentia_Nova",
+      "dur": 37,
+      "arquivo": "outputs/videos/short2_Intelligentia_Nova.mp4",
+      "mb": 0.73,
+      "status": "COMPOSTO",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+      "nota_upload": "Título YouTube: A IA Que Preve Sua Morte Antes de Voce Saber"
+    },
+    {
+      "id": "short3",
+      "canal": "Bastidores_do_Tempo",
+      "dur": 35,
+      "arquivo": "outputs/videos/short3_Bastidores_do_Tempo.mp4",
+      "mb": 0.62,
+      "status": "COMPOSTO",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+      "nota_upload": "Título YouTube: Por Que Roma Escondeu Este Segredo por 1500 Anos"
+    },
+    {
+      "id": "short4",
+      "canal": "Projeto_Secreto",
+      "dur": 40,
+      "arquivo": "outputs/videos/short4_Projeto_Secreto.mp4",
+      "mb": 0.64,
+      "status": "COMPOSTO",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+      "nota_upload": "Título YouTube: Por Que o Governo Lavou Cerebros de Cidadaos Reais"
+    },
+    {
+      "id": "short5",
+      "canal": "AquaZen_Relax",
+      "dur": 30,
+      "arquivo": "outputs/videos/short5_AquaZen_Relax.mp4",
+      "mb": 0.49,
+      "status": "COMPOSTO",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+      "nota_upload": "Título YouTube: Voce NUNCA Dormiu Tao Bem Com Estes Sons da Natureza"
+    }
+  ],
+  "proximo_passo": "Upload manual no YouTube Studio ou via YouTube Data API v3",
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}
