@@ -80,13 +80,16 @@ class MotionGraphicsAgent:
         titulo = payload.get("titulo", "Sem título")
 
         # Gerar filtro FFmpeg para overlay de texto
+        # cor_sombra pode não existir em todos os templates (ex: lower_third usa cor_fundo)
+        cor_sombra = template.get('cor_sombra', template.get('cor_fundo', 'black'))
+        duracao = template.get('duracao', 3.0) if isinstance(template.get('duracao'), (int, float)) else 3.0
         ffmpeg_filter = (
             f"drawtext=text='{titulo}':"
             f"fontcolor={template['cor_texto']}:"
             f"fontsize=72:"
             f"x=(w-text_w)/2:y=(h-text_h)/2:"
-            f"shadowcolor={template['cor_sombra']}:shadowx=3:shadowy=3:"
-            f"alpha='if(lt(t,0.5),t*2,if(lt(t,{template['duracao']}-0.5),1,(({template['duracao']}-t)*2)))'"
+            f"shadowcolor={cor_sombra}:shadowx=3:shadowy=3:"
+            f"alpha='if(lt(t,0.5),t*2,if(lt(t,{duracao}-0.5),1,(({duracao}-t)*2)))'"
         )
 
         return {

@@ -125,9 +125,12 @@ class DarkManager:
     def status_agentes(self) -> dict:
         """Retorna status de todos os agentes ativos."""
         return {
+            "agente": "dark_manager",
+            "status": "operacional",
             "total_agentes": len(self.AGENT_CAPABILITIES),
             "agentes": list(self.AGENT_CAPABILITIES.keys()),
             "jobs_em_fila": len(self.jobs),
             "log_entries": len(self.log),
-            "session_id": self.session_id
+            "session_id": self.session_id,
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
         }

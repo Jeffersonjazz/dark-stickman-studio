@@ -48,11 +48,31 @@ class VideoGeneratorAgent:
 
     def gerar_fundo_video(self, payload: dict) -> dict:
         """Gera vídeo de fundo via FFmpeg (gratuito, sem GPU)."""
+        audio_path = payload.get("audio_path", "")
+        if not audio_path:
+            # Sem áudio: retornar configuração para uso posterior
+            return {
+                "agente": self.AGENT_ID,
+                "status": "configurado",
+                "mensagem": "Forneça audio_path para gerar o vídeo. Ex: payload={'audio_path': 'outputs/audio/narr.mp3'}",
+                "resolucao": payload.get("resolucao", "1080x1920"),
+                "backend": "ffmpeg_gradient",
+                "custo": "GRATUITO — FFmpeg local",
+                "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+            }
+
+        # Construir output_path completo (arquivo, não diretório)
+        output_dir = payload.get("output_dir", "outputs/video")
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        video_id = f"vid_{uuid.uuid4().hex[:8]}"
+        output_path = str(Path(output_dir) / f"{video_id}.mp4")
+
         resultado = gerar_video_fundo_ffmpeg(
-            output_dir=payload.get("output_dir", "outputs/video"),
+            audio_path=audio_path,
+            output_path=output_path,
+            cor_bg=payload.get("cor_bg", "0x0A0A1E"),
             resolucao=payload.get("resolucao", "1080x1920"),
-            duracao=payload.get("duracao", 60),
-            nicho=payload.get("nicho", "narrativa")
+            fps=payload.get("fps", 30)
         )
         resultado["agente"] = self.AGENT_ID
         resultado["backend"] = "ffmpeg_gradient"

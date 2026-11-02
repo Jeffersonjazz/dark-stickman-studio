@@ -59,8 +59,7 @@ class AudioMasterAgent:
         resultado = gerar_voiceover_sync(
             script=script,
             voice_id=voice_id,
-            output_dir="outputs/audio",
-            rate=rate
+            output_dir="outputs/audio"
         )
         resultado["agente"] = self.AGENT_ID
         resultado["custo"] = "GRATUITO — edge-tts Microsoft Neural TTS"
