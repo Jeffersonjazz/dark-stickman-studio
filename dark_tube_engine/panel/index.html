@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DARK TUBE ENGINE</title>
+<style>
+:root {
+  --bg: #07070f;
+  --bg2: #0d0d1a;
+  --bg3: #141428;
+  --border: #1e1e3a;
+  --accent: #7c3aed;
+  --accent2: #a855f7;
+  --neon: #c084fc;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #eab308;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --card-glow: 0 0 20px rgba(124,58,237,0.15);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+  background: linear-gradient(135deg, var(--bg2), #0a0a1a);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 0 16px rgba(124,58,237,0.4);
+}
+.logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.logo-text span { color: var(--neon); }
+.badge {
+  background: var(--accent);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+}
+.status-dot {
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── Layout ── */
+.main {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: calc(100vh - 65px);
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+}
+.sidebar-section {
+  padding: 0 12px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 12px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+  color: #94a3b8;
+}
+.nav-item:hover, .nav-item.active {
+  background: rgba(124,58,237,0.12);
+  color: var(--text);
+  border-left-color: var(--accent);
+}
+.nav-item .icon { font-size: 16px; min-width: 20px; }
+
+/* ── Content ── */
+.content {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* ── Tabs ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── Stats Grid ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--card-glow);
+}
+.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 26px; font-weight: 700; margin-top: 6px; }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.stat-card.green .stat-value { color: var(--green); }
+.stat-card.purple .stat-value { color: var(--neon); }
+.stat-card.yellow .stat-value { color: var(--yellow); }
+
+/* ── Cards ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: var(--card-glow);
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Form ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.form-row.full { grid-template-columns: 1fr; }
+.form-group label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-size: 13px;
+  transition: border-color 0.15s;
+  outline: none;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(124,58,237,0.15);
+}
+.form-group textarea { min-height: 100px; resize: vertical; font-family: inherit; }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  box-shadow: 0 0 14px rgba(124,58,237,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 20px rgba(124,58,237,0.5); }
+.btn-ghost {
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--accent); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+
+/* ── Result Box ── */
+.result-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 14px;
+  font-size: 13px;
+  display: none;
+}
+.result-box.show { display: block; }
+.result-box pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ── Score Bar ── */
+.score-bar-wrap { margin: 10px 0; }
+.score-bar-bg { height: 8px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
+.score-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+.score-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+
+/* ── Vozes Grid ── */
+.vozes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+.voz-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.voz-card:hover, .voz-card.selected {
+  border-color: var(--accent);
+  background: rgba(124,58,237,0.1);
+}
+.voz-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.voz-nicho { font-size: 11px; color: var(--accent2); }
+.voz-id { font-size: 10px; color: var(--muted); margin-top: 4px; font-family: monospace; }
+
+/* ── Job Status ── */
+.job-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.job-badge.inprogress { background: rgba(234,179,8,0.15); color: var(--yellow); }
+.job-badge.completed { background: rgba(34,197,94,0.15); color: var(--green); }
+.job-badge.failed { background: rgba(239,68,68,0.15); color: var(--red); }
+
+/* ── Pipeline Steps ── */
+.pipeline {
+  display: flex;
+  gap: 0;
+  margin: 16px 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.pipe-step {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.pipe-node {
+  background: var(--bg3);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12px;
+  text-align: center;
+  min-width: 100px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pipe-node:hover, .pipe-node.done {
+  border-color: var(--accent);
+  background: rgba(124,58,237,0.12);
+}
+.pipe-node .step-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+.pipe-arrow { color: var(--muted); padding: 0 6px; font-size: 14px; }
+
+/* ── Agentes ── */
+.agentes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.agente-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.agente-icon { font-size: 28px; margin-bottom: 8px; }
+.agente-name { font-size: 13px; font-weight: 700; color: var(--neon); margin-bottom: 4px; }
+.agente-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+.agente-status {
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* ── Loader ── */
+.loader {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Disclosure ── */
+.ai-disclosure {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+  .main { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎬</div>
+    <div>
+      <div class="logo-text">DARK <span>TUBE</span> ENGINE</div>
+    </div>
+    <span class="badge">v1.0</span>
+  </div>
+  <div class="status-dot" title="API Online"></div>
+  <div class="header-right">
+    <span id="api-status">Conectando...</span>
+    <span>|</span>
+    <span>DARK STUDIO AAA</span>
+  </div>
+</header>
+
+<div class="main">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-section">Ferramentas</div>
+    <div class="nav-item active" onclick="showTab('dashboard')">
+      <span class="icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showTab('script')">
+      <span class="icon">📝</span> Script Engine
+    </div>
+    <div class="nav-item" onclick="showTab('voiceover')">
+      <span class="icon">🎙️</span> Voiceover
+    </div>
+    <div class="nav-item" onclick="showTab('thumbnail')">
+      <span class="icon">🖼️</span> Thumbnail
+    </div>
+    <div class="nav-item" onclick="showTab('keywords')">
+      <span class="icon">🔍</span> Keywords
+    </div>
+    <div class="nav-item" onclick="showTab('video')">
+      <span class="icon">🎬</span> Video Composer
+    </div>
+    <div class="nav-item" onclick="showTab('pipeline')">
+      <span class="icon">⚡</span> Pipeline Completo
+    </div>
+
+    <div class="sidebar-section" style="margin-top:16px">Agentes</div>
+    <div class="nav-item" onclick="showTab('agentes')">
+      <span class="icon">🤖</span> 9 Agentes Ativos
+    </div>
+    <div class="nav-item" onclick="showTab('jobs')">
+      <span class="icon">⏱️</span> Jobs Monitor
+    </div>
+
+    <div class="sidebar-section" style="margin-top:16px">Sistema</div>
+    <div class="nav-item" onclick="showTab('config')">
+      <span class="icon">⚙️</span> Configuração
+    </div>
+    <div class="nav-item" onclick="window.open('/docs','_blank')">
+      <span class="icon">📚</span> API Docs
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+
+    <!-- DASHBOARD -->
+    <div class="tab-panel active" id="tab-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">API Status</div>
+          <div class="stat-value" id="stat-status">●</div>
+          <div class="stat-sub">Online e pronto</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">Agentes Ativos</div>
+          <div class="stat-value">9</div>
+          <div class="stat-sub">Todos operacionais</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Jobs em Fila</div>
+          <div class="stat-value" id="stat-jobs">0</div>
+          <div class="stat-sub">Poll ativo</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">TTS Backend</div>
+          <div class="stat-value" style="font-size:16px;margin-top:8px" id="stat-tts">–</div>
+          <div class="stat-sub">Gratuito / local</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">FFmpeg</div>
+          <div class="stat-value" style="font-size:16px;margin-top:8px" id="stat-ffmpeg">–</div>
+          <div class="stat-sub">Compositor de vídeo</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pillow</div>
+          <div class="stat-value" style="font-size:16px;margin-top:8px" id="stat-pillow">–</div>
+          <div class="stat-sub">Gerador de thumbnail</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚡ Pipeline Rápido — Short Completo</div>
+        <div class="pipeline">
+          <div class="pipe-step">
+            <div class="pipe-node done" onclick="showTab('script')">
+              <span class="step-icon">📝</span>Script
+            </div>
+          </div>
+          <div class="pipe-step"><span class="pipe-arrow">→</span></div>
+          <div class="pipe-step">
+            <div class="pipe-node done" onclick="showTab('voiceover')">
+              <span class="step-icon">🎙️</span>Voz
+            </div>
+          </div>
+          <div class="pipe-step"><span class="pipe-arrow">→</span></div>
+          <div class="pipe-step">
+            <div class="pipe-node" onclick="showTab('thumbnail')">
+              <span class="step-icon">🖼️</span>Thumb
+            </div>
+          </div>
+          <div class="pipe-step"><span class="pipe-arrow">→</span></div>
+          <div class="pipe-step">
+            <div class="pipe-node" onclick="showTab('video')">
+              <span class="step-icon">🎬</span>Vídeo
+            </div>
+          </div>
+          <div class="pipe-step"><span class="pipe-arrow">→</span></div>
+          <div class="pipe-step">
+            <div class="pipe-node" onclick="showTab('keywords')">
+              <span class="step-icon">🔍</span>SEO
+            </div>
+          </div>
+          <div class="pipe-step"><span class="pipe-arrow">→</span></div>
+          <div class="pipe-step">
+            <div class="pipe-node">
+              <span class="step-icon">▶️</span>YouTube
+            </div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted)">
+          Clone funcional do vidIQ — todos os módulos operando com tecnologias open source gratuitas.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔄 Comparativo: vidIQ vs DARK TUBE ENGINE</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">
+              <th style="text-align:left;padding:8px 0">Funcionalidade</th>
+              <th style="text-align:center;padding:8px">vidIQ</th>
+              <th style="text-align:center;padding:8px">DARK ENGINE</th>
+              <th style="text-align:left;padding:8px">Tecnologia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-top:1px solid var(--border)">
+              <td style="padding:10px 0">Geração de Roteiro</td>
+              <td style="text-align:center">💰 Créditos</td>
+              <td style="text-align:center;color:var(--green)">✅ Grátis</td>
+              <td style="color:var(--muted)">Templates + LLM</td>
+            </tr>
+            <tr style="border-top:1px solid var(--border)">
+              <td style="padding:10px 0">Narração (TTS)</td>
+              <td style="text-align:center">💰 28 cr/vídeo</td>
+              <td style="text-align:center;color:var(--green)">✅ Grátis</td>
+              <td style="color:var(--muted)">edge-tts PT-BR</td>
+            </tr>
+            <tr style="border-top:1px solid var(--border)">
+              <td style="padding:10px 0">Thumbnail</td>
+              <td style="text-align:center">💰 Créditos</td>
+              <td style="text-align:center;color:var(--green)">✅ Grátis</td>
+              <td style="color:var(--muted)">Pillow local</td>
+            </tr>
+            <tr style="border-top:1px solid var(--border)">
+              <td style="padding:10px 0">Composição de Vídeo</td>
+              <td style="text-align:center">💰 Créditos</td>
+              <td style="text-align:center;color:var(--green)">✅ Grátis</td>
+              <td style="color:var(--muted)">FFmpeg</td>
+            </tr>
+            <tr style="border-top:1px solid var(--border)">
+              <td style="padding:10px 0">Score de Título</td>
+              <td style="text-align:center">💰 Plano pago</td>
+              <td style="text-align:center;color:var(--green)">✅ Grátis</td>
+              <td style="color:var(--muted)">Algoritmo próprio</td>
+            </tr>
+            <tr style="border-top:1px solid var(--border)">
+              <td style="padding:10px 0">Upload YouTube</td>
+              <td style="text-align:center">✅ Integrado</td>
+              <td style="text-align:center;color:var(--green)">✅ Grátis</td>
+              <td style="color:var(--muted)">YouTube Data API v3</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SCRIPT ENGINE -->
+    <div class="tab-panel" id="tab-script">
+      <div class="card">
+        <div class="card-title">📝 Script Engine — Clone vidiq_generate_script</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Título do Vídeo</label>
+            <input type="text" id="sc-titulo" placeholder="Ex: Por Que Você Procrastina?">
+          </div>
+          <div class="form-group">
+            <label>Canal</label>
+            <select id="sc-canal">
+              <option>Mente de Aço</option>
+              <option>Esquina do Medo</option>
+              <option>Intelligentia Nova</option>
+              <option>Projeto Secreto</option>
+              <option>AquaZen Relax</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Duração Alvo (segundos)</label>
+            <input type="number" id="sc-duracao" value="60" min="30" max="180">
+          </div>
+          <div class="form-group">
+            <label>Palavras-chave (vírgula)</label>
+            <input type="text" id="sc-keywords" placeholder="motivação, sucesso, hábitos">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="gerarScript()">✨ Gerar Roteiro</button>
+          <button class="btn btn-ghost btn-sm" onclick="scoreTitulo()">📊 Score do Título</button>
+        </div>
+
+        <div id="sc-score" class="result-box" style="margin-top:14px"></div>
+        <div id="sc-result" class="result-box"></div>
+      </div>
+    </div>
+
+    <!-- VOICEOVER -->
+    <div class="tab-panel" id="tab-voiceover">
+      <div class="card">
+        <div class="card-title">🎙️ Voiceover Engine — Clone vidiq_voiceover_generate (GRATUITO)</div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label>Roteiro para narrar</label>
+            <textarea id="vo-script" placeholder="Cole o roteiro aqui para gerar a narração em PT-BR..."></textarea>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px">
+          ✅ Sem limites de crédito — engine própria com Microsoft Neural TTS
+        </p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Velocidade</label>
+            <select id="vo-rate">
+              <option value="-10%">Lento (-10%)</option>
+              <option value="+0%" selected>Normal</option>
+              <option value="+10%">Rápido (+10%)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Voz selecionada</label>
+            <input type="text" id="vo-voice-id" value="pt-BR-AntonioNeural" readonly
+                   style="background:var(--bg3);cursor:default">
+          </div>
+        </div>
+
+        <div class="card-title" style="font-size:13px;margin-top:8px">🎤 Vozes PT-BR Disponíveis</div>
+        <div class="vozes-grid" id="vozes-grid">
+          <div style="color:var(--muted);font-size:12px">Carregando vozes...</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="gerarVoiceover()">🎙️ Gerar Narração</button>
+          <button class="btn btn-ghost btn-sm" onclick="carregarVozes()">🔄 Atualizar Vozes</button>
+        </div>
+        <div id="vo-result" class="result-box"></div>
+      </div>
+    </div>
+
+    <!-- THUMBNAIL -->
+    <div class="tab-panel" id="tab-thumbnail">
+      <div class="card">
+        <div class="card-title">🖼️ Thumbnail Engine — Clone vidiq_generate_thumbnail (GRATUITO)</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Título</label>
+            <input type="text" id="th-titulo" placeholder="Título do vídeo">
+          </div>
+          <div class="form-group">
+            <label>Canal</label>
+            <select id="th-canal">
+              <option>Mente de Aço</option>
+              <option>Esquina do Medo</option>
+              <option>Intelligentia Nova</option>
+              <option>Projeto Secreto</option>
+              <option>AquaZen Relax</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Subtítulo</label>
+            <input type="text" id="th-sub" placeholder="Texto secundário opcional">
+          </div>
+          <div class="form-group">
+            <label>Formato</label>
+            <select id="th-tamanho">
+              <option value="thumbnail_horizontal">Horizontal (1280×720)</option>
+              <option value="thumbnail_shorts">Shorts (1080×1920)</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="gerarThumbnail()">🖼️ Gerar Thumbnail</button>
+          <button class="btn btn-ghost btn-sm" onclick="gerarPackThumbnails()">📦 Pack Completo</button>
+        </div>
+        <div id="th-result" class="result-box"></div>
+      </div>
+    </div>
+
+    <!-- KEYWORDS -->
+    <div class="tab-panel" id="tab-keywords">
+      <div class="card">
+        <div class="card-title">🔍 Keyword Research — Clone vidIQ keyword engine</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Termo de pesquisa</label>
+            <input type="text" id="kw-termo" placeholder="Ex: psicologia, terror, IA">
+          </div>
+          <div class="form-group">
+            <label>Score do Título</label>
+            <input type="text" id="kw-titulo-score" placeholder="Cole o título para pontuar">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="pesquisarKeywords()">🔍 Pesquisar</button>
+          <button class="btn btn-ghost btn-sm" onclick="scoreTituloKw()">📊 Score Título</button>
+        </div>
+        <div id="kw-result" class="result-box"></div>
+      </div>
+    </div>
+
+    <!-- VIDEO COMPOSER -->
+    <div class="tab-panel" id="tab-video">
+      <div class="card">
+        <div class="card-title">🎬 Video Composer — Clone vidiq_compose</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Título do Short</label>
+            <input type="text" id="vc-titulo" placeholder="Título do vídeo">
+          </div>
+          <div class="form-group">
+            <label>Canal</label>
+            <select id="vc-canal">
+              <option>Mente de Aço</option>
+              <option>Esquina do Medo</option>
+              <option>Intelligentia Nova</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label>Script</label>
+            <textarea id="vc-script" placeholder="Script que será legendado..."></textarea>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Caminho do Áudio (gerado pelo Voiceover)</label>
+            <input type="text" id="vc-audio" placeholder="outputs/audio/narração.mp3">
+          </div>
+          <div class="form-group">
+            <label>Resolução</label>
+            <select id="vc-res">
+              <option value="1080x1920">Shorts 9:16 (1080×1920)</option>
+              <option value="1920x1080">Horizontal (1920×1080)</option>
+            </select>
+          </div>
+        </div>
+        <div id="vc-ffmpeg-status" style="font-size:12px;color:var(--muted);margin-bottom:10px"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="composerVideo()">🎬 Compor Vídeo</button>
+          <button class="btn btn-ghost btn-sm" onclick="checkFFmpeg()">🔧 Verificar FFmpeg</button>
+        </div>
+        <div id="vc-result" class="result-box"></div>
+      </div>
+    </div>
+
+    <!-- PIPELINE COMPLETO -->
+    <div class="tab-panel" id="tab-pipeline">
+      <div class="card">
+        <div class="card-title">⚡ Pipeline Completo — Short em 1 Clique</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
+          Gera script → narração → thumbnail → vídeo final automaticamente.
+        </p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Título do Short</label>
+            <input type="text" id="pip-titulo" placeholder="Ex: O Segredo Que Eles Escondem">
+          </div>
+          <div class="form-group">
+            <label>Canal</label>
+            <select id="pip-canal">
+              <option>Mente de Aço</option>
+              <option>Esquina do Medo</option>
+              <option>Intelligentia Nova</option>
+              <option>Projeto Secreto</option>
+              <option>AquaZen Relax</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="runPipeline()">🚀 Executar Pipeline</button>
+        </div>
+        <div id="pip-log" class="result-box" style="font-family:monospace;font-size:12px"></div>
+      </div>
+    </div>
+
+    <!-- AGENTES -->
+    <div class="tab-panel" id="tab-agentes">
+      <div class="card">
+        <div class="card-title">🤖 9 Agentes DARK CREATIVE LAB</div>
+        <div class="agentes-grid">
+          <div class="agente-card">
+            <div class="agente-icon">🖼️</div>
+            <div class="agente-name">IMAGE ENGINE</div>
+            <div class="agente-desc">Geração e tratamento de imagens, thumbnails, upscaling</div>
+            <div class="agente-status"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block"></span> Online</div>
+          </div>
+          <div class="agente-card">
+            <div class="agente-icon">🎬</div>
+            <div class="agente-name">VIDEO GENERATOR</div>
+            <div class="agente-desc">Geração de vídeos, animação de fotos, B-roll</div>
+            <div class="agente-status"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block"></span> Online</div>
+          </div>
+          <div class="agente-card">
+            <div class="agente-icon">🎥</div>
+            <div class="agente-name">CINEMATIC DIRECTOR</div>
+            <div class="agente-desc">Fotografia, composição, iluminação, continuidade visual</div>
+            <div class="agente-status"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block"></span> Online</div>
+          </div>
+          <div class="agente-card">
+            <div class="agente-icon">✂️</div>
+            <div class="agente-name">VIDEO EDITOR PRO</div>
+            <div class="agente-desc">Montagem, linha do tempo, transições, renderização</div>
+            <div class="agente-status"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block"></span> Online</div>
+          </div>
+          <div class="agente-card">
+            <div class="agente-icon">✨</div>
+            <div class="agente-name">MOTION GRAPHICS</div>
+            <div class="agente-desc">Animações, infográficos, títulos, efeitos visuais</div>
+            <div class="agente-status"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block"></span> Online</div>
+          </div>
+          <div class="agente-card">
+            <div class="agente-icon">🎙️</div>
+            <div class="agente-name">AUDIO MASTER</div>
+            <div class="agente-desc">Narração PT-BR, mixagem, masterização, equalização</div>
+            <div class="agente-status"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block"></span> Online</div>
+          </div>
+          <div class="agente-card">
+            <div class="agente-icon">🎨</div>
+            <div class="agente-name">VISUAL CONSISTENCY</div>
+            <div class="agente-desc">Identidade visual, paleta, estilo entre cenas</div>
+            <div class="agente-status"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block"></span> Online</div>
+          </div>
+          <div class="agente-card">
+            <div class="agente-icon">📦</div>
+            <div class="agente-name">ASSET MANAGER</div>
+            <div class="agente-desc">Keywords, SEO, licenças, arquivos de produção</div>
+            <div class="agente-status"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block"></span> Online</div>
+          </div>
+          <div class="agente-card">
+            <div class="agente-icon">✅</div>
+            <div class="agente-name">CREATIVE QA</div>
+            <div class="agente-desc">Qualidade visual, áudio, continuidade, conformidade</div>
+            <div class="agente-status"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block"></span> Online</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOBS -->
+    <div class="tab-panel" id="tab-jobs">
+      <div class="card">
+        <div class="card-title">⏱️ Jobs Monitor — Clone vidiq_job_poll</div>
+        <div class="btn-row">
+          <button class="btn btn-ghost btn-sm" onclick="carregarJobs()">🔄 Atualizar Jobs</button>
+        </div>
+        <div id="jobs-list" class="result-box show" style="margin-top:12px">
+          <em style="color:var(--muted)">Clique em Atualizar Jobs para ver os jobs em andamento.</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="tab-panel" id="tab-config">
+      <div class="card">
+        <div class="card-title">⚙️ Configuração</div>
+        <div id="config-result" class="result-box show">
+          <em style="color:var(--muted)">Carregando configuração...</em>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-primary" onclick="carregarStatus()">🔄 Verificar Sistema</button>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /content -->
+</div><!-- /main -->
+
+<div class="ai-disclosure">
+  ⚠️ Conteúdo produzido com auxílio de IA · ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB · v1.0.0
+</div>
+
+<script>
+const API = '';  // same origin
+
+// ── Navigation ─────────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event?.currentTarget?.classList.add('active');
+}
+
+// ── API call helper ────────────────────────────────────
+async function api(path, method = 'GET', body = null) {
+  const opts = { method, headers: {'Content-Type': 'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const r = await fetch(API + path, opts);
+    return await r.json();
+  } catch(e) {
+    return { error: e.message };
+  }
+}
+
+function showResult(id, data) {
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  el.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+}
+
+// ── Init ──────────────────────────────────────────────
+async function init() {
+  const status = await api('/sistema/status');
+  if (status.error) {
+    document.getElementById('api-status').textContent = '❌ API offline';
+    return;
+  }
+  document.getElementById('api-status').textContent = '✅ API online';
+  document.getElementById('stat-status').textContent = '✅';
+  document.getElementById('stat-tts').textContent = status.tts_backend || '–';
+  document.getElementById('stat-ffmpeg').textContent = status.ffmpeg?.disponivel ? '✅' : '❌';
+  document.getElementById('stat-pillow').textContent = status.pillow ? '✅' : '❌';
+
+  const jobs = await api('/jobs');
+  document.getElementById('stat-jobs').textContent = jobs.total || 0;
+  showResult('config-result', status);
+}
+
+// ── Script Engine ─────────────────────────────────────
+async function gerarScript() {
+  const titulo = document.getElementById('sc-titulo').value;
+  const canal = document.getElementById('sc-canal').value;
+  const kw = document.getElementById('sc-keywords').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const dur = parseInt(document.getElementById('sc-duracao').value);
+  if (!titulo) return alert('Informe o título!');
+  showResult('sc-result', {status: 'gerando...', aguarde: 'Processando roteiro'});
+  const r = await api('/script/criar', 'POST', {titulo, canal, palavras_chave: kw, duracao_alvo: dur});
+  showResult('sc-result', r);
+}
+
+async function scoreTitulo() {
+  const titulo = document.getElementById('sc-titulo').value;
+  if (!titulo) return alert('Informe o título!');
+  const r = await api('/script/score-titulo', 'POST', {titulo});
+  const score = r.score || 0;
+  const color = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : '#ef4444';
+  document.getElementById('sc-score').classList.add('show');
+  document.getElementById('sc-score').innerHTML = `
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-weight:700">Score do Título</span>
+        <span style="color:${color};font-weight:700;font-size:18px">${score}/100 — ${r.nivel}</span>
+      </div>
+      <div class="score-bar-bg">
+        <div class="score-bar-fill" style="width:${score}%;background:${color}"></div>
+      </div>
+    </div>
+    <div style="font-size:12px;line-height:1.8">${(r.feedback||[]).join('<br>')}</div>
+    <div style="margin-top:8px;font-size:12px;color:var(--accent2)">${r.recomendacao || ''}</div>
+  `;
+}
+
+// ── Voiceover ─────────────────────────────────────────
+async function carregarVozes() {
+  const r = await api('/voiceover/vozes');
+  const grid = document.getElementById('vozes-grid');
+  if (r.vozes_por_nicho) {
+    grid.innerHTML = r.vozes_por_nicho.map(v => `
+      <div class="voz-card" onclick="selecionarVoz('${v.voice_id||v.id}', this)">
+        <div class="voz-name">${v.nome || v.id}</div>
+        <div class="voz-nicho">📻 ${(v.id||'').replace('_',' ')}</div>
+        <div class="voz-id">${v.voice_id || ''}</div>
+      </div>
+    `).join('');
+  }
+}
+
+function selecionarVoz(voiceId, el) {
+  document.querySelectorAll('.voz-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('vo-voice-id').value = voiceId;
+}
+
+async function gerarVoiceover() {
+  const script = document.getElementById('vo-script').value;
+  const voice_id = document.getElementById('vo-voice-id').value;
+  const rate = document.getElementById('vo-rate').value;
+  if (!script) return alert('Informe o script!');
+  showResult('vo-result', {status: 'gerando...', engine: 'edge-tts (gratuito)', aguarde: 'Processando narração...'});
+  const r = await api('/voiceover/gerar', 'POST', {script, voice_id, rate});
+  // Poll se for async
+  if (r.job_id && r.status === 'inprogress') {
+    await pollJob(r.job_id, 'vo-result');
+  } else {
+    showResult('vo-result', r);
+  }
+}
+
+// ── Thumbnail ─────────────────────────────────────────
+async function gerarThumbnail() {
+  const titulo = document.getElementById('th-titulo').value;
+  const canal = document.getElementById('th-canal').value;
+  const subtitulo = document.getElementById('th-sub').value;
+  const tamanho = document.getElementById('th-tamanho').value;
+  if (!titulo) return alert('Informe o título!');
+  const r = await api('/thumbnail/gerar', 'POST', {titulo, canal, subtitulo, tamanho});
+  showResult('th-result', r);
+}
+
+async function gerarPackThumbnails() {
+  const titulo = document.getElementById('th-titulo').value;
+  const canal = document.getElementById('th-canal').value;
+  if (!titulo) return alert('Informe o título!');
+  const r = await api('/thumbnail/pack', 'POST', {titulo, canal});
+  showResult('th-result', r);
+}
+
+// ── Keywords ──────────────────────────────────────────
+async function pesquisarKeywords() {
+  const termo = document.getElementById('kw-termo').value;
+  if (!termo) return alert('Informe o termo!');
+  const r = await api('/keywords/pesquisar', 'POST', {termo, max_results: 15});
+  showResult('kw-result', r);
+}
+
+async function scoreTituloKw() {
+  const titulo = document.getElementById('kw-titulo-score').value;
+  if (!titulo) return alert('Informe o título!');
+  const r = await api('/script/score-titulo', 'POST', {titulo});
+  showResult('kw-result', r);
+}
+
+// ── Video ─────────────────────────────────────────────
+async function checkFFmpeg() {
+  const r = await api('/video/status');
+  document.getElementById('vc-ffmpeg-status').textContent =
+    r.disponivel ? '✅ FFmpeg disponível: ' + r.versao : '❌ FFmpeg não encontrado';
+}
+
+async function composerVideo() {
+  const titulo = document.getElementById('vc-titulo').value;
+  const canal = document.getElementById('vc-canal').value;
+  const script = document.getElementById('vc-script').value;
+  const audio_path = document.getElementById('vc-audio').value;
+  const resolucao = document.getElementById('vc-res').value;
+  if (!titulo || !audio_path) return alert('Informe título e caminho do áudio!');
+  const r = await api('/video/compor', 'POST', {titulo, canal, script, audio_path, resolucao});
+  if (r.job_id) await pollJob(r.job_id, 'vc-result');
+  else showResult('vc-result', r);
+}
+
+// ── Pipeline ──────────────────────────────────────────
+async function runPipeline() {
+  const titulo = document.getElementById('pip-titulo').value;
+  const canal = document.getElementById('pip-canal').value;
+  if (!titulo) return alert('Informe o título!');
+
+  const log = document.getElementById('pip-log');
+  log.classList.add('show');
+  const appendLog = (msg) => { log.innerHTML += msg + '\n'; };
+
+  appendLog(`[1/4] 📝 Gerando roteiro para: ${titulo}`);
+  const script = await api('/script/criar', 'POST', {titulo, canal});
+  appendLog(`      ✅ Job: ${script.job_id || 'criado'}`);
+
+  appendLog(`[2/4] 🖼️ Gerando thumbnail...`);
+  const thumb = await api('/thumbnail/gerar', 'POST', {titulo, canal});
+  appendLog(`      ✅ ${thumb.path || thumb.status}`);
+
+  appendLog(`[3/4] 🔍 Analisando keywords...`);
+  const kw = await api('/keywords/pesquisar', 'POST', {termo: titulo});
+  appendLog(`      ✅ ${kw.keywords?.length || 0} keywords encontradas`);
+
+  appendLog(`[4/4] 📊 Score do título...`);
+  const score = await api('/script/score-titulo', 'POST', {titulo});
+  appendLog(`      ✅ Score: ${score.score}/100 — ${score.nivel}`);
+
+  appendLog(`\n🚀 Pipeline concluído! Adicione áudio e execute /video/compor para finalizar.`);
+  appendLog(`ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB`);
+}
+
+// ── Job Poll ──────────────────────────────────────────
+async function pollJob(jobId, resultId, maxTries = 20) {
+  showResult(resultId, {status: 'inprogress', job_id: jobId, message: 'Aguardando conclusão...'});
+  for (let i = 0; i < maxTries; i++) {
+    await new Promise(r => setTimeout(r, 2000));
+    const r = await api('/jobs/' + jobId);
+    showResult(resultId, r);
+    if (r.status === 'completed' || r.status === 'failed') break;
+  }
+}
+
+// ── Jobs ──────────────────────────────────────────────
+async function carregarJobs() {
+  const r = await api('/jobs');
+  showResult('jobs-list', r);
+}
+
+// ── Status ────────────────────────────────────────────
+async function carregarStatus() {
+  const r = await api('/sistema/status');
+  showResult('config-result', r);
+}
+
+// ── Boot ──────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  init();
+  carregarVozes();
+  checkFFmpeg();
+});
+</script>
+
+</body>
+</html>
