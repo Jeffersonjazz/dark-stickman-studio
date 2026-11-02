@@ -1,0 +1,206 @@
+{
+  "batch": "Semana 01 — Nov 2026",
+  "gerado_em": "2026-11-02T20:46:22.759371",
+  "total_shorts": 5,
+  "canais": [
+    "Mente de Aço",
+    "Intelligentia Nova",
+    "Bastidores do Tempo",
+    "Projeto Secreto",
+    "AquaZen Relax"
+  ],
+  "shorts": [
+    {
+      "short": 1,
+      "canal": "Mente de Aço",
+      "dia": "Seg 03/11",
+      "etapas": {
+        "score_titulo": {
+          "score": 60,
+          "grade": "?"
+        },
+        "keywords": [
+          "Por Que Você Nunca Executa Seus Planos? revelado",
+          "Por Que Você Nunca Executa Seus Planos? explicado",
+          "Por Que Você Nunca Executa Seus Planos? completo",
+          "Por Que Você Nunca Executa Seus Planos? verdadeiro",
+          "Por Que Você Nunca Executa Seus Planos? secreto"
+        ],
+        "thumbnail": "outputs/thumbnails/thumb_51649bfb_por_que_você_nunca_executa_seu.jpg",
+        "audio": {
+          "job_id": "vo_295b8072042c43ba",
+          "voice": "pt-BR-AntonioNeural"
+        },
+        "script": "dtjob_178fce2bc29f405b",
+        "qa": {
+          "aprovado": true,
+          "score": 60
+        }
+      },
+      "contrato_id": "ctr_5e25d4fd1971",
+      "status": "PRONTO_PARA_POSTAGEM",
+      "postagem": {
+        "data": "Seg 03/11",
+        "horario": "17:00 BRT",
+        "titulo_youtube": "Por Que Você Nunca Executa Seus Planos?",
+        "tags": "#psicologia #motivacao #mentalidade #shorts",
+        "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        "ai_generated_tag": true
+      }
+    },
+    {
+      "short": 2,
+      "canal": "Intelligentia Nova",
+      "dia": "Ter 04/11",
+      "etapas": {
+        "score_titulo": {
+          "score": 55,
+          "grade": "?"
+        },
+        "keywords": [
+          "A IA Que Prevê Sua Morte Antes de Você Saber revelado",
+          "A IA Que Prevê Sua Morte Antes de Você Saber explicado",
+          "A IA Que Prevê Sua Morte Antes de Você Saber completo",
+          "A IA Que Prevê Sua Morte Antes de Você Saber verdadeiro",
+          "A IA Que Prevê Sua Morte Antes de Você Saber secreto"
+        ],
+        "thumbnail": "outputs/thumbnails/thumb_4d7b1b20_a_ia_que_prevê_sua_morte_antes.jpg",
+        "audio": {
+          "job_id": "vo_5d3cfe1f29d445b6",
+          "voice": "pt-BR-AntonioNeural"
+        },
+        "script": "dtjob_4355b6e4177d4b43",
+        "qa": {
+          "aprovado": true,
+          "score": 55
+        }
+      },
+      "contrato_id": "ctr_4dc9939cd101",
+      "status": "PRONTO_PARA_POSTAGEM",
+      "postagem": {
+        "data": "Ter 04/11",
+        "horario": "17:00 BRT",
+        "titulo_youtube": "A IA Que Prevê Sua Morte Antes de Você Saber",
+        "tags": "#inteligenciaartificial #ia #tecnologia #shorts",
+        "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        "ai_generated_tag": true
+      }
+    },
+    {
+      "short": 3,
+      "canal": "Bastidores do Tempo",
+      "dia": "Qua 05/11",
+      "etapas": {
+        "score_titulo": {
+          "score": 70,
+          "grade": "?"
+        },
+        "keywords": [
+          "Por Que Roma Escondeu Este Segredo por 1500 Anos? revelado",
+          "Por Que Roma Escondeu Este Segredo por 1500 Anos? explicado",
+          "Por Que Roma Escondeu Este Segredo por 1500 Anos? completo",
+          "Por Que Roma Escondeu Este Segredo por 1500 Anos? verdadeiro",
+          "Por Que Roma Escondeu Este Segredo por 1500 Anos? secreto"
+        ],
+        "thumbnail": "outputs/thumbnails/thumb_b6e78d75_por_que_roma_escondeu_este_seg.jpg",
+        "audio": {
+          "job_id": "vo_589785ff308b42b4",
+          "voice": "pt-BR-AntonioNeural"
+        },
+        "script": "dtjob_d3b219abe58841b7",
+        "qa": {
+          "aprovado": true,
+          "score": 70
+        }
+      },
+      "contrato_id": "ctr_5e48d4584387",
+      "status": "PRONTO_PARA_POSTAGEM",
+      "postagem": {
+        "data": "Qua 05/11",
+        "horario": "17:00 BRT",
+        "titulo_youtube": "Por Que Roma Escondeu Este Segredo por 1500 Anos?",
+        "tags": "#historia #roma #curiosidades #shorts",
+        "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        "ai_generated_tag": true
+      }
+    },
+    {
+      "short": 4,
+      "canal": "Projeto Secreto",
+      "dia": "Qui 06/11",
+      "etapas": {
+        "score_titulo": {
+          "score": 50,
+          "grade": "?"
+        },
+        "keywords": [
+          "Por Que o Governo Lavou Cérebros de Cidadãos Reais? revelado",
+          "Por Que o Governo Lavou Cérebros de Cidadãos Reais? explicado",
+          "Por Que o Governo Lavou Cérebros de Cidadãos Reais? completo",
+          "Por Que o Governo Lavou Cérebros de Cidadãos Reais? verdadeiro",
+          "Por Que o Governo Lavou Cérebros de Cidadãos Reais? secreto"
+        ],
+        "thumbnail": "outputs/thumbnails/thumb_27018b80_por_que_o_governo_lavou_cérebr.jpg",
+        "audio": {
+          "job_id": "vo_05ad5cae8ecd4033",
+          "voice": "pt-BR-AntonioNeural"
+        },
+        "script": "dtjob_46fb974db0b74162",
+        "qa": {
+          "aprovado": true,
+          "score": 50
+        }
+      },
+      "contrato_id": "ctr_5b78148ed588",
+      "status": "PRONTO_PARA_POSTAGEM",
+      "postagem": {
+        "data": "Qui 06/11",
+        "horario": "17:00 BRT",
+        "titulo_youtube": "Por Que o Governo Lavou Cérebros de Cidadãos Reais?",
+        "tags": "#conspiracao #cia #mkultra #shorts",
+        "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        "ai_generated_tag": true
+      }
+    },
+    {
+      "short": 5,
+      "canal": "AquaZen Relax",
+      "dia": "Sex 07/11",
+      "etapas": {
+        "score_titulo": {
+          "score": 55,
+          "grade": "?"
+        },
+        "keywords": [
+          "Você NUNCA Dormiu Tão Bem Quanto Com Estes Sons da Natureza revelado",
+          "Você NUNCA Dormiu Tão Bem Quanto Com Estes Sons da Natureza explicado",
+          "Você NUNCA Dormiu Tão Bem Quanto Com Estes Sons da Natureza completo",
+          "Você NUNCA Dormiu Tão Bem Quanto Com Estes Sons da Natureza verdadeiro",
+          "Você NUNCA Dormiu Tão Bem Quanto Com Estes Sons da Natureza secreto"
+        ],
+        "thumbnail": "outputs/thumbnails/thumb_ff3b6fd6_você_nunca_dormiu_tão_bem_quan.jpg",
+        "audio": {
+          "job_id": "vo_b593477f5f724955",
+          "voice": "pt-BR-FranciscaNeural"
+        },
+        "script": "dtjob_d19788246ba0449a",
+        "qa": {
+          "aprovado": true,
+          "score": 55
+        }
+      },
+      "contrato_id": "ctr_bbce573d680b",
+      "status": "PRONTO_PARA_POSTAGEM",
+      "postagem": {
+        "data": "Sex 07/11",
+        "horario": "17:00 BRT",
+        "titulo_youtube": "Você NUNCA Dormiu Tão Bem Quanto Com Estes Sons da Natureza",
+        "tags": "#relaxamento #natureza #sonoeprofundo #shorts",
+        "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        "ai_generated_tag": true
+      }
+    }
+  ],
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}
