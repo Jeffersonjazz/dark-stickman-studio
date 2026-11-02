@@ -52,3 +52,10 @@ Thumbs.db
 # Piper models (pesados)
 *.onnx
 *.onnx.json
+
+# Outputs gerados (binários — não versionar)
+outputs/thumbnails/
+outputs/audio/
+outputs/video/
+outputs/referencias/
+outputs/catalog.json
