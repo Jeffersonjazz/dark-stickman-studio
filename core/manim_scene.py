@@ -19,8 +19,11 @@ MANIM_BIN = shutil.which("manim") or "manim"
 
 def check_manim() -> bool:
     """Verifica se Manim CE está instalado."""
-    result = subprocess.run([MANIM_BIN, "--version"], capture_output=True, text=True, check=False)
-    return result.returncode == 0
+    try:
+        result = subprocess.run([MANIM_BIN, "--version"], capture_output=True, text=True, check=False)
+        return result.returncode == 0
+    except (FileNotFoundError, OSError):
+        return False
 
 
 def render_stickman_scene(

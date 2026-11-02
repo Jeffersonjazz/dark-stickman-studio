@@ -23,6 +23,12 @@ try:
 except ImportError:
     GTTS_AVAILABLE = False
 
+try:
+    import pyttsx3
+    PYTTSX3_AVAILABLE = True
+except ImportError:
+    PYTTSX3_AVAILABLE = False
+
 # Vozes PT-BR disponíveis (edge-tts) — equivalentes às vozes vidIQ
 VOZES_PTBR = {
     "narrativa": {
@@ -155,7 +161,76 @@ async def gerar_voiceover(
         except Exception as e:
             return {"job_id": job_id, "status": "failed", "error": str(e)}
 
-    return {"job_id": job_id, "status": "failed", "error": "Nenhum backend TTS disponível"}
+    elif PYTTSX3_AVAILABLE:
+        try:
+            engine = pyttsx3.init()
+            voices = engine.getProperty('voices')
+            for v in voices:
+                if 'brazil' in v.name.lower() or 'pt' in v.id.lower():
+                    engine.setProperty('voice', v.id)
+                    break
+            engine.setProperty('rate', 160)
+            wav_path = output_path.replace('.mp3', '.wav')
+            engine.save_to_file(script, wav_path)
+            engine.runAndWait()
+            import subprocess
+            conv = subprocess.run(
+                ["ffmpeg", "-y", "-i", wav_path, "-codec:a", "libmp3lame", "-q:a", "4", output_path],
+                capture_output=True
+            )
+            if conv.returncode == 0 and os.path.exists(output_path):
+                os.remove(wav_path)
+                audio_final = output_path
+            else:
+                audio_final = wav_path
+                filename = filename.replace('.mp3', '.wav')
+            return {
+                "job_id": job_id,
+                "status": "completed",
+                "audio_path": audio_final,
+                "filename": filename,
+                "chars": chars,
+                "duracao_estimada_s": round(chars / 15, 1),
+                "voice_id": "pyttsx3-offline",
+                "backend": "pyttsx3",
+                "nota": "TTS offline — qualidade básica; edge-tts recomendado para produção",
+                "ai_generated": True,
+                "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+            }
+        except Exception as e:
+            pass  # Fallback para silent_placeholder abaixo
+
+    # Fallback final: gerar placeholder de áudio silencioso via FFmpeg
+    # (permite testar o pipeline completo mesmo sem TTS)
+    try:
+        import subprocess
+        duracao_est = max(5, len(script) // 15)
+        result = subprocess.run([
+            "ffmpeg", "-y",
+            "-f", "lavfi", "-i", f"anullsrc=r=44100:cl=mono",
+            "-t", str(duracao_est),
+            "-codec:a", "libmp3lame", "-q:a", "9",
+            output_path
+        ], capture_output=True)
+        if result.returncode == 0:
+            return {
+                "job_id": job_id,
+                "status": "placeholder",
+                "audio_path": output_path,
+                "filename": filename,
+                "chars": chars,
+                "duracao_estimada_s": duracao_est,
+                "voice_id": "silent-placeholder",
+                "backend": "ffmpeg-silent",
+                "nota": "PLACEHOLDER: instale edge-tts localmente para narração real. No cloud use gTTS ou edge-tts com rede.",
+                "script_texto": script[:200] + ("..." if len(script) > 200 else ""),
+                "ai_generated": True,
+                "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+            }
+    except Exception:
+        pass
+
+    return {"job_id": job_id, "status": "failed", "error": "Nenhum backend TTS disponível (edge-tts/gtts/pyttsx3). Instale com: pip install edge-tts"}
 
 
 def gerar_voiceover_sync(script: str, voice_id: str = "pt-BR-AntonioNeural",

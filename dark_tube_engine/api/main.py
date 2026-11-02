@@ -84,9 +84,13 @@ class ThumbnailRequest(BaseModel):
     emoji: Optional[str] = ""
 
 class KeywordRequest(BaseModel):
-    termo: str
+    termo: Optional[str] = None
+    tema: Optional[str] = None   # alias de 'termo' para compatibilidade
     api_key: Optional[str] = None
     max_results: Optional[int] = 10
+
+    def get_termo(self) -> str:
+        return self.termo or self.tema or ""
 
 class TituloScoreRequest(BaseModel):
     titulo: str
@@ -280,7 +284,7 @@ def gerar_pack_endpoint(req: ThumbnailRequest):
 def pesquisar_keywords(req: KeywordRequest):
     """Pesquisa palavras-chave — clone do vidiq_keyword_research"""
     return pesquisar_palavras_chave_youtube(
-        termo=req.termo,
+        termo=req.get_termo(),
         api_key=req.api_key,
         max_results=req.max_results or 10
     )
