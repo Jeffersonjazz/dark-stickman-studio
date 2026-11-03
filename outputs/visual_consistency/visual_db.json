@@ -1,0 +1,403 @@
+{
+  "dark_studio_aaa": {
+    "ai_generated": true,
+    "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+    "timestamp": "2026-11-03T00:48:51.252865",
+    "agentes": [
+      "VISUAL CONSISTENCY",
+      "ASSET MANAGER",
+      "IMAGE ENGINE",
+      "CREATIVE QA"
+    ]
+  },
+  "canais": {
+    "v001": {
+      "vid_id": "v001",
+      "canal": "Mente de Aço",
+      "nicho": "psicologia",
+      "timestamp": "2026-11-03T00:48:50.156303",
+      "frame_ref": "/home/claude/dark-stickman-studio/outputs/visual_consistency/frames_referencia/v001_ref_frame.jpg",
+      "histograma": {
+        "r": {
+          "media": 36.7,
+          "desvio": 25.7
+        },
+        "g": {
+          "media": 34.3,
+          "desvio": 24.3
+        },
+        "b": {
+          "media": 58.3,
+          "desvio": 31.3
+        },
+        "brilho_medio": 43.1
+      },
+      "paleta": {
+        "primaria": "#9B59B6",
+        "secundaria": "#E8DAEF",
+        "fundo": "#1A0533",
+        "texto": "#FFFFFF",
+        "acento": "#D4ACFB",
+        "aviso": "#E74C3C"
+      },
+      "cinematografia": {
+        "aspect_ratio": "16:9",
+        "letterbox": false,
+        "vinheta": 0.6,
+        "grain": 0.03,
+        "temperatura": "fria-neutra (5500K)",
+        "contraste": "alto",
+        "saturacao": "levemente reduzida"
+      },
+      "estilo_prompt": "cinematic dark psychology channel, moody purple tones, #9B59B6 accent, deep shadows, introspective atmosphere, professional photography style, 8K resolution, film grain, vignette, no presenter, faceless channel",
+      "proibido": [
+        "logos de marcas reais",
+        "rostos identificáveis sem autorização",
+        "imagens documentais apresentadas como reais"
+      ],
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+    },
+    "v002": {
+      "vid_id": "v002",
+      "canal": "Bastidores do Tempo",
+      "nicho": "historia",
+      "timestamp": "2026-11-03T00:48:50.246890",
+      "frame_ref": "/home/claude/dark-stickman-studio/outputs/visual_consistency/frames_referencia/v002_ref_frame.jpg",
+      "histograma": {
+        "r": {
+          "media": 58.3,
+          "desvio": 31.8
+        },
+        "g": {
+          "media": 35.2,
+          "desvio": 26.4
+        },
+        "b": {
+          "media": 33.1,
+          "desvio": 25.7
+        },
+        "brilho_medio": 42.2
+      },
+      "paleta": {
+        "primaria": "#D4A017",
+        "secundaria": "#FAF0E6",
+        "fundo": "#1C0A00",
+        "texto": "#FAF0E6",
+        "acento": "#F0C040",
+        "aviso": "#8B0000"
+      },
+      "cinematografia": {
+        "aspect_ratio": "2.39:1",
+        "letterbox": true,
+        "vinheta": 0.7,
+        "grain": 0.05,
+        "temperatura": "quente-sépia (3200K)",
+        "contraste": "muito alto",
+        "saturacao": "reduzida, tons âmbar"
+      },
+      "estilo_prompt": "cinematic historical documentary channel, warm sepia tones, #D4A017 gold accent, aged parchment texture, dramatic chiaroscuro lighting, letterbox 2.39:1, film grain, vintage photography style, no presenter, faceless channel",
+      "proibido": [
+        "anacronismos visuais",
+        "elementos modernos em cenas históricas",
+        "imagens históricas reais não licenciadas"
+      ],
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+    },
+    "v003": {
+      "vid_id": "v003",
+      "canal": "Intelligentia Nova",
+      "nicho": "tecnologia",
+      "timestamp": "2026-11-03T00:48:50.335310",
+      "frame_ref": "/home/claude/dark-stickman-studio/outputs/visual_consistency/frames_referencia/v003_ref_frame.jpg",
+      "histograma": {
+        "r": {
+          "media": 24.8,
+          "desvio": 23.9
+        },
+        "g": {
+          "media": 38.7,
+          "desvio": 27.3
+        },
+        "b": {
+          "media": 38.9,
+          "desvio": 28.2
+        },
+        "brilho_medio": 34.1
+      },
+      "paleta": {
+        "primaria": "#00D4FF",
+        "secundaria": "#E0F7FF",
+        "fundo": "#000D1A",
+        "texto": "#E0F7FF",
+        "acento": "#00FF88",
+        "aviso": "#FF4400"
+      },
+      "cinematografia": {
+        "aspect_ratio": "16:9",
+        "letterbox": false,
+        "vinheta": 0.4,
+        "grain": 0.01,
+        "temperatura": "fria-azulada (7000K)",
+        "contraste": "alto",
+        "saturacao": "alta nos cianos e azuis"
+      },
+      "estilo_prompt": "futuristic tech channel, deep navy background #000D1A, cyan #00D4FF holographic elements, digital HUD overlay, circuit board patterns, no presenter, faceless AI channel, high contrast, 8K, professional CGI style",
+      "proibido": [
+        "logos de empresas de tecnologia reais",
+        "código-fonte proprietário visível",
+        "interfaces reais de produtos sem licença"
+      ],
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+    },
+    "v004": {
+      "vid_id": "v004",
+      "canal": "Projeto Secreto",
+      "nicho": "misterio",
+      "timestamp": "2026-11-03T00:48:50.423762",
+      "frame_ref": "/home/claude/dark-stickman-studio/outputs/visual_consistency/frames_referencia/v004_ref_frame.jpg",
+      "histograma": {
+        "r": {
+          "media": 28.5,
+          "desvio": 24.1
+        },
+        "g": {
+          "media": 16.2,
+          "desvio": 21.0
+        },
+        "b": {
+          "media": 40.1,
+          "desvio": 26.2
+        },
+        "brilho_medio": 28.3
+      },
+      "paleta": {
+        "primaria": "#8B0000",
+        "secundaria": "#CCCCCC",
+        "fundo": "#0A0A0A",
+        "texto": "#CCCCCC",
+        "acento": "#CC0000",
+        "aviso": "#FF0000"
+      },
+      "cinematografia": {
+        "aspect_ratio": "2.39:1",
+        "letterbox": true,
+        "vinheta": 0.8,
+        "grain": 0.06,
+        "temperatura": "neutra-fria (5000K) com realce vermelho",
+        "contraste": "extremo",
+        "saturacao": "quase monocromático com acento vermelho"
+      },
+      "estilo_prompt": "mystery conspiracy channel, near-black background #0A0A0A, dark red #8B0000 accents, extreme vignette, classified document aesthetic, dramatic shadows, letterbox 2.39:1, heavy grain, no presenter, faceless dark channel",
+      "proibido": [
+        "teorias conspiratórias apresentadas como fatos",
+        "documentos governamentais reais classificados",
+        "nomes de pessoas reais em contextos prejudiciais"
+      ],
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+    },
+    "v005": {
+      "vid_id": "v005",
+      "canal": "AquaZen Relax",
+      "nicho": "natureza",
+      "timestamp": "2026-11-03T00:48:50.508643",
+      "frame_ref": "/home/claude/dark-stickman-studio/outputs/visual_consistency/frames_referencia/v005_ref_frame.jpg",
+      "histograma": {
+        "r": {
+          "media": 20.5,
+          "desvio": 22.0
+        },
+        "g": {
+          "media": 35.6,
+          "desvio": 25.3
+        },
+        "b": {
+          "media": 28.2,
+          "desvio": 24.2
+        },
+        "brilho_medio": 28.1
+      },
+      "paleta": {
+        "primaria": "#2ECC71",
+        "secundaria": "#D5F5E3",
+        "fundo": "#001A0A",
+        "texto": "#D5F5E3",
+        "acento": "#1ABC9C",
+        "aviso": "#F39C12"
+      },
+      "cinematografia": {
+        "aspect_ratio": "16:9",
+        "letterbox": false,
+        "vinheta": 0.5,
+        "grain": 0.02,
+        "temperatura": "neutra-verde (5800K)",
+        "contraste": "suave",
+        "saturacao": "levemente aumentada nos verdes e turquesas"
+      },
+      "estilo_prompt": "relaxation nature channel, deep green background #001A0A, emerald #2ECC71 and turquoise accents, crystal clear water, soft natural lighting, peaceful atmosphere, no presenter, faceless zen channel, high detail nature photography, 8K",
+      "proibido": [
+        "elementos urbanos ou industriais",
+        "poluição ou degradação ambiental",
+        "animais em situação de sofrimento"
+      ],
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+    }
+  },
+  "style_guides": [
+    "/home/claude/dark-stickman-studio/outputs/visual_consistency/style_guides/style_guide_psicologia.html",
+    "/home/claude/dark-stickman-studio/outputs/visual_consistency/style_guides/style_guide_historia.html",
+    "/home/claude/dark-stickman-studio/outputs/visual_consistency/style_guides/style_guide_tecnologia.html",
+    "/home/claude/dark-stickman-studio/outputs/visual_consistency/style_guides/style_guide_misterio.html",
+    "/home/claude/dark-stickman-studio/outputs/visual_consistency/style_guides/style_guide_natureza.html"
+  ],
+  "scores_consistencia": [
+    {
+      "vid_a": "v001",
+      "vid_b": "v002",
+      "score": 81.8,
+      "classificacao": "excelente",
+      "hist_a": {
+        "r": {
+          "media": 36.7,
+          "desvio": 25.7
+        },
+        "g": {
+          "media": 34.3,
+          "desvio": 24.3
+        },
+        "b": {
+          "media": 58.3,
+          "desvio": 31.3
+        },
+        "brilho_medio": 43.1
+      },
+      "hist_b": {
+        "r": {
+          "media": 58.3,
+          "desvio": 31.8
+        },
+        "g": {
+          "media": 35.2,
+          "desvio": 26.4
+        },
+        "b": {
+          "media": 33.1,
+          "desvio": 25.7
+        },
+        "brilho_medio": 42.2
+      }
+    },
+    {
+      "vid_a": "v002",
+      "vid_b": "v003",
+      "score": 83.8,
+      "classificacao": "excelente",
+      "hist_a": {
+        "r": {
+          "media": 58.3,
+          "desvio": 31.8
+        },
+        "g": {
+          "media": 35.2,
+          "desvio": 26.4
+        },
+        "b": {
+          "media": 33.1,
+          "desvio": 25.7
+        },
+        "brilho_medio": 42.2
+      },
+      "hist_b": {
+        "r": {
+          "media": 24.8,
+          "desvio": 23.9
+        },
+        "g": {
+          "media": 38.7,
+          "desvio": 27.3
+        },
+        "b": {
+          "media": 38.9,
+          "desvio": 28.2
+        },
+        "brilho_medio": 34.1
+      }
+    },
+    {
+      "vid_a": "v003",
+      "vid_b": "v004",
+      "score": 89.5,
+      "classificacao": "excelente",
+      "hist_a": {
+        "r": {
+          "media": 24.8,
+          "desvio": 23.9
+        },
+        "g": {
+          "media": 38.7,
+          "desvio": 27.3
+        },
+        "b": {
+          "media": 38.9,
+          "desvio": 28.2
+        },
+        "brilho_medio": 34.1
+      },
+      "hist_b": {
+        "r": {
+          "media": 28.5,
+          "desvio": 24.1
+        },
+        "g": {
+          "media": 16.2,
+          "desvio": 21.0
+        },
+        "b": {
+          "media": 40.1,
+          "desvio": 26.2
+        },
+        "brilho_medio": 28.3
+      }
+    },
+    {
+      "vid_a": "v004",
+      "vid_b": "v005",
+      "score": 85.5,
+      "classificacao": "excelente",
+      "hist_a": {
+        "r": {
+          "media": 28.5,
+          "desvio": 24.1
+        },
+        "g": {
+          "media": 16.2,
+          "desvio": 21.0
+        },
+        "b": {
+          "media": 40.1,
+          "desvio": 26.2
+        },
+        "brilho_medio": 28.3
+      },
+      "hist_b": {
+        "r": {
+          "media": 20.5,
+          "desvio": 22.0
+        },
+        "g": {
+          "media": 35.6,
+          "desvio": 25.3
+        },
+        "b": {
+          "media": 28.2,
+          "desvio": 24.2
+        },
+        "brilho_medio": 28.1
+      }
+    }
+  ]
+}

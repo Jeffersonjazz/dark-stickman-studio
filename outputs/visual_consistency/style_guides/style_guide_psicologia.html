@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Style Guide — Mente de Aço</title>
+<style>
+  :root {
+    --bg: #111;
+    --card: #1a1a1a;
+    --border: #333;
+    --text: #eee;
+    --accent: #9B59B6;
+    --fundo-canal: #1A0533;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0 }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 2rem }
+  h1 { color: var(--accent); font-size: 2rem; margin-bottom: 0.3rem }
+  h2 { color: var(--accent); font-size: 1.2rem; margin: 2rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem }
+  h3 { color: #aaa; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem }
+  .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 2rem }
+  .section { margin-bottom: 2rem }
+  .swatches { display: flex; flex-wrap: wrap; gap: 1rem }
+  .swatch { width: 120px }
+  .swatch-color { height: 80px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-family: monospace; font-weight: bold }
+  .swatch-name { text-align: center; margin-top: 0.4rem; font-size: 0.8rem; color: #aaa; text-transform: capitalize }
+  .specs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem }
+  .spec-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem }
+  .spec-label { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 1px }
+  .spec-value { font-size: 1rem; color: var(--text); margin-top: 0.25rem; font-weight: 600 }
+  .prompt-box { background: var(--fundo-canal); border: 1px solid var(--accent); border-radius: 8px; padding: 1.2rem; font-family: monospace; font-size: 0.85rem; color: #E8DAEF; line-height: 1.6 }
+  .cenario-card { background: var(--card); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem; margin-bottom: 1rem }
+  .cenario-card h4 { color: var(--accent); margin-bottom: 0.4rem }
+  .cenario-card p { color: #aaa; font-size: 0.9rem; margin-bottom: 0.5rem }
+  .cenario-card ul { color: #888; font-size: 0.85rem; padding-left: 1.2rem }
+  .proibido-list { list-style: none; padding: 0 }
+  .proibido-list li { padding: 0.4rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem }
+  .badge { display: inline-block; background: var(--accent); color: var(--fundo-canal); border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.75rem; font-weight: bold; margin-left: 0.5rem }
+  .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: #555; font-size: 0.8rem }
+</style>
+</head>
+<body>
+<h1>🎨 Mente de Aço</h1>
+<p class="subtitle">Style Guide Visual — DARK STUDIO AAA | Nicho: PSICOLOGIA <span class="badge">v1.0</span></p>
+
+<div class="section">
+  <h2>🎨 Paleta de Cores</h2>
+  <div class="swatches">
+        <div class="swatch">
+          <div class="swatch-color" style="background:#9B59B6;color:#FFF">
+            #9B59B6
+          </div>
+          <div class="swatch-name">primaria</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#E8DAEF;color:#000">
+            #E8DAEF
+          </div>
+          <div class="swatch-name">secundaria</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#1A0533;color:#FFF">
+            #1A0533
+          </div>
+          <div class="swatch-name">fundo</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#FFFFFF;color:#000">
+            #FFFFFF
+          </div>
+          <div class="swatch-name">texto</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#D4ACFB;color:#000">
+            #D4ACFB
+          </div>
+          <div class="swatch-name">acento</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#E74C3C;color:#FFF">
+            #E74C3C
+          </div>
+          <div class="swatch-name">aviso</div>
+        </div></div>
+</div>
+
+<div class="section">
+  <h2>📐 Especificações Cinematográficas</h2>
+  <div class="specs-grid">
+    <div class="spec-card"><div class="spec-label">Aspect Ratio</div><div class="spec-value">16:9</div></div>
+    <div class="spec-card"><div class="spec-label">Letterbox</div><div class="spec-value">Não</div></div>
+    <div class="spec-card"><div class="spec-label">Vinheta</div><div class="spec-value">60%</div></div>
+    <div class="spec-card"><div class="spec-label">Grain Cinematográfico</div><div class="spec-value">3%</div></div>
+    <div class="spec-card"><div class="spec-label">Temperatura de Cor</div><div class="spec-value">fria-neutra (5500K)</div></div>
+    <div class="spec-card"><div class="spec-label">Contraste</div><div class="spec-value">Alto</div></div>
+    <div class="spec-card"><div class="spec-label">Saturação</div><div class="spec-value">Levemente Reduzida</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>✍️ Tipografia</h2>
+  <div class="specs-grid">
+    <div class="spec-card"><div class="spec-label">Título</div><div class="spec-value">Arial Black / Bold</div></div>
+    <div class="spec-card"><div class="spec-label">Corpo / Legenda</div><div class="spec-value">Arial / Regular</div></div>
+    <div class="spec-card"><div class="spec-label">Tamanho Título</div><div class="spec-value">80px</div></div>
+    <div class="spec-card"><div class="spec-label">Tamanho Legenda</div><div class="spec-value">52px</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>🎬 Cenários Aprovados</h2>
+  
+        <div class="cenario-card">
+          <h4>Interior introspectivo</h4>
+          <p>Ambiente escuro com iluminação lateral suave, tons roxos e azulados, profundidade de campo rasa</p>
+          <ul><li>névoa suave</li><li>luz direcional única</li><li>fundo desfocado</li></ul>
+        </div>
+</div>
+
+<div class="section">
+  <h2>🤖 Prompt de Consistência (IA Generativa)</h2>
+  <div class="prompt-box">cinematic dark psychology channel, moody purple tones, #9B59B6 accent, deep shadows, introspective atmosphere, professional photography style, 8K resolution, film grain, vignette, no presenter, faceless channel</div>
+</div>
+
+<div class="section">
+  <h2>🚫 Elementos Proibidos</h2>
+  <ul class="proibido-list"><li>🚫 logos de marcas reais</li><li>🚫 rostos identificáveis sem autorização</li><li>🚫 imagens documentais apresentadas como reais</li></ul>
+</div>
+
+<div class="footer">
+  Gerado por DARK VISUAL CONSISTENCY — DARK STUDIO AAA v1.4.0<br>
+  ai_generated: true | ai_disclosure: "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"<br>
+  2026-11-03 00:48
+</div>
+</body>
+</html>

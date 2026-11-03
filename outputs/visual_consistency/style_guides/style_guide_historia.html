@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Style Guide — Bastidores do Tempo</title>
+<style>
+  :root {
+    --bg: #111;
+    --card: #1a1a1a;
+    --border: #333;
+    --text: #eee;
+    --accent: #D4A017;
+    --fundo-canal: #1C0A00;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0 }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 2rem }
+  h1 { color: var(--accent); font-size: 2rem; margin-bottom: 0.3rem }
+  h2 { color: var(--accent); font-size: 1.2rem; margin: 2rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem }
+  h3 { color: #aaa; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem }
+  .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 2rem }
+  .section { margin-bottom: 2rem }
+  .swatches { display: flex; flex-wrap: wrap; gap: 1rem }
+  .swatch { width: 120px }
+  .swatch-color { height: 80px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-family: monospace; font-weight: bold }
+  .swatch-name { text-align: center; margin-top: 0.4rem; font-size: 0.8rem; color: #aaa; text-transform: capitalize }
+  .specs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem }
+  .spec-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem }
+  .spec-label { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 1px }
+  .spec-value { font-size: 1rem; color: var(--text); margin-top: 0.25rem; font-weight: 600 }
+  .prompt-box { background: var(--fundo-canal); border: 1px solid var(--accent); border-radius: 8px; padding: 1.2rem; font-family: monospace; font-size: 0.85rem; color: #FAF0E6; line-height: 1.6 }
+  .cenario-card { background: var(--card); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1rem; margin-bottom: 1rem }
+  .cenario-card h4 { color: var(--accent); margin-bottom: 0.4rem }
+  .cenario-card p { color: #aaa; font-size: 0.9rem; margin-bottom: 0.5rem }
+  .cenario-card ul { color: #888; font-size: 0.85rem; padding-left: 1.2rem }
+  .proibido-list { list-style: none; padding: 0 }
+  .proibido-list li { padding: 0.4rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem }
+  .badge { display: inline-block; background: var(--accent); color: var(--fundo-canal); border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.75rem; font-weight: bold; margin-left: 0.5rem }
+  .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: #555; font-size: 0.8rem }
+</style>
+</head>
+<body>
+<h1>🎨 Bastidores do Tempo</h1>
+<p class="subtitle">Style Guide Visual — DARK STUDIO AAA | Nicho: HISTORIA <span class="badge">v1.0</span></p>
+
+<div class="section">
+  <h2>🎨 Paleta de Cores</h2>
+  <div class="swatches">
+        <div class="swatch">
+          <div class="swatch-color" style="background:#D4A017;color:#000">
+            #D4A017
+          </div>
+          <div class="swatch-name">primaria</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#FAF0E6;color:#000">
+            #FAF0E6
+          </div>
+          <div class="swatch-name">secundaria</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#1C0A00;color:#FFF">
+            #1C0A00
+          </div>
+          <div class="swatch-name">fundo</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#FAF0E6;color:#000">
+            #FAF0E6
+          </div>
+          <div class="swatch-name">texto</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#F0C040;color:#000">
+            #F0C040
+          </div>
+          <div class="swatch-name">acento</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#8B0000;color:#FFF">
+            #8B0000
+          </div>
+          <div class="swatch-name">aviso</div>
+        </div></div>
+</div>
+
+<div class="section">
+  <h2>📐 Especificações Cinematográficas</h2>
+  <div class="specs-grid">
+    <div class="spec-card"><div class="spec-label">Aspect Ratio</div><div class="spec-value">2.39:1</div></div>
+    <div class="spec-card"><div class="spec-label">Letterbox</div><div class="spec-value">Sim (2.39:1)</div></div>
+    <div class="spec-card"><div class="spec-label">Vinheta</div><div class="spec-value">70%</div></div>
+    <div class="spec-card"><div class="spec-label">Grain Cinematográfico</div><div class="spec-value">5%</div></div>
+    <div class="spec-card"><div class="spec-label">Temperatura de Cor</div><div class="spec-value">quente-sépia (3200K)</div></div>
+    <div class="spec-card"><div class="spec-label">Contraste</div><div class="spec-value">Muito Alto</div></div>
+    <div class="spec-card"><div class="spec-label">Saturação</div><div class="spec-value">Reduzida, Tons Âmbar</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>✍️ Tipografia</h2>
+  <div class="specs-grid">
+    <div class="spec-card"><div class="spec-label">Título</div><div class="spec-value">Cinzel / Bold</div></div>
+    <div class="spec-card"><div class="spec-label">Corpo / Legenda</div><div class="spec-value">Lora / Regular</div></div>
+    <div class="spec-card"><div class="spec-label">Tamanho Título</div><div class="spec-value">72px</div></div>
+    <div class="spec-card"><div class="spec-label">Tamanho Legenda</div><div class="spec-value">48px</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>🎬 Cenários Aprovados</h2>
+  
+        <div class="cenario-card">
+          <h4>Arquivo histórico</h4>
+          <p>Documentos antigos, mapas, luz de vela ou lamparina, tons sépia e âmbar</p>
+          <ul><li>papel envelhecido</li><li>tinta antiga</li><li>luz quente direcionada</li></ul>
+        </div>
+</div>
+
+<div class="section">
+  <h2>🤖 Prompt de Consistência (IA Generativa)</h2>
+  <div class="prompt-box">cinematic historical documentary channel, warm sepia tones, #D4A017 gold accent, aged parchment texture, dramatic chiaroscuro lighting, letterbox 2.39:1, film grain, vintage photography style, no presenter, faceless channel</div>
+</div>
+
+<div class="section">
+  <h2>🚫 Elementos Proibidos</h2>
+  <ul class="proibido-list"><li>🚫 anacronismos visuais</li><li>🚫 elementos modernos em cenas históricas</li><li>🚫 imagens históricas reais não licenciadas</li></ul>
+</div>
+
+<div class="footer">
+  Gerado por DARK VISUAL CONSISTENCY — DARK STUDIO AAA v1.4.0<br>
+  ai_generated: true | ai_disclosure: "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"<br>
+  2026-11-03 00:48
+</div>
+</body>
+</html>
