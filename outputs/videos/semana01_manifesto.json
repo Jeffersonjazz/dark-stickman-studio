@@ -1,0 +1,57 @@
+[
+  {
+    "id": "v001",
+    "titulo": "Por Que Você Se Sente Vazio",
+    "arquivo": "/home/claude/dark-stickman-studio/outputs/videos/v001_Por_Que_Você_Se_Sente_Vazio.mp4",
+    "sucesso": true,
+    "qa": {
+      "status": "✅ APROVADO",
+      "duracao": "197s",
+      "tamanho": "6.2MB"
+    }
+  },
+  {
+    "id": "v002",
+    "titulo": "Os Bastidores do Tempo",
+    "arquivo": "/home/claude/dark-stickman-studio/outputs/videos/v002_Os_Bastidores_do_Tempo.mp4",
+    "sucesso": true,
+    "qa": {
+      "status": "✅ APROVADO",
+      "duracao": "157s",
+      "tamanho": "5.2MB"
+    }
+  },
+  {
+    "id": "v003",
+    "titulo": "Intelligentia Nova",
+    "arquivo": "/home/claude/dark-stickman-studio/outputs/videos/v003_Intelligentia_Nova.mp4",
+    "sucesso": true,
+    "qa": {
+      "status": "✅ APROVADO",
+      "duracao": "141s",
+      "tamanho": "4.5MB"
+    }
+  },
+  {
+    "id": "v004",
+    "titulo": "Projeto Secreto",
+    "arquivo": "/home/claude/dark-stickman-studio/outputs/videos/v004_Projeto_Secreto.mp4",
+    "sucesso": true,
+    "qa": {
+      "status": "✅ APROVADO",
+      "duracao": "141s",
+      "tamanho": "4.4MB"
+    }
+  },
+  {
+    "id": "v005",
+    "titulo": "AquaZen — O Poder da Água",
+    "arquivo": "/home/claude/dark-stickman-studio/outputs/videos/v005_AquaZen_—_O_Poder_da_Água.mp4",
+    "sucesso": true,
+    "qa": {
+      "status": "✅ APROVADO",
+      "duracao": "141s",
+      "tamanho": "3.9MB"
+    }
+  }
+]

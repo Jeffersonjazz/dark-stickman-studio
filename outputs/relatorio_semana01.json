@@ -1,0 +1,40 @@
+{
+  "semana": "01_nov_2026",
+  "data_execucao": "2026-11-02T23:36:16.951285",
+  "total_videos": 5,
+  "aprovados": 0,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "videos": [
+    {
+      "id": "v001",
+      "titulo": "Por Que Você Se Sente Vazio Mesmo Tendo Tudo",
+      "canal": "Mente_de_Aco",
+      "status": "audio_falhou"
+    },
+    {
+      "id": "v002",
+      "titulo": "O Político Que Fingiu Sua Própria Morte e Começou Uma Nova Vida",
+      "canal": "Bastidores_do_Tempo",
+      "status": "audio_falhou"
+    },
+    {
+      "id": "v003",
+      "titulo": "A IA Que Pode Prever Sua Morte Com 87% de Precisão",
+      "canal": "Intelligentia_Nova",
+      "status": "audio_falhou"
+    },
+    {
+      "id": "v004",
+      "titulo": "O Arquivo Secreto Que Governos Não Querem Que Você Veja",
+      "canal": "Projeto_Secreto",
+      "status": "audio_falhou"
+    },
+    {
+      "id": "v005",
+      "titulo": "A Floresta Que Respira e Pensa — O Organismo Mais Antigo da Terra",
+      "canal": "AquaZen_Relax",
+      "status": "audio_falhou"
+    }
+  ]
+}
