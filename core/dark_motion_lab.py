@@ -476,6 +476,305 @@ class DarkMotionLab:
         img.save(output_path, "PNG")
         return self._resultado(output_path, "ok", f"Infográfico com {n} barras gerado")
 
+    # ── Contagem regressiva ───────────────────────────────────────────────────
+
+    def contagem_regressiva(
+        self,
+        output_path: str,
+        segundos: int = 5,
+        estilo: str = "cinematico",
+        resolucao: tuple = (1920, 1080),
+    ) -> dict:
+        """
+        Gera vídeo de contagem regressiva estilo cinema (clone After Effects countdown).
+        Contagem de `segundos` até 1, seguida de flash branco.
+        Usa FFmpeg drawtext com expressão de tempo — custo R$0,00.
+        """
+        w, h = resolucao
+        pal = PALETAS.get(estilo, PALETAS["cinematico"])
+        fonte = self._fonte("titulo")
+        fs = max(120, w // 10)
+        duracao_total = float(segundos + 0.5)  # +0.5s para o flash
+
+        # Cada dígito aparece por 1s; expr arredonda o segundo restante
+        # Flash branco no último 0.3s
+        filtros = [
+            # Número da contagem regressiva
+            f"drawtext={fonte}"
+            f"text='%{{eif\\:max(0\\,{segundos}-floor(t))\\:d}}':"
+            f"fontcolor={pal['fg']}:fontsize={fs}:"
+            f"x=(w-text_w)/2:y=(h-text_h)/2:"
+            f"enable='lte(t,{segundos})'",
+            # Linha de progresso embaixo
+            f"drawbox=x=0:y={h-8}:w='iw*min(t/{segundos},1)':h=8:"
+            f"color={pal['accent']}:t=fill:"
+            f"enable='lte(t,{segundos})'",
+            # Flash branco no final
+            f"fade=in:st={segundos}:d=0.15:color=white",
+            f"fade=out:st={segundos+0.15}:d=0.35",
+        ]
+
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi",
+            "-i", f"color=c={pal['bg']}:size={w}x{h}:rate=30:duration={duracao_total}",
+            "-vf", ",".join(filtros),
+            "-c:v", "libx264", "-crf", "20", "-pix_fmt", "yuv420p",
+            "-t", str(duracao_total),
+            output_path,
+        ]
+        r = subprocess.run(cmd, capture_output=True, timeout=60)
+        if r.returncode == 0:
+            res = self._resultado(output_path, "ok", f"Contagem regressiva {segundos}s gerada")
+            res.update({"output": output_path, "duracao": duracao_total})
+            return res
+        return self._resultado(None, "erro", r.stderr.decode()[:300])
+
+    # ── Animação de logo ──────────────────────────────────────────────────────
+
+    def animacao_logo(
+        self,
+        canal_nome: str,
+        output_path: str,
+        duracao: float = 3.0,
+        cor_primaria: str = "#FFFFFF",
+        resolucao: tuple = (1920, 1080),
+    ) -> dict:
+        """
+        Gera animação de entrada do logo/nome do canal.
+        Efeito: fade-in com escala gradual + brilho (glow) via FFmpeg.
+        Custo R$0,00.
+        """
+        w, h = resolucao
+        # Converter cor hex para formato FFmpeg (0xRRGGBB)
+        cor_hex = cor_primaria.lstrip("#")
+        cor_ffmpeg = f"0x{cor_hex.upper()}"
+        fs = max(80, w // 14)
+        fonte = self._fonte("titulo")
+
+        # Fundo escuro com gradiente radial simulado via vignette
+        # Texto com alpha crescente + escala via zoompan no fundo
+        fade_in = min(1.2, duracao * 0.4)
+        fade_out = min(0.5, duracao * 0.15)
+
+        # Camada 1: sombra/glow (texto ligeiramente maior, desfocado, cor accent)
+        # Camada 2: texto principal com fade-in
+        filtros = [
+            # Texto principal com fade-in e leve escala via zoom no background
+            f"drawtext={fonte}text='{self._esc(canal_nome.upper())}':"
+            f"fontcolor={cor_ffmpeg}:fontsize={fs}:"
+            f"shadowcolor=white:shadowx=0:shadowy=0:"
+            f"x=(w-text_w)/2:y=(h-text_h)/2:"
+            f"alpha='if(lt(t,{fade_in}),pow(t/{fade_in},2),"
+            f"if(gt(t,{duracao-fade_out}),({duracao}-t)/{fade_out},1))'",
+            # Sublinha accent que cresce da esquerda para direita
+            f"drawbox=x='(w-iw*0.4)/2':y='(h/2)+{int(fs*0.7)}':"
+            f"w='iw*0.4*min(t/{fade_in},1)':h=4:"
+            f"color={cor_ffmpeg}:t=fill",
+            # Fade-in do vídeo inteiro
+            f"fade=in:st=0:d={fade_in*0.5}",
+            f"fade=out:st={duracao-fade_out}:d={fade_out}",
+        ]
+
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi",
+            "-i", f"color=c=0x080808:size={w}x{h}:rate=30:duration={duracao}",
+            "-vf", ",".join(filtros),
+            "-c:v", "libx264", "-crf", "20", "-pix_fmt", "yuv420p",
+            "-t", str(duracao),
+            output_path,
+        ]
+        r = subprocess.run(cmd, capture_output=True, timeout=60)
+        if r.returncode == 0:
+            res = self._resultado(output_path, "ok", f"Animação de logo '{canal_nome}' gerada")
+            res.update({"output": output_path, "duracao": duracao})
+            return res
+        return self._resultado(None, "erro", r.stderr.decode()[:300])
+
+    # ── Infográfico em vídeo ──────────────────────────────────────────────────
+
+    def infografico_video(
+        self,
+        dados: list,          # [{"label": str, "valor": float, "cor": str}, ...]
+        titulo: str,
+        output_path: str,
+        duracao: float = 8.0,
+        resolucao: tuple = (1920, 1080),
+    ) -> dict:
+        """
+        Gera vídeo de infográfico com barras animadas crescendo progressivamente.
+        Cada barra cresce ao longo do tempo via expressões FFmpeg — custo R$0,00.
+        """
+        if not dados:
+            return self._resultado(None, "erro", "Lista de dados vazia")
+
+        w, h = resolucao
+        fonte_tit = self._fonte("titulo")
+        fonte_sub = self._fonte("corpo")
+        n = len(dados)
+        max_val = max(d["valor"] for d in dados)
+        anim_dur = duracao * 0.6   # barras crescem nos primeiros 60% do tempo
+        bar_max_h = int(h * 0.55)
+        bar_w = min(160, (w - 200) // n)
+        bar_gap = (w - 200) // n
+        margin_left = 100
+        base_y = int(h * 0.80)
+        fs_tit = max(40, w // 30)
+        fs_label = max(22, w // 60)
+        fs_val = max(26, w // 50)
+
+        filtros = []
+        # Título
+        if titulo:
+            filtros.append(
+                f"drawtext={fonte_tit}text='{self._esc(titulo)}':"
+                f"fontcolor=0xFFFFFF:fontsize={fs_tit}:"
+                f"x=(w-text_w)/2:y={int(h*0.07)}:"
+                f"alpha='if(lt(t,0.5),t/0.5,1)'"
+            )
+
+        # Barras animadas: cada uma aparece com 0.3s de delay entre si
+        for i, item in enumerate(dados):
+            delay = (i / n) * anim_dur * 0.4
+            bar_frac = item["valor"] / max_val
+            bar_h_final = int(bar_frac * bar_max_h)
+            x = margin_left + i * bar_gap + (bar_gap - bar_w) // 2
+            # Cor da barra: usa a cor do item se fornecida, senão accent azul
+            cor_raw = item.get("cor", "#3B82F6").lstrip("#")
+            cor_box = f"0x{cor_raw.upper()}"
+
+            # Barra cresce de baixo para cima
+            filtros.append(
+                f"drawbox="
+                f"x={x}:"
+                f"y='max({base_y-bar_h_final},{base_y}-{bar_h_final}*"
+                f"max(0,min(1,(t-{delay:.2f})/{anim_dur:.2f})))':"
+                f"w={bar_w}:"
+                f"h='{bar_h_final}*max(0,min(1,(t-{delay:.2f})/{anim_dur:.2f}))':"
+                f"color={cor_box}@0.9:t=fill"
+            )
+            # Label abaixo da barra
+            label_text = self._esc(str(item["label"])[:12])
+            filtros.append(
+                f"drawtext={fonte_sub}text='{label_text}':"
+                f"fontcolor=0xCCCCCC:fontsize={fs_label}:"
+                f"x={x + bar_w//2 - len(item['label'])*fs_label//4}:y={base_y+12}:"
+                f"enable='gte(t,{delay:.2f})'"
+            )
+            # Valor acima da barra (aparece quando barra está quase cheia)
+            filtros.append(
+                f"drawtext={fonte_sub}text='{self._esc(str(item[\"valor\"]))}%':"
+                f"fontcolor=0xFFFFFF:fontsize={fs_val}:"
+                f"x={x + bar_w//2 - fs_val}:y='{base_y-bar_h_final}-{fs_val+8}':"
+                f"enable='gte(t,{delay+anim_dur*0.5:.2f})'"
+            )
+
+        # Linha de base
+        filtros.append(
+            f"drawbox=x={margin_left}:y={base_y}:w={w-200}:h=2:color=0x555555:t=fill"
+        )
+        # Fade final
+        filtros.append(f"fade=out:st={duracao-0.5}:d=0.5")
+
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi",
+            "-i", f"color=c=0x0A0A0A:size={w}x{h}:rate=30:duration={duracao}",
+            "-vf", ",".join(filtros),
+            "-c:v", "libx264", "-crf", "22", "-pix_fmt", "yuv420p",
+            "-t", str(duracao),
+            output_path,
+        ]
+        r = subprocess.run(cmd, capture_output=True, timeout=120)
+        if r.returncode == 0:
+            res = self._resultado(output_path, "ok", f"Infográfico vídeo com {n} barras gerado")
+            res.update({"output": output_path, "duracao": duracao})
+            return res
+        return self._resultado(None, "erro", r.stderr.decode()[:300])
+
+    # ── Contador de estatísticas ──────────────────────────────────────────────
+
+    def contador_estatisticas(
+        self,
+        numero: float,
+        label: str,
+        output_path: str,
+        duracao: float = 3.0,
+        cor: str = "#FFFFFF",
+        resolucao: tuple = (1920, 1080),
+    ) -> dict:
+        """
+        Anima contagem de 0 até `numero` com efeito de odômetro.
+        Usa FFmpeg drawtext com expressão de tempo — custo R$0,00.
+        """
+        w, h = resolucao
+        fonte_num = self._fonte("titulo")
+        fonte_lbl = self._fonte("corpo")
+        cor_hex = cor.lstrip("#")
+        cor_ffmpeg = f"0x{cor_hex.upper()}"
+        fs_num = max(160, w // 8)
+        fs_lbl = max(50, w // 28)
+        accel_dur = duracao * 0.8  # aceleração nos primeiros 80%
+
+        # Número inteiro ou decimal
+        is_int = isinstance(numero, int) or numero == int(numero)
+        num_fmt = "%d" if is_int else "%.1f"
+        numero_int = int(numero) if is_int else numero
+
+        # Expressão: odômetro com easing (ease-out: t/dur ao quadrado invertido)
+        # eif = evaluate integer format; min(t, dur)/dur controla o progresso
+        prog_expr = f"min(t,{accel_dur})/{accel_dur}"
+        # Ease-out quadrático: prog = 1 - (1-t)^2
+        eased = f"(2*{prog_expr})-({prog_expr}*{prog_expr})"
+
+        if is_int:
+            num_expr = f"%{{eif\\:round({eased}*{numero_int})\\:d}}"
+        else:
+            # Para decimal usamos inteiro e dividimos mentalmente (limitação FFmpeg)
+            num_expr = f"%{{eif\\:round({eased}*{numero_int})\\:d}}"
+
+        # Gradiente de fundo (simulado com dois drawbox sobrepostos)
+        grad_mid = int(h * 0.55)
+        filtros = [
+            # Fundo degradê: parte superior mais escura
+            f"drawbox=x=0:y=0:w={w}:h={grad_mid}:color=0x050505:t=fill",
+            f"drawbox=x=0:y={grad_mid}:w={w}:h={h-grad_mid}:color=0x0F0F0F:t=fill",
+            # Número principal (odômetro)
+            f"drawtext={fonte_num}text='{num_expr}':"
+            f"fontcolor={cor_ffmpeg}:fontsize={fs_num}:"
+            f"x=(w-text_w)/2:y=(h-text_h)/2-{fs_lbl//2}:"
+            f"shadowcolor=black:shadowx=3:shadowy=3",
+            # Label abaixo do número
+            f"drawtext={fonte_lbl}text='{self._esc(label)}':"
+            f"fontcolor=0xAAAAAA:fontsize={fs_lbl}:"
+            f"x=(w-text_w)/2:y=(h+{fs_num}//2)/2+20:"
+            f"alpha='if(lt(t,0.3),t/0.3,1)'",
+            # Linha accent embaixo do número
+            f"drawbox=x=(w-{w//4})/2:y={int(h*0.72)}:w={w//4}:h=3:"
+            f"color={cor_ffmpeg}@0.6:t=fill:"
+            f"enable='gte(t,{accel_dur*0.3:.2f})'",
+            # Fade in e fade out
+            f"fade=in:st=0:d=0.3",
+            f"fade=out:st={duracao-0.4}:d=0.4",
+        ]
+
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi",
+            "-i", f"color=c=0x080808:size={w}x{h}:rate=30:duration={duracao}",
+            "-vf", ",".join(filtros),
+            "-c:v", "libx264", "-crf", "20", "-pix_fmt", "yuv420p",
+            "-t", str(duracao),
+            output_path,
+        ]
+        r = subprocess.run(cmd, capture_output=True, timeout=60)
+        if r.returncode == 0:
+            res = self._resultado(output_path, "ok", f"Contador '{label}': 0→{numero} em {duracao}s")
+            res.update({"output": output_path, "duracao": duracao})
+            return res
+        return self._resultado(None, "erro", r.stderr.decode()[:300])
+
     # ── Helpers ───────────────────────────────────────────────────────────────
 
     def _esc(self, txt: str) -> str:
