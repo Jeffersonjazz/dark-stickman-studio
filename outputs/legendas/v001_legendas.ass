@@ -1,0 +1,22 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+ScaledBorderAndShadow: yes
+YCbCr Matrix: None
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,52,&H00EFDAE8,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,2.5,1.5,2,80,80,60,1
+Style: Titulo,Arial Black,72,&H00B6599B,&H000000FF,&H00000000,&H90000000,-1,0,0,0,100,100,2,0,1,3,2,5,40,40,120,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:08.00,Default,,0,0,0,,{\fad(200,200)}Você já acordou se\Nsentindo vazio por dentro?
+Dialogue: 0,0:00:08.00,0:00:18.00,Default,,0,0,0,,{\fad(200,200)}Essa sensação tem um nome científico.
+Dialogue: 0,0:00:18.00,0:00:35.00,Default,,0,0,0,,{\fad(200,200)}O cérebro interpreta a\Nausência de propósito como dor real.
+Dialogue: 0,0:00:35.00,0:01:00.00,Default,,0,0,0,,{\fad(200,200)}Viktor Frankl chamou\Nisso de vazio existencial.
+Dialogue: 0,0:01:00.00,0:01:30.00,Default,,0,0,0,,{\fad(200,200)}A dopamina cria ciclos de\Nexpectativa que raramente se cumprem.
+Dialogue: 0,0:01:30.00,0:02:10.00,Default,,0,0,0,,{\fad(200,200)}O vazio não é fraqueza — é\Num sinal do sistema nervoso.
+Dialogue: 0,0:02:10.00,0:02:45.00,Default,,0,0,0,,{\fad(200,200)}Reconhecer o padrão é o\Nprimeiro passo para quebrar o ciclo.
+Dialogue: 0,0:02:45.00,0:03:17.00,Default,,0,0,0,,{\fad(200,200)}Inscreva-se para continuar descobrindo.

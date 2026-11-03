@@ -1,0 +1,3 @@
+file '/home/claude/dark-stickman-studio/outputs/motion_assets/v004_abertura.mp4'
+file '/home/claude/dark-stickman-studio/outputs/motion_assets/v004_com_legendas.mp4'
+file '/home/claude/dark-stickman-studio/outputs/motion_assets/v004_encerramento.mp4'
