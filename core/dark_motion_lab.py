@@ -735,8 +735,15 @@ class DarkMotionLab:
             # Para decimal usamos inteiro e dividimos mentalmente (limitação FFmpeg)
             num_expr = f"%{{eif\\:round({eased}*{numero_int})\\:d}}"
 
-        # Gradiente de fundo (simulado com dois drawbox sobrepostos)
+        # Pré-calcular posições (evitar // em f-strings dentro de expressões FFmpeg)
         grad_mid = int(h * 0.55)
+        num_y_offset = fs_lbl // 2
+        lbl_y = int(h * 0.62)
+        accent_x = (w - w // 4) // 2
+        accent_y = int(h * 0.72)
+        accent_w = w // 4
+        label_esc = self._esc(label)
+
         filtros = [
             # Fundo degradê: parte superior mais escura
             f"drawbox=x=0:y=0:w={w}:h={grad_mid}:color=0x050505:t=fill",
@@ -744,15 +751,15 @@ class DarkMotionLab:
             # Número principal (odômetro)
             f"drawtext={fonte_num}text='{num_expr}':"
             f"fontcolor={cor_ffmpeg}:fontsize={fs_num}:"
-            f"x=(w-text_w)/2:y=(h-text_h)/2-{fs_lbl//2}:"
+            f"x=(w-text_w)/2:y=(h-text_h)/2-{num_y_offset}:"
             f"shadowcolor=black:shadowx=3:shadowy=3",
             # Label abaixo do número
-            f"drawtext={fonte_lbl}text='{self._esc(label)}':"
+            f"drawtext={fonte_lbl}text='{label_esc}':"
             f"fontcolor=0xAAAAAA:fontsize={fs_lbl}:"
-            f"x=(w-text_w)/2:y=(h+{fs_num}//2)/2+20:"
+            f"x=(w-text_w)/2:y={lbl_y}:"
             f"alpha='if(lt(t,0.3),t/0.3,1)'",
-            # Linha accent embaixo do número
-            f"drawbox=x=(w-{w//4})/2:y={int(h*0.72)}:w={w//4}:h=3:"
+            # Linha accent
+            f"drawbox=x={accent_x}:y={accent_y}:w={accent_w}:h=3:"
             f"color={cor_ffmpeg}@0.6:t=fill:"
             f"enable='gte(t,{accel_dur*0.3:.2f})'",
             # Fade in e fade out
