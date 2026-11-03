@@ -60,3 +60,4 @@ outputs/video/
 outputs/referencias/
 outputs/catalog.json
 *.mp4
+outputs/tmp_segs/concat_list.txt
