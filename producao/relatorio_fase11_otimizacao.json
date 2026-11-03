@@ -11,7 +11,7 @@
     "cpu_cores": 2,
     "cpu_fisicos": 2,
     "disco_total_gb": 270.6,
-    "disco_livre_gb": 21.9,
+    "disco_livre_gb": 21.6,
     "gpu": "sem GPU detectada",
     "cuda": false,
     "vram_gb": 0,
