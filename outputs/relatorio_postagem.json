@@ -1,0 +1,82 @@
+{
+  "gerado_em": "2026-11-03T03:22:13.916106+00:00",
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "resultados": [
+    {
+      "id": "v001",
+      "status": "pronto_para_upload",
+      "erros": [],
+      "video_final": "/home/claude/dark-stickman-studio/outputs/videos_com_audio/v001_Por_Que_Você_Se_Sente_Vazio_narrado.mp4",
+      "qa": {
+        "ok": true,
+        "erros": [],
+        "info": {
+          "duracao_s": 197.0,
+          "tamanho_mb": 6.5,
+          "bitrate_kbps": 264.0
+        }
+      }
+    },
+    {
+      "id": "v002",
+      "status": "pronto_para_upload",
+      "erros": [],
+      "video_final": "/home/claude/dark-stickman-studio/outputs/videos_com_audio/v002_Os_Bastidores_do_Tempo_narrado.mp4",
+      "qa": {
+        "ok": true,
+        "erros": [],
+        "info": {
+          "duracao_s": 157.0,
+          "tamanho_mb": 5.5,
+          "bitrate_kbps": 279.0
+        }
+      }
+    },
+    {
+      "id": "v003",
+      "status": "pronto_para_upload",
+      "erros": [],
+      "video_final": "/home/claude/dark-stickman-studio/outputs/videos_com_audio/v003_Intelligentia_Nova_narrado.mp4",
+      "qa": {
+        "ok": true,
+        "erros": [],
+        "info": {
+          "duracao_s": 141.0,
+          "tamanho_mb": 4.7,
+          "bitrate_kbps": 267.0
+        }
+      }
+    },
+    {
+      "id": "v004",
+      "status": "pronto_para_upload",
+      "erros": [],
+      "video_final": "/home/claude/dark-stickman-studio/outputs/videos_com_audio/v004_Projeto_Secreto_narrado.mp4",
+      "qa": {
+        "ok": true,
+        "erros": [],
+        "info": {
+          "duracao_s": 141.0,
+          "tamanho_mb": 4.6,
+          "bitrate_kbps": 261.0
+        }
+      }
+    },
+    {
+      "id": "v005",
+      "status": "pronto_para_upload",
+      "erros": [],
+      "video_final": "/home/claude/dark-stickman-studio/outputs/videos_com_audio/v005_AquaZen_—_O_Poder_da_Água_narrado.mp4",
+      "qa": {
+        "ok": true,
+        "erros": [],
+        "info": {
+          "duracao_s": 141.0,
+          "tamanho_mb": 4.1,
+          "bitrate_kbps": 233.0
+        }
+      }
+    }
+  ]
+}
