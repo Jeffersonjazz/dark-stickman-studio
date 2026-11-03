@@ -1,0 +1,136 @@
+{
+  "dark_studio_aaa": {
+    "semana": "01",
+    "ai_generated": true,
+    "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+    "timestamp": "2026-11-03T00:43:02.301395",
+    "agentes": [
+      "MOTION GRAPHICS",
+      "VIDEO EDITOR PRO",
+      "VISUAL CONSISTENCY",
+      "CREATIVE QA"
+    ]
+  },
+  "videos": [
+    {
+      "vid_id": "v001",
+      "titulo": "Por Que Você Se Sente Vazio?",
+      "preset": "psicologia",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+      "timestamp": "2026-11-03T00:33:00.350263",
+      "srt": "/home/claude/dark-stickman-studio/outputs/legendas/v001_legendas.srt",
+      "ass": "/home/claude/dark-stickman-studio/outputs/legendas/v001_legendas.ass",
+      "video_graded": "/home/claude/dark-stickman-studio/outputs/motion_assets/v001_graded.mp4",
+      "video_com_legendas": "/home/claude/dark-stickman-studio/outputs/motion_assets/v001_com_legendas.mp4",
+      "abertura": "/home/claude/dark-stickman-studio/outputs/motion_assets/v001_abertura.mp4",
+      "encerramento": "/home/claude/dark-stickman-studio/outputs/motion_assets/v001_encerramento.mp4",
+      "video_final": "/home/claude/dark-stickman-studio/outputs/videos_finais/v001_final.mp4",
+      "qa": {
+        "ok": true,
+        "duracao_s": 206.0,
+        "tamanho_mb": 4.6,
+        "bitrate_kbps": 187.0,
+        "tem_video": true,
+        "tem_audio": false
+      },
+      "status": "completo"
+    },
+    {
+      "vid_id": "v002",
+      "titulo": "Os Bastidores do Tempo",
+      "preset": "historia",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+      "timestamp": "2026-11-03T00:34:42.955945",
+      "srt": "/home/claude/dark-stickman-studio/outputs/legendas/v002_legendas.srt",
+      "ass": "/home/claude/dark-stickman-studio/outputs/legendas/v002_legendas.ass",
+      "video_graded": "/home/claude/dark-stickman-studio/outputs/motion_assets/v002_graded.mp4",
+      "video_com_legendas": "/home/claude/dark-stickman-studio/outputs/motion_assets/v002_com_legendas.mp4",
+      "abertura": "/home/claude/dark-stickman-studio/outputs/motion_assets/v002_abertura.mp4",
+      "encerramento": "/home/claude/dark-stickman-studio/outputs/motion_assets/v002_encerramento.mp4",
+      "video_final": "/home/claude/dark-stickman-studio/outputs/videos_finais/v002_final.mp4",
+      "qa": {
+        "ok": true,
+        "duracao_s": 166.0,
+        "tamanho_mb": 4.0,
+        "bitrate_kbps": 202.0,
+        "tem_video": true,
+        "tem_audio": false
+      },
+      "status": "completo"
+    },
+    {
+      "vid_id": "v003",
+      "titulo": "Intelligentia Nova",
+      "preset": "tecnologia",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+      "timestamp": "2026-11-03T00:36:08.703591",
+      "srt": "/home/claude/dark-stickman-studio/outputs/legendas/v003_legendas.srt",
+      "ass": "/home/claude/dark-stickman-studio/outputs/legendas/v003_legendas.ass",
+      "video_graded": "/home/claude/dark-stickman-studio/outputs/motion_assets/v003_graded.mp4",
+      "video_com_legendas": "/home/claude/dark-stickman-studio/outputs/motion_assets/v003_com_legendas.mp4",
+      "abertura": "/home/claude/dark-stickman-studio/outputs/motion_assets/v003_abertura.mp4",
+      "encerramento": "/home/claude/dark-stickman-studio/outputs/motion_assets/v003_encerramento.mp4",
+      "video_final": "/home/claude/dark-stickman-studio/outputs/videos_finais/v003_final.mp4",
+      "qa": {
+        "ok": true,
+        "duracao_s": 150.0,
+        "tamanho_mb": 3.38,
+        "bitrate_kbps": 189.0,
+        "tem_video": true,
+        "tem_audio": false
+      },
+      "status": "completo"
+    },
+    {
+      "vid_id": "v004",
+      "titulo": "Projeto Secreto",
+      "preset": "misterio",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+      "timestamp": "2026-11-03T00:38:25.347171",
+      "srt": "/home/claude/dark-stickman-studio/outputs/legendas/v004_legendas.srt",
+      "ass": "/home/claude/dark-stickman-studio/outputs/legendas/v004_legendas.ass",
+      "video_graded": "/home/claude/dark-stickman-studio/outputs/motion_assets/v004_graded.mp4",
+      "video_com_legendas": "/home/claude/dark-stickman-studio/outputs/motion_assets/v004_com_legendas.mp4",
+      "abertura": "/home/claude/dark-stickman-studio/outputs/motion_assets/v004_abertura.mp4",
+      "encerramento": "/home/claude/dark-stickman-studio/outputs/motion_assets/v004_encerramento.mp4",
+      "video_final": "/home/claude/dark-stickman-studio/outputs/videos_finais/v004_final.mp4",
+      "qa": {
+        "ok": true,
+        "duracao_s": 150.0,
+        "tamanho_mb": 3.37,
+        "bitrate_kbps": 188.0,
+        "tem_video": true,
+        "tem_audio": false
+      },
+      "status": "completo"
+    },
+    {
+      "vid_id": "v005",
+      "titulo": "AquaZen",
+      "preset": "natureza",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+      "timestamp": "2026-11-03T00:40:45.059758",
+      "srt": "/home/claude/dark-stickman-studio/outputs/legendas/v005_legendas.srt",
+      "ass": "/home/claude/dark-stickman-studio/outputs/legendas/v005_legendas.ass",
+      "video_graded": "/home/claude/dark-stickman-studio/outputs/motion_assets/v005_graded.mp4",
+      "video_com_legendas": "/home/claude/dark-stickman-studio/outputs/motion_assets/v005_com_legendas.mp4",
+      "abertura": "/home/claude/dark-stickman-studio/outputs/motion_assets/v005_abertura.mp4",
+      "encerramento": "/home/claude/dark-stickman-studio/outputs/motion_assets/v005_encerramento.mp4",
+      "video_final": "/home/claude/dark-stickman-studio/outputs/videos_finais/v005_final.mp4",
+      "qa": {
+        "ok": true,
+        "duracao_s": 150.0,
+        "tamanho_mb": 2.96,
+        "bitrate_kbps": 165.0,
+        "tem_video": true,
+        "tem_audio": false
+      },
+      "status": "completo"
+    }
+  ]
+}
