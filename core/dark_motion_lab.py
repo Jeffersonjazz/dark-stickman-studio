@@ -235,10 +235,16 @@ class DarkMotionLab:
         fs_tit = max(56, w // 18)
         fs_sub = max(28, w // 40)
 
+        # Pré-computar valores do drawbox como inteiros literais
+        # FFmpeg não avalia aritmética Python (ex: "1080*0.1") em parâmetros drawbox
+        box_x = int(w * 0.1)
+        box_y = h // 2 - 4
+        box_w = int(w * 0.8)
+
         # Fundo + linha divisória + título + slogan
         filtros = [
-            # Linha accent
-            f"drawbox=x=w*0.1:y=h/2-4:w=w*0.8:h=4:color={pal['accent']}:t=fill:"
+            # Linha accent com valores pré-computados (FFmpeg aceita inteiros literais)
+            f"drawbox=x={box_x}:y={box_y}:w={box_w}:h=4:color={pal['accent']}:t=fill:"
             f"enable='between(t,1,{duracao})'",
             # Canal nome
             f"drawtext={fonte_tit}text='{self._esc(canal_nome.upper())}':"

@@ -1,0 +1,27 @@
+{
+  "agente": "VIDEO_GENERATOR",
+  "versao": "1.0.0",
+  "descricao": "Geração de vídeos realistas e animações",
+  "entrada": {
+    "prompt": "str — descrição do vídeo",
+    "imagem": "str? — path da imagem (para img2video)",
+    "modelo": "str? — cogvideox|hunyuanvideo|ltx_video|animatediff",
+    "duracao": "int? — segundos (default: 5)",
+    "estilo": "str? — cinematografico|documental|natureza|urbano|historico",
+    "seed": "int? — seed para reprodutibilidade"
+  },
+  "saida": {
+    "status": "OK|erro",
+    "arquivo": "str — path do MP4 gerado",
+    "modelo_usado": "str",
+    "custo": "str — GRATUITO ou valor em USD",
+    "ai_generated": "bool",
+    "ai_disclosure": "str"
+  },
+  "politica_custo": "SEMPRE gratuito por padrão. Modelos pagos exigem aprovação.",
+  "dependencias": [
+    "gradio_client",
+    "huggingface_hub"
+  ],
+  "install": "pip install gradio_client huggingface_hub --break-system-packages"
+}

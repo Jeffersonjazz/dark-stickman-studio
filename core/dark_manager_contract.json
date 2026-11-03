@@ -1,0 +1,52 @@
+{
+  "agente": "DARK_MANAGER",
+  "versao": "1.0.0",
+  "descricao": "Orquestrador central — decide qual agente usar em cada tarefa",
+  "agentes_gerenciados": [
+    "IMAGE_ENGINE",
+    "VIDEO_GENERATOR",
+    "CINEMATIC_DIRECTOR",
+    "VIDEO_EDITOR_PRO",
+    "MOTION_GRAPHICS",
+    "AUDIO_MASTER",
+    "VISUAL_CONSISTENCY",
+    "ASSET_MANAGER",
+    "CREATIVE_QA"
+  ],
+  "metodos": {
+    "pipeline_short": {
+      "entrada": {
+        "titulo": "str",
+        "roteiro": "str — texto completo",
+        "preset": "str — misterio|documentary|natureza|historia|tecnologia|educacao|relaxamento|musical|dark_storytelling",
+        "projeto_id": "str?",
+        "canal": "str?"
+      },
+      "saida": "dict — resultado completo com todos os assets e status por etapa"
+    },
+    "decidir_agente": {
+      "entrada": {
+        "tarefa": "str — descrição em linguagem natural"
+      },
+      "saida": "str — nome do agente responsável"
+    },
+    "status_agentes": {
+      "entrada": {},
+      "saida": "dict — status de todos os 9 agentes"
+    }
+  },
+  "presets": [
+    "documentary",
+    "natureza",
+    "historia",
+    "tecnologia",
+    "misterio",
+    "educacao",
+    "relaxamento",
+    "musical",
+    "dark_storytelling"
+  ],
+  "politica_custo": "Alternativas gratuitas sempre. APIs pagas requerem aprovação.",
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

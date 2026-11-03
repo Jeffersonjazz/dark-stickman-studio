@@ -1,0 +1,88 @@
+{
+  "projeto_id": "teste_fase8",
+  "titulo": "Teste FASE 8",
+  "canal": "DARK MYSTERIES",
+  "nicho": "misterio",
+  "descricao": "",
+  "criado_em": "2026-11-02T21:28:53.590106",
+  "atualizado_em": "2026-11-02T21:28:53.591303",
+  "paleta_aprovada": {
+    "nome": "Mistério e Suspense",
+    "bg": "#080810",
+    "fg": "#C0B8D0",
+    "accent": "#5D6D7E",
+    "accent2": "#7F8C8D",
+    "sombra": "#050510",
+    "temperatura": "muito fria",
+    "saturacao": "muito baixa",
+    "contraste": "muito alto",
+    "color_grade_ffmpeg": "curves=r='0/0 0.25/0.15 1/0.85':g='0/0 0.5/0.42 1/0.8':b='0/0.02 0.5/0.55 1/1',eq=contrast=1.4:saturation=0.5"
+  },
+  "personagens": {
+    "22c5e6a0": {
+      "id": "22c5e6a0",
+      "nome": "Narrador",
+      "descricao_visual": "Voz masculina grave, sem aparência visual",
+      "vestuario": "Sem vestuário (apenas voz)",
+      "imagem_referencia": "",
+      "notas": "",
+      "registrado_em": "2026-11-02T21:28:53.590528",
+      "prompt_consistencia": "character consistency: Narrador, Voz masculina grave, sem aparência visual, wearing Sem vestuário (apenas voz), same appearance throughout all scenes, consistent facial features, consistent body proportions"
+    }
+  },
+  "cenarios": {
+    "46366a70": {
+      "id": "46366a70",
+      "nome": "Floresta Noturna",
+      "descricao_visual": "Floresta densa, árvores altas, neblina, silêncio",
+      "iluminacao": "Luz da lua filtrada entre galhos",
+      "epoca": "",
+      "notas": "",
+      "registrado_em": "2026-11-02T21:28:53.590761",
+      "prompt_consistencia": "location: Floresta Noturna, Floresta densa, árvores altas, neblina, silêncio, lighting: Luz da lua filtrada entre galhos, consistent environment details"
+    }
+  },
+  "objetos": {},
+  "estilos_aprovados": [],
+  "regras_continuidade": [
+    "Manter mesma temperatura de cor entre cenas da mesma sequência",
+    "Não mudar plano abruptamente sem transição ou corte motivado",
+    "Preservar direção do olhar dos personagens (regra dos 180°)",
+    "Color grade consistente dentro do mesmo episódio",
+    "Movimento de câmera coerente com a emoção da cena",
+    "Manter proporções e escala dos objetos entre planos",
+    "Vestuário e aparência dos personagens devem ser idênticos entre cenas",
+    "Iluminação coerente com horário e clima estabelecidos",
+    "Paleta de cores aprovada pela bíblia visual do projeto",
+    "Identificar explicitamente conteúdo gerado por IA quando necessário"
+  ],
+  "cenas_registradas": [
+    {
+      "num_cena": 1,
+      "descricao": "Câmera penetra na floresta lentamente",
+      "personagens": [],
+      "cenario": {
+        "id": "46366a70",
+        "nome": "Floresta Noturna",
+        "descricao_visual": "Floresta densa, árvores altas, neblina, silêncio",
+        "iluminacao": "Luz da lua filtrada entre galhos",
+        "epoca": "",
+        "notas": "",
+        "registrado_em": "2026-11-02T21:28:53.590761",
+        "prompt_consistencia": "location: Floresta Noturna, Floresta densa, árvores altas, neblina, silêncio, lighting: Luz da lua filtrada entre galhos, consistent environment details"
+      },
+      "hora_dia": "meia-noite",
+      "clima": "neblina",
+      "notas": "",
+      "prompt_consistencia": "Câmera penetra na floresta lentamente, location: Floresta Noturna, Floresta densa, árvores altas, neblina, silêncio, lighting: Luz da lua filtrada entre galhos, consistent environment details, time of day: meia-noite, weather: neblina, color palette: Mistério e Suspense, cinematic style: misterio, ai-generated content, not real footage",
+      "registrado_em": "2026-11-02T21:28:53.591298",
+      "alertas_continuidade": []
+    }
+  ],
+  "estilo_fotografico": "documentary",
+  "color_grade_preset": "misterio",
+  "resolucao_padrao": "1080x1920",
+  "fps_padrao": 30,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

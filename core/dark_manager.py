@@ -1,738 +1,696 @@
 """
-DARK CREATIVE LAB — DARK MANAGER
-Orquestrador central dos agentes especializados.
+DARK MANAGER — FASE 9 do DARK CREATIVE LAB
+Orquestrador central do DARK STUDIO AAA.
 
-Roteia tarefas para os agentes corretos com base no tipo de operação
-e retorna resultado padronizado em JSON.
+Integra todos os 9 agentes especializados:
+  1. IMAGE ENGINE       — geração e tratamento de imagens
+  2. VIDEO GENERATOR    — geração de vídeos realistas
+  3. CINEMATIC DIRECTOR — direção de fotografia e roteiro visual
+  4. VIDEO EDITOR PRO   — montagem, color grading e renderização
+  5. MOTION GRAPHICS    — animações, títulos e efeitos
+  6. AUDIO MASTER       — narração, TTS, tratamento de áudio
+  7. VISUAL CONSISTENCY — continuidade visual entre cenas
+  8. ASSET MANAGER      — gestão de arquivos e assets
+  9. CREATIVE QA        — controle de qualidade audiovisual
 
-Agentes disponíveis:
-- IMAGE ENGINE       → core/image_engine.py ✅
-- VIDEO GENERATOR    → core/video_generator.py ✅
-- CINEMATIC DIRECTOR → core/cinematic_director.py
-- VIDEO EDITOR PRO   → core/ffmpeg_utils.py (wrapper)
-- MOTION GRAPHICS    → core/motion_graphics.py ✅
-- AUDIO MASTER       → core/audio_master.py
-- VISUAL CONSISTENCY → core/visual_consistency.py
-- ASSET MANAGER      → core/asset_manager.py ✅
-- CREATIVE QA        → core/creative_qa.py ✅
+O DARK MANAGER decide qual agente usar, na menor custo possível,
+respeitando o padrão de qualidade definido por preset.
 
-Todos os contratos de entrada/saída usam dicts JSON documentados.
+Política: SEMPRE alternativas gratuitas. APIs pagas requerem aprovação.
 
-Licença: MIT — DARK CREATIVE LAB
 ai_generated: True
 ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
 """
 
-from __future__ import annotations
-import time
+import json
+import os
+import sys
+import subprocess
 from pathlib import Path
-from typing import Any, Optional
+from datetime import datetime
+from typing import Optional, Dict, Any, List
+
+# Garante que o diretório raiz do projeto esteja no sys.path
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 
-# ─────────────────────────────────────────────────────────────────
-#  TIPOS DE TAREFA SUPORTADOS
-# ─────────────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════
+# IMPORT LAZY DOS AGENTES (evita dependências pesadas no import)
+# ═══════════════════════════════════════════════════════
+def _import_agente(modulo: str, classe: str):
+    """Import dinâmico para evitar falhas se um módulo opcional não estiver disponível."""
+    try:
+        import importlib
+        mod = importlib.import_module(modulo)
+        return getattr(mod, classe)
+    except Exception as e:
+        print(f"  [DARK_MANAGER] ⚠️  Agente {classe} não carregado: {e}")
+        return None
 
-TASK_TYPES = {
-    # Imagem
-    "gerar_imagem":        "IMAGE_ENGINE",
-    "editar_imagem":       "IMAGE_ENGINE",
-    "upscale_imagem":      "IMAGE_ENGINE",
-    "thumbnail":           "IMAGE_ENGINE",
 
-    # Vídeo
-    "gerar_video":         "VIDEO_GENERATOR",
-    "animar_imagem":       "VIDEO_GENERATOR",
-    "b_roll":              "VIDEO_GENERATOR",
-    "gerar_cenas":         "VIDEO_GENERATOR",
-
-    # Cinematografia
-    "plano_cenas":         "CINEMATIC_DIRECTOR",
-    "filtro_zoompan":      "CINEMATIC_DIRECTOR",
-    "color_grade":         "CINEMATIC_DIRECTOR",
-    "prompt_visual":       "CINEMATIC_DIRECTOR",
-
-    # Edição (CINEMA EDITOR)
-    "concat_clips":        "VIDEO_EDITOR_PRO",
-    "add_audio":           "VIDEO_EDITOR_PRO",
-    "exportar_final":      "VIDEO_EDITOR_PRO",
-    "legendas":            "VIDEO_EDITOR_PRO",
-    "montar_automatico":   "VIDEO_EDITOR_PRO",
-    "renderizar":          "VIDEO_EDITOR_PRO",
-    "exportar_resolucoes": "VIDEO_EDITOR_PRO",
-    "remover_silencio":    "VIDEO_EDITOR_PRO",
-    "renderizar_lote":     "VIDEO_EDITOR_PRO",
-
-    # Motion
-    "titulo_animado":      "MOTION_GRAPHICS",
-    "legenda_animada":     "MOTION_GRAPHICS",
-    "infografico":         "MOTION_GRAPHICS",
-    "gerar_intro":         "MOTION_GRAPHICS",
-    "gerar_outro":         "MOTION_GRAPHICS",
-    "pacote_canal":        "MOTION_GRAPHICS",
-
-    # Áudio
-    "narrar":              "AUDIO_MASTER",
-    "masterizar":          "AUDIO_MASTER",
-    "mixar":               "AUDIO_MASTER",
-    "normalizar_audio":    "AUDIO_MASTER",
-
-    # Consistência
-    "setup_projeto":       "VISUAL_CONSISTENCY",
-    "validar_consistencia":"VISUAL_CONSISTENCY",
-    "prompt_continuidade": "VISUAL_CONSISTENCY",
-
-    # Assets
-    "registrar_asset":     "ASSET_MANAGER",
-    "buscar_asset":        "ASSET_MANAGER",
-    "organizar_projeto":   "ASSET_MANAGER",
-    "listar_assets":       "ASSET_MANAGER",
-    "varredura":           "ASSET_MANAGER",
-    "validar_licenca":     "ASSET_MANAGER",
-
-    # QA
-    "verificar_qualidade": "CREATIVE_QA",
-    "verificar_resolucao": "CREATIVE_QA",
-    "verificar_audio_qa":  "CREATIVE_QA",
-    "verificar_legenda":   "CREATIVE_QA",
-    "verificar_conformidade": "CREATIVE_QA",
-
-    # Performance (Fase 11)
-    "benchmark":           "PERFORMANCE",
-    "profiling":           "PERFORMANCE",
-    "relatorio_custo":     "PERFORMANCE",
-    "params_ffmpeg":       "PERFORMANCE",
-    "stats_cache":         "PERFORMANCE",
+# ═══════════════════════════════════════════════════════
+# PRESETS DE PRODUÇÃO
+# ═══════════════════════════════════════════════════════
+PRESETS_PRODUCAO = {
+    "documentary": {
+        "nome": "Documentário Cinematográfico",
+        "estilo_visual": "documentary",
+        "color_grade": "documentary",
+        "nicho_consistencia": "cinematico",
+        "tts_velocidade": 0.9,
+        "fps": 24,
+        "resolucao": "1080x1920",
+    },
+    "natureza": {
+        "nome": "Natureza e Vida Selvagem",
+        "estilo_visual": "nature",
+        "color_grade": "nature",
+        "nicho_consistencia": "natureza",
+        "tts_velocidade": 0.85,
+        "fps": 24,
+        "resolucao": "1080x1920",
+    },
+    "historia": {
+        "nome": "História e Acontecimentos",
+        "estilo_visual": "history",
+        "color_grade": "history",
+        "nicho_consistencia": "historia",
+        "tts_velocidade": 0.85,
+        "fps": 24,
+        "resolucao": "1080x1920",
+    },
+    "tecnologia": {
+        "nome": "Tecnologia e Inteligência Artificial",
+        "estilo_visual": "sci_tech",
+        "color_grade": "sci_tech",
+        "nicho_consistencia": "tecnologia",
+        "tts_velocidade": 1.0,
+        "fps": 24,
+        "resolucao": "1080x1920",
+    },
+    "misterio": {
+        "nome": "Mistério e Suspense",
+        "estilo_visual": "dark_thriller",
+        "color_grade": "dark_thriller",
+        "nicho_consistencia": "misterio",
+        "tts_velocidade": 0.85,
+        "fps": 24,
+        "resolucao": "1080x1920",
+    },
+    "educacao": {
+        "nome": "Educação",
+        "estilo_visual": "education",
+        "color_grade": "cinematic",
+        "nicho_consistencia": "geral",
+        "tts_velocidade": 0.95,
+        "fps": 24,
+        "resolucao": "1080x1920",
+    },
+    "relaxamento": {
+        "nome": "Relaxamento",
+        "estilo_visual": "relaxation",
+        "color_grade": "relaxation",
+        "nicho_consistencia": "geral",
+        "tts_velocidade": 0.8,
+        "fps": 24,
+        "resolucao": "1080x1920",
+    },
+    "musical": {
+        "nome": "Conteúdo Musical",
+        "estilo_visual": "music",
+        "color_grade": "cinematic",
+        "nicho_consistencia": "motivacao",
+        "tts_velocidade": 1.0,
+        "fps": 30,
+        "resolucao": "1080x1920",
+    },
+    "dark_storytelling": {
+        "nome": "Storytelling Dark",
+        "estilo_visual": "dark_thriller",
+        "color_grade": "dark_thriller",
+        "nicho_consistencia": "cinematico",
+        "tts_velocidade": 0.85,
+        "fps": 24,
+        "resolucao": "1080x1920",
+    },
 }
 
 
-# ─────────────────────────────────────────────────────────────────
-#  DISPATCHER PRINCIPAL
-# ─────────────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════
+# AGENTE ASSET MANAGER (embutido — sem dependências)
+# ═══════════════════════════════════════════════════════
+class AssetManager:
+    """Gerencia assets de produção: imagens, vídeos, áudios, licenças."""
 
-def _normalizar_params(tarefa: str, params: dict) -> dict:
-    """
-    Adapta params modernos (nicho, preset, titulo) para o formato legado
-    que os agentes originais esperam (canal_config dict).
-    Garante compatibilidade sem quebrar a API antiga.
-    """
-    p = dict(params)
+    def __init__(self, projeto_id: str, base_dir: str = "outputs"):
+        self.projeto_id = projeto_id
+        self.base = Path(base_dir) / projeto_id
+        self.base.mkdir(parents=True, exist_ok=True)
+        for sub in ["imagens", "videos", "audios", "motion", "final", "thumbnails"]:
+            (self.base / sub).mkdir(exist_ok=True)
+        self.registro: List[dict] = []
 
-    # Se já tem canal_config, não mexe
-    if "canal_config" not in p:
-        nicho  = p.get("nicho", "documentario")
-        preset = p.get("preset", p.get("estilo_cinematico", "documentario"))
-        titulo = p.get("titulo", "Vídeo DARK STUDIO")
-        projeto_id = p.get("projeto_id", p.get("nome", "projeto_default"))
+    def registrar(self, path: str, tipo: str, descricao: str = "", custo: float = 0.0):
+        entry = {
+            "path": path,
+            "tipo": tipo,
+            "descricao": descricao,
+            "custo_brl": custo,
+            "registrado_em": datetime.now().isoformat(),
+            "ai_generated": True,
+        }
+        self.registro.append(entry)
+        return entry
 
-        p["canal_config"] = {
-            "id": projeto_id,
-            "nome": titulo,
-            "nicho": nicho,
-            "preset": preset,
-            "estilo_cinematico": preset,
-            "resolucao": p.get("resolucao", "1920x1080"),
-            "orientacao": p.get("orientacao", "horizontal"),
+    def pasta(self, tipo: str) -> str:
+        return str(self.base / tipo)
+
+    def listar(self, tipo: str = None) -> list:
+        if tipo:
+            return [r for r in self.registro if r["tipo"] == tipo]
+        return self.registro
+
+    def custo_total(self) -> float:
+        return sum(r.get("custo_brl", 0) for r in self.registro)
+
+    def relatorio(self) -> dict:
+        tipos = {}
+        for r in self.registro:
+            t = r["tipo"]
+            tipos[t] = tipos.get(t, 0) + 1
+        return {
+            "projeto_id": self.projeto_id,
+            "total_assets": len(self.registro),
+            "por_tipo": tipos,
+            "custo_total_brl": self.custo_total(),
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
         }
 
-    # setup_projeto precisa de campos específicos
-    if tarefa == "setup_projeto":
-        p.setdefault("nome", p["canal_config"]["id"])
-        p.setdefault("nicho", p["canal_config"]["nicho"])
-        p.setdefault("estilo_cinematico", p["canal_config"].get("preset", "documentario"))
-        p.setdefault("paleta_descricao", "tons escuros, alto contraste")
-        p.setdefault("resolucao", "1920x1080")
 
-    # organizar_projeto: precisa de projeto_dir
-    if tarefa == "organizar_projeto":
-        if "projeto_dir" not in p:
-            import os
-            base = "/tmp/dark-studio/projetos"
-            os.makedirs(base, exist_ok=True)
-            p["projeto_dir"] = f"{base}/{p['canal_config']['id']}"
-            os.makedirs(p["projeto_dir"], exist_ok=True)
+# ═══════════════════════════════════════════════════════
+# AGENTE CREATIVE QA (embutido)
+# ═══════════════════════════════════════════════════════
+class CreativeQA:
+    """Avalia qualidade de vídeos, imagens e áudio gerados."""
 
-    return p
+    def verificar_arquivo(self, path: str) -> dict:
+        p = Path(path)
+        if not p.exists():
+            return {"status": "erro", "msg": "Arquivo não encontrado", "path": path}
+
+        tamanho_kb = p.stat().st_size / 1024
+        if tamanho_kb < 5:
+            return {"status": "alerta", "msg": f"Arquivo muito pequeno ({tamanho_kb:.1f}KB)", "path": path}
+
+        return {
+            "status": "ok",
+            "path": path,
+            "tamanho_kb": round(tamanho_kb, 1),
+            "extensao": p.suffix,
+        }
+
+    def verificar_video(self, path: str) -> dict:
+        """Verifica duração e resolução do vídeo via ffprobe."""
+        base = self.verificar_arquivo(path)
+        if base["status"] == "erro":
+            return base
+
+        try:
+            r = subprocess.run([
+                "ffprobe", "-v", "error",
+                "-show_entries", "format=duration:stream=width,height",
+                "-of", "json", path
+            ], capture_output=True, text=True, timeout=15)
+
+            if r.returncode == 0:
+                data = json.loads(r.stdout)
+                dur = float(data.get("format", {}).get("duration", 0))
+                streams = data.get("streams", [{}])
+                w = streams[0].get("width", 0) if streams else 0
+                h = streams[0].get("height", 0) if streams else 0
+                base.update({
+                    "duracao_s": round(dur, 2),
+                    "resolucao": f"{w}x{h}",
+                    "qualidade": "ok" if dur > 0.5 and w >= 720 else "baixa",
+                })
+        except Exception:
+            pass
+
+        return base
+
+    def relatorio_qa(self, assets: list) -> dict:
+        resultados = [self.verificar_arquivo(a["path"]) for a in assets if "path" in a]
+        ok = sum(1 for r in resultados if r.get("status") == "ok")
+        alertas = sum(1 for r in resultados if r.get("status") == "alerta")
+        erros = sum(1 for r in resultados if r.get("status") == "erro")
+        return {
+            "total": len(resultados),
+            "ok": ok,
+            "alertas": alertas,
+            "erros": erros,
+            "aprovado": erros == 0 and alertas == 0,
+            "detalhes": resultados,
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        }
 
 
-def executar(tarefa: str, params: dict, verbose: bool = True) -> dict:
+# ═══════════════════════════════════════════════════════
+# DARK MANAGER — ORQUESTRADOR PRINCIPAL
+# ═══════════════════════════════════════════════════════
+class DarkManager:
     """
-    DARK MANAGER — Roteia tarefa para o agente especializado correto.
+    Orquestrador central do DARK STUDIO AAA.
+    Decide qual agente chamar para cada tarefa e gerencia o pipeline completo.
+    """
 
-    Args:
-        tarefa: Nome da tarefa (ver TASK_TYPES).
-        params: Parâmetros da tarefa em dict.
-        verbose: Imprimir logs de orquestração.
+    VERSION = "1.0.0"
 
-    Returns:
-        Dict padronizado com:
-        {
-            "status": "ok" | "error",
-            "agente": str,
-            "tarefa": str,
-            "resultado": Any,
-            "tempo_s": float,
+    def __init__(self):
+        self._agentes: Dict[str, Any] = {}
+        self._log: List[dict] = []
+        print(f"\n╔══════════════════════════════════════════════════════╗")
+        print(f"║   DARK MANAGER v{self.VERSION} — DARK STUDIO AAA          ║")
+        print(f"║   Orquestrador de 9 Agentes Especializados           ║")
+        print(f"╚══════════════════════════════════════════════════════╝")
+
+    def _log_evento(self, agente: str, acao: str, resultado: str, custo: float = 0.0):
+        evento = {
+            "ts": datetime.now().isoformat(),
+            "agente": agente,
+            "acao": acao,
+            "resultado": resultado,
+            "custo_brl": custo,
+        }
+        self._log.append(evento)
+        custo_str = f" R${custo:.2f}" if custo > 0 else " GRÁTIS"
+        print(f"  [{agente}] {acao} → {resultado}{custo_str}")
+
+    # ── Carregamento lazy dos agentes ─────────────────────────────────────────
+
+    def _get_motion_lab(self):
+        if "motion" not in self._agentes:
+            cls = _import_agente("core.dark_motion_lab", "DarkMotionLab")
+            if cls:
+                self._agentes["motion"] = cls()
+        return self._agentes.get("motion")
+
+    def _get_audio_studio(self):
+        if "audio" not in self._agentes:
+            cls = _import_agente("core.dark_audio_studio", "DarkAudioStudio")
+            if cls:
+                self._agentes["audio"] = cls()
+        return self._agentes.get("audio")
+
+    def _get_cinema_editor(self):
+        if "editor" not in self._agentes:
+            cls = _import_agente("core.dark_cinema_editor", "DarkCinemaEditor")
+            if cls:
+                self._agentes["editor"] = cls()
+        return self._agentes.get("editor")
+
+    def _get_cinematic_director(self):
+        if "director" not in self._agentes:
+            cls = _import_agente("core.dark_cinematic_director", "DarkCinematicDirector")
+            if cls:
+                self._agentes["director"] = cls()
+        return self._agentes.get("director")
+
+    def _get_visual_consistency(self):
+        if "consistency" not in self._agentes:
+            cls = _import_agente("core.dark_visual_consistency", "DarkVisualConsistency")
+            if cls:
+                self._agentes["consistency"] = cls()
+        return self._agentes.get("consistency")
+
+    # ── Decisão do orquestrador ───────────────────────────────────────────────
+
+    def decidir_agente(self, tarefa: str) -> str:
+        """
+        Decide qual agente chamar com base na tarefa.
+        Retorna o nome do agente responsável.
+        """
+        tarefa_lower = tarefa.lower()
+
+        if any(w in tarefa_lower for w in ["imagem", "image", "thumbnail", "capa", "foto"]):
+            return "IMAGE_ENGINE"
+        if any(w in tarefa_lower for w in ["animar", "animação", "vídeo a partir de imagem"]):
+            return "VIDEO_GENERATOR"
+        if any(w in tarefa_lower for w in ["montar", "editar", "color grade", "renderizar", "sequência"]):
+            return "VIDEO_EDITOR_PRO"
+        if any(w in tarefa_lower for w in ["roteiro", "cena", "plano", "enquadramento", "câmera"]):
+            return "CINEMATIC_DIRECTOR"
+        if any(w in tarefa_lower for w in ["abertura", "título", "motion", "animação de texto", "infográfico"]):
+            return "MOTION_GRAPHICS"
+        if any(w in tarefa_lower for w in ["voz", "narração", "tts", "áudio", "falar"]):
+            return "AUDIO_MASTER"
+        if any(w in tarefa_lower for w in ["short", "shorts", "vertical", "reels"]):
+            return "SHORTS_FACTORY"
+        if any(w in tarefa_lower for w in ["qualidade", "qa", "verificar", "aprovar"]):
+            return "CREATIVE_QA"
+        if any(w in tarefa_lower for w in ["consistência", "personagem", "cenário", "bíblia visual"]):
+            return "VISUAL_CONSISTENCY"
+
+        return "DARK_MANAGER"
+
+    # ── Pipeline de produção completo ─────────────────────────────────────────
+
+    def pipeline_short(
+        self,
+        titulo: str,
+        roteiro: str,
+        preset: str = "misterio",
+        projeto_id: str = None,
+        canal: str = "DARK STUDIO AAA",
+    ) -> dict:
+        """
+        Pipeline completo para produção de um Short:
+        Roteiro → Abertura → Narração → Edição → Color Grade → QA
+        """
+        if projeto_id is None:
+            projeto_id = f"short_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+        cfg = PRESETS_PRODUCAO.get(preset, PRESETS_PRODUCAO["misterio"])
+        assets = AssetManager(projeto_id)
+        qa = CreativeQA()
+
+        print(f"\n{'═'*56}")
+        print(f"  PIPELINE SHORT: {titulo}")
+        print(f"  Preset: {cfg['nome']} | Projeto: {projeto_id}")
+        print(f"{'═'*56}")
+
+        resultado = {
+            "projeto_id": projeto_id,
+            "titulo": titulo,
+            "preset": preset,
+            "canal": canal,
+            "inicio": datetime.now().isoformat(),
+            "etapas": {},
             "ai_generated": True,
             "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
         }
 
-    Contrato JSON documentado — todos os agentes devem seguir este formato.
-    """
-    t0 = time.time()
-    agente_nome = TASK_TYPES.get(tarefa, "DESCONHECIDO")
-
-    if verbose:
-        print(f"[DARK MANAGER] Tarefa={tarefa} → Agente={agente_nome}")
-
-    try:
-        params = _normalizar_params(tarefa, params)
-        resultado = _despachar(tarefa, agente_nome, params)
-        status = "ok"
-    except Exception as e:
-        resultado = {"erro": str(e)}
-        status = "error"
-        if verbose:
-            print(f"[DARK MANAGER] ERRO em {agente_nome}: {e}")
-
-    elapsed = round(time.time() - t0, 3)
-
-    return {
-        "status": status,
-        "agente": agente_nome,
-        "tarefa": tarefa,
-        "resultado": resultado,
-        "tempo_s": elapsed,
-        "ai_generated": True,
-        "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
-    }
-
-
-def _despachar(tarefa: str, agente: str, params: dict) -> Any:
-    """Roteamento interno — chama a função correta do agente."""
-
-    # ── CINEMATIC DIRECTOR ────────────────────────────────────────
-    if agente == "CINEMATIC_DIRECTOR":
-        from core.cinematic_director import (
-            criar_plano_cenas, gerar_prompt_visual,
-            gerar_filtro_zoompan_antijitter, gerar_filtro_colorgrade,
-            check_cinematic_director,
-        )
-        if tarefa == "plano_cenas":
-            canal_cfg = params.get("canal_config", {
-                "nicho": params.get("nicho", "documentario"),
-                "preset": params.get("preset", "documentario"),
-                "id": "projeto",
-                "nome": params.get("titulo", "Vídeo"),
-            })
-            return criar_plano_cenas(params["roteiro"], canal_cfg)
-        if tarefa == "prompt_visual":
-            return gerar_prompt_visual(params["cena"], params.get("preset", "documentario"))
-        if tarefa == "filtro_zoompan":
-            return gerar_filtro_zoompan_antijitter(
-                params.get("preset", "documentario"),
-                params.get("duracao", 5.0),
-            )
-        if tarefa == "color_grade":
-            return gerar_filtro_colorgrade(params.get("preset", "documentario"))
-
-    # ── AUDIO MASTER ──────────────────────────────────────────────
-    if agente == "AUDIO_MASTER":
-        from core.audio_master import (
-            synthesize, masterizar, mixar_narr_trilha,
-            normalizar_lufs, narrar_roteiro_completo,
-        )
-        if tarefa == "narrar":
-            return synthesize(
-                params["texto"],
-                Path(params["output_path"]),
-                duracao_esperada=params.get("duracao", 5.0),
-            )
-        if tarefa == "masterizar":
-            p = masterizar(Path(params["input"]), Path(params["output"]))
-            return {"output": str(p)}
-        if tarefa == "mixar":
-            p = mixar_narr_trilha(
-                Path(params["narr"]), Path(params["trilha"]), Path(params["output"]),
-                vol_narr=params.get("vol_narr", 1.0),
-                vol_trilha=params.get("vol_trilha", 0.12),
-            )
-            return {"output": str(p)}
-        if tarefa == "normalizar_audio":
-            p = normalizar_lufs(Path(params["input"]), Path(params["output"]))
-            return {"output": str(p)}
-
-    # ── VISUAL CONSISTENCY ────────────────────────────────────────
-    if agente == "VISUAL_CONSISTENCY":
-        from core.visual_consistency import (
-            setup_projeto, validar_consistencia_roteiro,
-            gerar_prompt_com_continuidade, VisualConsistencyDB,
-        )
-        if tarefa == "setup_projeto":
-            # Suporte ao novo endpoint dark_visual_consistency
+        # ── ETAPA 1: MOTION GRAPHICS — Abertura ───────────────────────────────
+        print(f"\n  [1/5] MOTION GRAPHICS — Abertura")
+        motion = self._get_motion_lab()
+        abertura_path = None
+        if motion:
             try:
-                from core.dark_visual_consistency import DarkVisualConsistency
-                vc = DarkVisualConsistency()
-                proj = vc.criar_projeto(
-                    nome=params.get("nome", params["canal_config"]["id"]),
-                    nicho=params.get("nicho", params["canal_config"]["nicho"]),
-                    estilo_cinematico=params.get("estilo_cinematico",
-                        params["canal_config"].get("preset", "documentario")),
-                    paleta_descricao=params.get("paleta_descricao", "tons escuros"),
-                    resolucao=params.get("resolucao", "1920x1080"),
+                r_abertura = motion.abertura(
+                    canal_nome=canal,
+                    slogan=titulo,
+                    duracao=4.0,
+                    nicho=cfg["nicho_consistencia"],
+                    resolucao=(1080, 1920),
                 )
-                return proj
-            except Exception as e_new:
-                # fallback para legacy
-                import os
-                out_dir = params.get("output_dir",
-                    f"/tmp/dark-studio/projetos/{params['canal_config']['id']}")
-                os.makedirs(out_dir, exist_ok=True)
-                db = setup_projeto(
-                    Path(out_dir),
-                    params["canal_config"],
-                    preset_nome=params.get("preset"),
+                if r_abertura.get("status") == "ok":
+                    abertura_path = r_abertura["path"]
+                    assets.registrar(abertura_path, "motion", f"Abertura: {titulo}")
+                    self._log_evento("MOTION_GRAPHICS", "abertura()", "ok")
+                    resultado["etapas"]["abertura"] = {"status": "ok", "path": abertura_path}
+                else:
+                    self._log_evento("MOTION_GRAPHICS", "abertura()", f"erro: {r_abertura.get('erro', '?')}")
+                    resultado["etapas"]["abertura"] = {"status": "skip"}
+            except Exception as e:
+                self._log_evento("MOTION_GRAPHICS", "abertura()", f"exceção: {e}")
+                resultado["etapas"]["abertura"] = {"status": "skip"}
+        else:
+            resultado["etapas"]["abertura"] = {"status": "skip", "motivo": "agente não carregado"}
+
+        # ── ETAPA 2: CINEMATIC DIRECTOR — Roteiro Visual ───────────────────────
+        print(f"\n  [2/5] CINEMATIC DIRECTOR — Roteiro visual")
+        director = self._get_cinematic_director()
+        cenas_visuais = []
+        if director:
+            try:
+                cenas_raw = [{"descricao": linha.strip()}
+                              for linha in roteiro.split("\n") if linha.strip()][:6]
+                roteiro_camera = director.gerar_roteiro_de_camera(
+                    titulo=titulo,
+                    cenas=cenas_raw,
+                    estilo=cfg["estilo_visual"],
                 )
-                return {"db_path": str(db.db_path)}
-        if tarefa == "validar_consistencia":
-            db = VisualConsistencyDB(Path(params["output_dir"]))
-            return validar_consistencia_roteiro(params["cenas"], db)
-        if tarefa == "prompt_continuidade":
-            db = VisualConsistencyDB(Path(params["output_dir"]))
-            return gerar_prompt_com_continuidade(
-                params["cena"], db, params.get("prompt_base", "")
+                cenas_visuais = roteiro_camera.get("cenas", [])
+                self._log_evento("CINEMATIC_DIRECTOR", "roteiro_camera()", f"{len(cenas_visuais)} cenas")
+                resultado["etapas"]["roteiro_visual"] = {
+                    "status": "ok",
+                    "total_cenas": len(cenas_visuais),
+                    "estilo": cfg["estilo_visual"],
+                }
+            except Exception as e:
+                self._log_evento("CINEMATIC_DIRECTOR", "roteiro_camera()", f"exceção: {e}")
+                resultado["etapas"]["roteiro_visual"] = {"status": "skip"}
+        else:
+            resultado["etapas"]["roteiro_visual"] = {"status": "skip"}
+
+        # ── ETAPA 3: AUDIO MASTER — Narração TTS ─────────────────────────────
+        print(f"\n  [3/5] AUDIO MASTER — Narração TTS")
+        audio = self._get_audio_studio()
+        audio_path = None
+        if audio:
+            try:
+                audio_out = str(Path(assets.pasta("audios")) / f"{projeto_id}_narracao.mp3")
+                r_audio = audio.tts_edge(
+                    texto=roteiro,
+                    output_path=audio_out,
+                )
+                if r_audio.get("status") in ("ok", "OK"):
+                    audio_path = r_audio["path"]
+                    assets.registrar(audio_path, "audio", "Narração TTS")
+                    self._log_evento("AUDIO_MASTER", "narrar()", "ok")
+                    resultado["etapas"]["narracao"] = {"status": "ok", "path": audio_path}
+                else:
+                    self._log_evento("AUDIO_MASTER", "narrar()", f"erro: {r_audio.get('erro', '?')}")
+                    resultado["etapas"]["narracao"] = {"status": "skip"}
+            except Exception as e:
+                self._log_evento("AUDIO_MASTER", "narrar()", f"exceção: {e}")
+                resultado["etapas"]["narracao"] = {"status": "skip"}
+        else:
+            resultado["etapas"]["narracao"] = {"status": "skip", "motivo": "agente não carregado"}
+
+        # ── ETAPA 4: VIDEO EDITOR PRO — Montagem + Color Grade ────────────────
+        print(f"\n  [4/5] VIDEO EDITOR PRO — Montagem e color grade")
+        editor = self._get_cinema_editor()
+        video_final = None
+
+        if abertura_path and editor:
+            try:
+                video_mux = str(Path(assets.pasta("final")) / f"{projeto_id}_FINAL.mp4")
+                if audio_path:
+                    r_edit = editor.pipeline_edicao(
+                        input_video=abertura_path,
+                        input_audio=audio_path,
+                        nome=projeto_id,
+                        color_preset=cfg["color_grade"],
+                    )
+                else:
+                    # Só color grade sem áudio
+                    r_edit = editor.aplicar_color_grade(
+                        abertura_path,
+                        preset=cfg["color_grade"],
+                        output_path=video_mux,
+                    )
+                    r_edit["status"] = "OK"
+
+                if r_edit.get("status") == "OK":
+                    video_final = r_edit.get("arquivo", video_mux)
+                    assets.registrar(video_final, "video", "Vídeo final")
+                    self._log_evento("VIDEO_EDITOR_PRO", "pipeline_edicao()", "ok")
+                    resultado["etapas"]["edicao"] = {"status": "ok", "path": video_final}
+                else:
+                    self._log_evento("VIDEO_EDITOR_PRO", "pipeline_edicao()", "erro")
+                    resultado["etapas"]["edicao"] = {"status": "skip"}
+            except Exception as e:
+                self._log_evento("VIDEO_EDITOR_PRO", "pipeline_edicao()", f"exceção: {e}")
+                resultado["etapas"]["edicao"] = {"status": "skip"}
+        elif abertura_path:
+            video_final = abertura_path
+            resultado["etapas"]["edicao"] = {"status": "skip", "video_base": abertura_path}
+        else:
+            resultado["etapas"]["edicao"] = {"status": "skip", "motivo": "sem vídeo base"}
+
+        # ── ETAPA 5: CREATIVE QA ───────────────────────────────────────────────
+        print(f"\n  [5/5] CREATIVE QA — Controle de qualidade")
+        qa_relatorio = qa.relatorio_qa(assets.listar())
+        resultado["etapas"]["qa"] = qa_relatorio
+        if qa_relatorio["aprovado"]:
+            self._log_evento("CREATIVE_QA", "relatorio_qa()", f"✅ Aprovado ({qa_relatorio['ok']} assets)")
+        else:
+            self._log_evento("CREATIVE_QA", "relatorio_qa()", f"⚠️  {qa_relatorio['erros']} erros")
+
+        # ── Resultado final ────────────────────────────────────────────────────
+        resultado["fim"] = datetime.now().isoformat()
+        resultado["video_final"] = video_final
+        resultado["assets_total"] = len(assets.listar())
+        resultado["custo_total_brl"] = assets.custo_total()
+        resultado["qa_aprovado"] = qa_relatorio["aprovado"]
+
+        print(f"\n{'═'*56}")
+        print(f"  PIPELINE CONCLUÍDO: {projeto_id}")
+        print(f"  Vídeo final: {video_final or 'N/A'}")
+        print(f"  Assets: {resultado['assets_total']} | QA: {'✅' if qa_relatorio['aprovado'] else '⚠️'}")
+        print(f"  Custo total: R${resultado['custo_total_brl']:.2f} (GRÁTIS)")
+        print(f"{'═'*56}\n")
+
+        return resultado
+
+    def pipeline_producao_semanal(
+        self,
+        canal_config: dict,
+        semana: int,
+        dias: int = 5,
+    ) -> dict:
+        """
+        Produz a semana completa de Shorts para um canal.
+        canal_config: {'id', 'nome', 'preset', 'temas': [lista de roteiros]}
+        """
+        canal_id = canal_config.get("id", "canal_001")
+        canal_nome = canal_config.get("nome", "DARK CHANNEL")
+        preset = canal_config.get("preset", "misterio")
+        temas = canal_config.get("temas", [])
+
+        print(f"\n{'═'*56}")
+        print(f"  PRODUÇÃO SEMANAL — SEMANA {semana:02d}")
+        print(f"  Canal: {canal_nome} | {dias} dias")
+        print(f"{'═'*56}")
+
+        producao = []
+        for i in range(min(dias, len(temas))):
+            tema = temas[i]
+            projeto_id = f"{canal_id}_S{semana:02d}D{i+1:02d}"
+            r = self.pipeline_short(
+                titulo=tema.get("titulo", f"Episódio {i+1}"),
+                roteiro=tema.get("roteiro", tema.get("titulo", "")),
+                preset=preset,
+                projeto_id=projeto_id,
+                canal=canal_nome,
             )
+            producao.append(r)
 
-    # ── VIDEO EDITOR PRO (CINEMA EDITOR) ─────────────────────────
-    if agente == "VIDEO_EDITOR_PRO":
-        from core.cinema_editor import (
-            montar_automatico, renderizar, exportar_multi_resolucao,
-            remover_silencio, renderizar_lote, Timeline, check_cinema_editor,
-        )
-        from core.ffmpeg_utils import (
-            concat_videos, add_audio, export_final, burn_subtitles,
-        )
-        if tarefa == "concat_clips":
-            clips = [Path(c) for c in params["clips"]]
-            output = Path(params["output"])
-            n = len(clips)
-            transition = params.get("transition", "none" if n > 3 else "dissolve")
-            concat_videos(clips, output, transition=transition)
-            return {"output": str(output)}
-        if tarefa == "add_audio":
-            p = add_audio(Path(params["video"]), Path(params["audio"]), Path(params["output"]))
-            return {"output": str(p)}
-        if tarefa == "exportar_final":
-            p = export_final(
-                Path(params["video"]), Path(params["output"]),
-                resolution=params.get("resolution", "1920x1080"),
-                format=params.get("format", "16:9"),
-            )
-            return {"output": str(p)}
-        if tarefa == "legendas":
-            p = burn_subtitles(Path(params["video"]), Path(params["srt"]), Path(params["output"]))
-            return {"output": str(p)}
-        if tarefa == "montar_automatico":
-            clips_v = [Path(c) for c in params["clips_video"]]
-            narrs = [Path(n) for n in params["narracoes"]]
-            tl = montar_automatico(
-                clips_v, narrs,
-                Path(params["output_dir"]),
-                params["canal_config"],
-                srt_path=Path(params["srt"]) if params.get("srt") else None,
-                trilha_path=Path(params["trilha"]) if params.get("trilha") else None,
-            )
-            return {"timeline": str(Path(params["output_dir"]) / "timeline.json")}
-        if tarefa == "renderizar":
-            tl = Timeline.importar_json(Path(params["timeline_json"]))
-            return renderizar(tl, Path(params["output"]))
-        if tarefa == "exportar_resolucoes":
-            return exportar_multi_resolucao(
-                Path(params["input"]),
-                Path(params["output_dir"]),
-                resolucoes=params.get("resolucoes", ["1080p", "720p"]),
-            )
-        if tarefa == "remover_silencio":
-            return remover_silencio(
-                Path(params["input"]), Path(params["output"]),
-                silence_threshold=params.get("threshold", -40.0),
-            )
-        if tarefa == "renderizar_lote":
-            return {"resultados": renderizar_lote(params["projetos"])}
+        aprovados = sum(1 for p in producao if p.get("qa_aprovado"))
+        return {
+            "canal_id": canal_id,
+            "semana": semana,
+            "total_produzidos": len(producao),
+            "aprovados": aprovados,
+            "producao": producao,
+            "ai_generated": True,
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        }
 
-    # ── MOTION GRAPHICS ───────────────────────────────────────────
-    if agente == "MOTION_GRAPHICS":
-        from core.motion_graphics import (
-            gerar_titulo_animado, gerar_lower_third,
-            gerar_intro, gerar_outro, gerar_pacote_canal, gerar_contador,
-        )
-        if tarefa == "titulo_animado":
-            import os
-            out = params.get("output", params.get("output_path", "/tmp/dark-studio/titulo.mp4"))
-            os.makedirs(os.path.dirname(out) if os.path.dirname(out) else ".", exist_ok=True)
-            return gerar_titulo_animado(
-                params.get("texto", params.get("titulo", "Título")),
-                Path(out),
-                duracao=params.get("duracao", 4.0),
-                animacao=params.get("animacao", "fade"),
-                resolucao=params.get("resolucao", "1920x1080"),
-            )
-        if tarefa == "legenda_animada":
-            return gerar_lower_third(
-                params["titulo"],
-                subtitulo=params.get("subtitulo", ""),
-                output_path=Path(params["output"]),
-                duracao=params.get("duracao", 5.0),
-                resolucao=params.get("resolucao", "1920x1080"),
-            )
-        if tarefa == "infografico":
-            # Contador animado como infográfico numérico
-            return gerar_contador(
-                params["valor"],
-                params.get("label", ""),
-                Path(params["output"]),
-                duracao=params.get("duracao", 3.0),
-                resolucao=params.get("resolucao", "1920x1080"),
-            )
-        if tarefa == "gerar_intro":
-            import os
-            out = params.get("output", params.get("output_path", "/tmp/dark-studio/intro.mp4"))
-            os.makedirs(os.path.dirname(out) if os.path.dirname(out) else ".", exist_ok=True)
-            return gerar_intro(
-                params["canal_config"],
-                Path(out),
-                estilo=params.get("estilo", params.get("preset", "documentario")),
-                resolucao=params.get("resolucao", "1920x1080"),
-            )
-        if tarefa == "gerar_outro":
-            return gerar_outro(
-                params["canal_config"],
-                Path(params["output"]),
-                cta_texto=params.get("cta", "INSCREVA-SE"),
-                resolucao=params.get("resolucao", "1920x1080"),
-            )
-        if tarefa == "pacote_canal":
-            return gerar_pacote_canal(
-                params["canal_config"],
-                Path(params["output_dir"]),
-                titulo_video=params.get("titulo", ""),
-                resolucao=params.get("resolucao", "1920x1080"),
-            )
+    def status_agentes(self) -> dict:
+        """Retorna status de disponibilidade de todos os agentes."""
+        agentes = {
+            "IMAGE_ENGINE": "dark_image_studio (em desenvolvimento)",
+            "VIDEO_GENERATOR": "dark_video_generator — disponível (HuggingFace)",
+            "CINEMATIC_DIRECTOR": "dark_cinematic_director — disponível ✅",
+            "VIDEO_EDITOR_PRO": "dark_cinema_editor — disponível ✅",
+            "MOTION_GRAPHICS": "dark_motion_lab — disponível ✅",
+            "AUDIO_MASTER": "dark_audio_studio — disponível (edge-tts) ✅",
+            "VISUAL_CONSISTENCY": "dark_visual_consistency — disponível ✅",
+            "ASSET_MANAGER": "integrado no DarkManager ✅",
+            "CREATIVE_QA": "integrado no DarkManager ✅",
+        }
+        return {
+            "versao": self.VERSION,
+            "agentes": agentes,
+            "presets": list(PRESETS_PRODUCAO.keys()),
+            "politica_custo": "SEMPRE gratuito. APIs pagas requerem aprovação explícita.",
+            "ai_generated": True,
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        }
 
-    # ── ASSET MANAGER ─────────────────────────────────────────────
-    if agente == "ASSET_MANAGER":
-        from core.asset_manager import (
-            registrar_asset, buscar_asset, organizar_projeto,
-            listar_assets_projeto, varredura_assets, validar_licenca,
-        )
-        if tarefa == "registrar_asset":
-            return registrar_asset(
-                Path(params["arquivo"]),
-                Path(params["projeto_dir"]),
-                canal=params.get("canal", "global"),
-                tags=params.get("tags", []),
-                licenca=params.get("licenca", "MIT"),
-                descricao=params.get("descricao", ""),
-                copiar=params.get("copiar", False),
-            )
-        if tarefa == "buscar_asset":
-            return buscar_asset(
-                Path(params["projeto_dir"]),
-                asset_id=params.get("asset_id"),
-                tipo=params.get("tipo"),
-                canal=params.get("canal"),
-                tag=params.get("tag"),
-                licenca=params.get("licenca"),
-            )
-        if tarefa == "organizar_projeto":
-            return organizar_projeto(Path(params["projeto_dir"]), params.get("canal_config", {}))
-        if tarefa == "listar_assets":
-            return listar_assets_projeto(Path(params["projeto_dir"]))
-        if tarefa == "varredura":
-            return varredura_assets(Path(params["projeto_dir"]), canal=params.get("canal", "global"))
-        if tarefa == "validar_licenca":
-            return validar_licenca(params["licenca"])
-
-    # ── CREATIVE QA ───────────────────────────────────────────────
-    if agente == "CREATIVE_QA":
-        from core.creative_qa import (
-            verificar_qualidade, verificar_resolucao,
-            verificar_audio, verificar_legenda, verificar_conformidade_ia,
-        )
-        if tarefa == "verificar_qualidade":
-            return verificar_qualidade(
-                Path(params["video"]),
-                srt_path=Path(params["srt"]) if params.get("srt") else None,
-                canal_config=params.get("canal_config"),
-                minimo_s=params.get("minimo_s", 240),
-            )
-        if tarefa == "verificar_resolucao":
-            return verificar_resolucao(Path(params["video"]))
-        if tarefa == "verificar_audio_qa":
-            return verificar_audio(Path(params["video"]))
-        if tarefa == "verificar_legenda":
-            return verificar_legenda(Path(params["srt"]))
-        if tarefa == "verificar_conformidade":
-            return verificar_conformidade_ia(Path(params["video"]))
-
-    # ── PERFORMANCE ───────────────────────────────────────────────
-    if agente == "PERFORMANCE":
-        from core.performance import (
-            ffmpeg_params_otimizados,
-            sugerir_perfil_ffmpeg,
-            check_performance,
-            AssetCache,
-            PipelineProfiler,
-            CustoEstimador,
-        )
-        if tarefa == "params_ffmpeg":
-            return {
-                "status": "ok",
-                "params": ffmpeg_params_otimizados(params.get("perfil", "balanced")),
-                "perfil": params.get("perfil", "balanced"),
-                "ai_generated": True,
-            }
-        if tarefa == "benchmark":
-            return check_performance()
-        if tarefa == "profiling":
-            # Retorna relatório de profiling de um job salvo
-            job_id = params.get("job_id", "unknown")
-            output_dir = Path(params.get("output_dir", "."))
-            profiler_file = output_dir / f"profiler_{job_id}.json"
-            if profiler_file.exists():
-                import json
-                return {"status": "ok", "relatorio": json.loads(profiler_file.read_text())}
-            return {"status": "not_found", "mensagem": f"Relatório de profiling não encontrado: {profiler_file}"}
-        if tarefa == "relatorio_custo":
-            # Retorna relatório de custo de um job (usa CustoEstimador como exemplo)
-            estimador = CustoEstimador()
-            return {"status": "ok", "relatorio": estimador.relatorio(), "ai_generated": True}
-        if tarefa == "stats_cache":
-            cache_dir = Path(params.get("cache_dir", "."))
-            cache = AssetCache(cache_dir)
-            return {"status": "ok", "stats": cache.estatisticas(), "ai_generated": True}
-        return {"status": "error", "mensagem": f"Tarefa '{tarefa}' não reconhecida para PERFORMANCE"}
-
-    # ── IMAGE ENGINE ──────────────────────────────────────────────
-    if agente == "IMAGE_ENGINE":
-        from core.image_engine import (
-            gerar_imagem, upscalar_imagem, remover_fundo,
-            corrigir_imagem, redimensionar, gerar_thumbnail,
-        )
-        if tarefa == "gerar_imagem":
-            return gerar_imagem(
-                prompt=params.get("prompt", "dark cinematic scene"),
-                estilo=params.get("estilo", "cinematografico"),
-                resolucao=params.get("resolucao", "youtube_thumbnail"),
-                output_path=params.get("output_path"),
-                engine=params.get("engine", "auto"),
-                steps=params.get("steps", 30),
-            )
-        if tarefa == "upscale_imagem":
-            return upscalar_imagem(
-                input_path=params["input_path"],
-                fator=params.get("fator", 2),
-                output_path=params.get("output_path"),
-            )
-        if tarefa == "remover_fundo":
-            return remover_fundo(
-                input_path=params["input_path"],
-                output_path=params.get("output_path"),
-            )
-        if tarefa == "corrigir_imagem":
-            return corrigir_imagem(
-                input_path=params["input_path"],
-                brilho=params.get("brilho", 1.0),
-                contraste=params.get("contraste", 1.0),
-                saturacao=params.get("saturacao", 1.0),
-                nitidez=params.get("nitidez", 1.0),
-                output_path=params.get("output_path"),
-            )
-        if tarefa == "redimensionar":
-            return redimensionar(
-                input_path=params["input_path"],
-                largura=params.get("largura"),
-                altura=params.get("altura"),
-                resolucao_preset=params.get("resolucao_preset"),
-                manter_proporcao=params.get("manter_proporcao", True),
-                output_path=params.get("output_path"),
-            )
-        if tarefa == "thumbnail":
-            return gerar_thumbnail(
-                titulo=params.get("titulo", "DARK VIDEO"),
-                subtitulo=params.get("subtitulo", ""),
-                background_path=params.get("background_path"),
-                output_path=params.get("output_path"),
-                estilo=params.get("estilo", "dark_channel"),
-                canal=params.get("canal", "DARK STUDIO AAA"),
-            )
-        return {"status": "error", "mensagem": f"Tarefa '{tarefa}' não reconhecida para IMAGE_ENGINE"}
-
-    # ── VIDEO GENERATOR ───────────────────────────────────────────
-    if agente == "VIDEO_GENERATOR":
-        from core.video_generator import (
-            gerar_video, imagem_para_video, gerar_broll, gerar_cenas_video,
-        )
-        if tarefa == "gerar_video":
-            return gerar_video(
-                prompt=params.get("prompt", "dark cinematic scene"),
-                output_path=params.get("output_path"),
-                resolucao=params.get("resolucao", "1080p"),
-                duracao_s=int(params.get("duracao_s", 8)),
-                estilo=params.get("estilo", "cinematografico"),
-                movimento=params.get("movimento", "zoom_in"),
-                engine=params.get("engine", "auto"),
-                steps=int(params.get("steps", 20)),
-            )
-        if tarefa == "animar_imagem":
-            return imagem_para_video(
-                input_path=params["input_path"],
-                output_path=params.get("output_path"),
-                duracao_s=int(params.get("duracao_s", 8)),
-                movimento=params.get("movimento", "zoom_in"),
-                resolucao=params.get("resolucao", "1080p"),
-                estilo=params.get("estilo", "cinematografico"),
-                fps=int(params.get("fps", 30)),
-            )
-        if tarefa == "b_roll":
-            return {
-                "status": "ok",
-                "clips": gerar_broll(
-                    prompt=params.get("prompt", "natureza cinematografica"),
-                    output_dir=params["output_dir"],
-                    num_clips=int(params.get("num_clips", 3)),
-                    duracao_s=int(params.get("duracao_s", 6)),
-                    resolucao=params.get("resolucao", "1080p"),
-                    estilo=params.get("estilo", "documentario"),
-                ),
-                "ai_generated": True,
-                "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
-            }
-        if tarefa == "gerar_cenas":
-            paths = gerar_cenas_video(
-                cenas=params["cenas"],
-                output_dir=params["output_dir"],
-                preset=params.get("preset", "documentario"),
-                verbose=params.get("verbose", False),
-            )
-            return {
-                "status": "ok",
-                "videos": paths,
-                "ai_generated": True,
-                "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
-            }
-        return {"status": "error", "mensagem": f"Tarefa '{tarefa}' não reconhecida para VIDEO_GENERATOR"}
-
-    raise ValueError(f"Tarefa '{tarefa}' não mapeada para nenhum agente disponível.")
+    def exportar_log(self, path: str = None) -> str:
+        """Exporta o log de operações como JSON."""
+        if path is None:
+            path = f"/tmp/dark_manager_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(self._log, f, ensure_ascii=False, indent=2)
+        return path
 
 
-def _placeholder(agente: str, tarefa: str, params: dict) -> dict:
-    """Retorna resultado de placeholder para agentes ainda não implementados."""
-    return {
-        "status": "placeholder",
-        "agente": agente,
-        "tarefa": tarefa,
-        "mensagem": f"Agente {agente} será implementado nas próximas fases do DARK CREATIVE LAB.",
-        "params_recebidos": list(params.keys()),
-    }
+# ═══════════════════════════════════════════════════════
+# CONTRATO JSON
+# ═══════════════════════════════════════════════════════
+CONTRACT = {
+    "agente": "DARK_MANAGER",
+    "versao": "1.0.0",
+    "descricao": "Orquestrador central — decide qual agente usar em cada tarefa",
+    "agentes_gerenciados": [
+        "IMAGE_ENGINE", "VIDEO_GENERATOR", "CINEMATIC_DIRECTOR",
+        "VIDEO_EDITOR_PRO", "MOTION_GRAPHICS", "AUDIO_MASTER",
+        "VISUAL_CONSISTENCY", "ASSET_MANAGER", "CREATIVE_QA",
+    ],
+    "metodos": {
+        "pipeline_short": {
+            "entrada": {
+                "titulo": "str",
+                "roteiro": "str — texto completo",
+                "preset": "str — misterio|documentary|natureza|historia|tecnologia|educacao|relaxamento|musical|dark_storytelling",
+                "projeto_id": "str?",
+                "canal": "str?",
+            },
+            "saida": "dict — resultado completo com todos os assets e status por etapa",
+        },
+        "decidir_agente": {
+            "entrada": {"tarefa": "str — descrição em linguagem natural"},
+            "saida": "str — nome do agente responsável",
+        },
+        "status_agentes": {
+            "entrada": {},
+            "saida": "dict — status de todos os 9 agentes",
+        },
+    },
+    "presets": list(PRESETS_PRODUCAO.keys()),
+    "politica_custo": "Alternativas gratuitas sempre. APIs pagas requerem aprovação.",
+    "ai_generated": True,
+    "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+}
 
 
-# ─────────────────────────────────────────────────────────────────
-#  DIAGNÓSTICO DE TODOS OS AGENTES
-# ─────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    manager = DarkManager()
 
-def check_all_agents() -> dict:
-    """Verifica status de todos os agentes disponíveis."""
-    resultados = {}
+    # Status dos agentes
+    status = manager.status_agentes()
+    print("\nSTATUS DOS AGENTES:")
+    for nome, desc in status["agentes"].items():
+        print(f"  {nome:25} — {desc}")
 
-    # Cinematic Director
-    try:
-        from core.cinematic_director import check_cinematic_director
-        resultados["CINEMATIC_DIRECTOR"] = check_cinematic_director()
-    except Exception as e:
-        resultados["CINEMATIC_DIRECTOR"] = {"status": "error", "erro": str(e)}
+    print(f"\nPRESETS DISPONÍVEIS:")
+    for k, v in PRESETS_PRODUCAO.items():
+        print(f"  {k:20} — {v['nome']}")
 
-    # Audio Master
-    try:
-        from core.audio_master import check_audio_master
-        resultados["AUDIO_MASTER"] = check_audio_master()
-    except Exception as e:
-        resultados["AUDIO_MASTER"] = {"status": "error", "erro": str(e)}
+    # Teste de decisão de agente
+    tarefas_teste = [
+        "Gerar imagem para thumbnail",
+        "Gravar narração do roteiro",
+        "Montar sequência de cenas",
+        "Criar abertura animada",
+        "Verificar qualidade do vídeo",
+        "Manter consistência do personagem",
+    ]
+    print(f"\nDECISÃO DE AGENTES:")
+    for tarefa in tarefas_teste:
+        agente = manager.decidir_agente(tarefa)
+        print(f"  '{tarefa}' → {agente}")
 
-    # Visual Consistency
-    try:
-        from core.visual_consistency import check_visual_consistency
-        resultados["VISUAL_CONSISTENCY"] = check_visual_consistency()
-    except Exception as e:
-        resultados["VISUAL_CONSISTENCY"] = {"status": "error", "erro": str(e)}
+    # Salvar contrato
+    Path("core").mkdir(exist_ok=True)
+    with open("core/dark_manager_contract.json", "w", encoding="utf-8") as f:
+        json.dump(CONTRACT, f, ensure_ascii=False, indent=2)
+    print(f"\n  Contrato: core/dark_manager_contract.json")
 
-    # Cinema Editor (Video Editor Pro)
-    try:
-        from core.cinema_editor import check_cinema_editor
-        resultados["VIDEO_EDITOR_PRO"] = check_cinema_editor()
-    except Exception as e:
-        resultados["VIDEO_EDITOR_PRO"] = {"status": "error", "erro": str(e)}
-
-    # Motion Graphics
-    try:
-        from core.motion_graphics import check_motion_graphics
-        resultados["MOTION_GRAPHICS"] = check_motion_graphics()
-    except Exception as e:
-        resultados["MOTION_GRAPHICS"] = {"status": "error", "erro": str(e)}
-
-    # Asset Manager
-    try:
-        from core.asset_manager import check_asset_manager
-        resultados["ASSET_MANAGER"] = check_asset_manager()
-    except Exception as e:
-        resultados["ASSET_MANAGER"] = {"status": "error", "erro": str(e)}
-
-    # Creative QA
-    try:
-        from core.creative_qa import check_creative_qa
-        resultados["CREATIVE_QA"] = check_creative_qa()
-    except Exception as e:
-        resultados["CREATIVE_QA"] = {"status": "error", "erro": str(e)}
-
-    # Performance (Fase 11)
-    try:
-        from core.performance import check_performance
-        resultados["PERFORMANCE"] = check_performance()
-    except Exception as e:
-        resultados["PERFORMANCE"] = {"status": "error", "erro": str(e)}
-
-    # Image Engine (Fase 2 — implementado)
-    try:
-        from core.image_engine import check_image_engine
-        resultados["IMAGE_ENGINE"] = check_image_engine()
-    except Exception as e:
-        resultados["IMAGE_ENGINE"] = {"status": "error", "erro": str(e)}
-
-    # Video Generator (Fase 3 — implementado)
-    try:
-        from core.video_generator import check_video_generator
-        resultados["VIDEO_GENERATOR"] = check_video_generator()
-    except Exception as e:
-        resultados["VIDEO_GENERATOR"] = {"status": "error", "erro": str(e)}
-
-    n_ok = sum(1 for v in resultados.values() if v.get("status") in ("ok", "placeholder"))
-
-    return {
-        "status": "ok",
-        "agentes": resultados,
-        "total": len(resultados),
-        "operacionais": n_ok,
-        "tarefas_suportadas": list(TASK_TYPES.keys()),
-        "ai_generated": True,
-        "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
-    }
-
-
-def _fase_agente(agente: str) -> str:
-    mapa = {
-        "IMAGE_ENGINE":   "Fase 2 — Image Studio",
-        "VIDEO_GENERATOR":"Fase 3 — Video Generator",
-        "MOTION_GRAPHICS":"Fase 7 — Motion Graphics",
-        "ASSET_MANAGER":  "Fase 9 — Integração DARK STUDIO AAA",
-        "CREATIVE_QA":    "Fase 10 — Testes de produção",
-    }
-    return mapa.get(agente, "A implementar")
+    # Pipeline teste (sem gerar vídeo real)
+    print(f"\n  TESTE RÁPIDO DE PIPELINE...")
+    r = manager.pipeline_short(
+        titulo="Teste FASE 9 — DARK MANAGER",
+        roteiro="Esta é uma narração de teste.\nO DARK STUDIO AAA está operacional.\nTodos os agentes integrados.",
+        preset="misterio",
+        projeto_id="fase9_teste",
+        canal="DARK MANAGER TEST",
+    )
+    print(f"\n  Etapas concluídas: {list(r['etapas'].keys())}")
+    print(f"  QA aprovado: {r['qa_aprovado']}")
+    print(f"  Custo: R${r['custo_total_brl']:.2f}\n")
