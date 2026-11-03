@@ -171,6 +171,7 @@ class PipelineProfiler:
         return {
             "job_id": self.job_id,
             "duracao_total_s": round(duracao_total, 2),
+            "total_segundos": round(duracao_total, 2),   # alias retrocompat
             "duracao_total_formatada": _formatar_duracao(duracao_total),
             "total_etapas": len(self._etapas),
             "etapas_ok": len(etapas_ok),
@@ -210,7 +211,9 @@ class AssetCache:
 
     CACHE_FILE = ".perf_cache.json"
 
-    def __init__(self, cache_dir: Path):
+    def __init__(self, cache_dir: Path = None):
+        if cache_dir is None:
+            cache_dir = Path(__file__).parent.parent / "db" / "cache"
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self._db_path = self.cache_dir / self.CACHE_FILE
