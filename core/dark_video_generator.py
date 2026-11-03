@@ -338,14 +338,15 @@ class DarkVideoGenerator:
         total_frames = int(dur * fps)
 
         # Pan: move o ponto de crop de um lado ao outro
+        # Usa `t` (segundos) no filtro crop, não `on` (só disponível em zoompan)
         if direcao == "esquerda":
-            # Corta da esquerda para a direita (câmera move para esquerda)
-            x_expr = f"(iw-ow)*on/{total_frames}"
+            # x avança de 0 até 480 ao longo de `dur` segundos
+            x_expr = f"480*t/{dur}"
         else:
-            # Corta da direita para a esquerda
-            x_expr = f"(iw-ow)*(1-on/{total_frames})"
+            # x recua de 480 até 0
+            x_expr = f"480*(1-t/{dur})"
 
-        # Crop 80% da largura para ter espaço para o pan
+        # Escala para 2400px de largura, depois crop 1920 com x animado
         vf = (
             f"scale=2400:1080,"
             f"crop=1920:1080:x='{x_expr}':y=0"
