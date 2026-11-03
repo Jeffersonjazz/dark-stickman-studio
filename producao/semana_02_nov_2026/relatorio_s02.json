@@ -1,0 +1,59 @@
+{
+  "gerado_em": "2026-11-02T21:10:53.485544",
+  "ok": 5,
+  "total": 5,
+  "videos": [
+    {
+      "id": "s02_short1",
+      "canal": "Esquina_do_Medo",
+      "dur": 38,
+      "arquivo": "/home/claude/dark-stickman-studio/outputs/videos/s02_short1_Esquina_do_Medo.mp4",
+      "mb": 0.56,
+      "status": "COMPOSTO",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA \u2014 DARK CREATIVE LAB"
+    },
+    {
+      "id": "s02_short2",
+      "canal": "Horizonte_Cosmico",
+      "dur": 35,
+      "arquivo": "/home/claude/dark-stickman-studio/outputs/videos/s02_short2_Horizonte_Cosmico.mp4",
+      "mb": 0.95,
+      "status": "COMPOSTO",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA \u2014 DARK CREATIVE LAB"
+    },
+    {
+      "id": "s02_short3",
+      "canal": "Mestre_do_Oculto",
+      "dur": 36,
+      "arquivo": "/home/claude/dark-stickman-studio/outputs/videos/s02_short3_Mestre_do_Oculto.mp4",
+      "mb": 0.56,
+      "status": "COMPOSTO",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA \u2014 DARK CREATIVE LAB"
+    },
+    {
+      "id": "s02_short4",
+      "canal": "Raizes_da_Terra",
+      "dur": 33,
+      "arquivo": "/home/claude/dark-stickman-studio/outputs/videos/s02_short4_Raizes_da_Terra.mp4",
+      "mb": 0.84,
+      "status": "COMPOSTO",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA \u2014 DARK CREATIVE LAB"
+    },
+    {
+      "id": "s02_short5",
+      "canal": "Pulso_Digital",
+      "dur": 38,
+      "arquivo": "/home/claude/dark-stickman-studio/outputs/videos/s02_short5_Pulso_Digital.mp4",
+      "mb": 0.72,
+      "status": "COMPOSTO",
+      "ai_generated": true,
+      "ai_disclosure": "Produzido com DARK STUDIO AAA \u2014 DARK CREATIVE LAB"
+    }
+  ],
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA \u2014 DARK CREATIVE LAB"
+}

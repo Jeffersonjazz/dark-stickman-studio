@@ -1,593 +1,426 @@
 """
-DARK AUDIO STUDIO — Fase 6
-Clone funcional de: ElevenLabs, XTTS, Piper TTS, Coqui, Whisper, Audacity
-Custo: R$0,00 — backends gratuitos em cascata
+DARK AUDIO STUDIO — FASE 6 do DARK CREATIVE LAB
+Agente de narração, mixagem e masterização de áudio.
 
-Backends em ordem de qualidade:
-  1. XTTS v2 (Coqui) — local, voz clonável, pt-BR excelente (GPL-3.0)
-  2. Piper TTS — local, ultra-rápido, leve (MIT)
-  3. gTTS — Google TTS free (sem API key), pt-BR nativo
-  4. edge-tts — Microsoft Edge TTS free, voz neural pt-BR (Leila, Antonio)
-  5. espeak-ng — offline puro fallback
+Motores TTS suportados (gratuitos):
+  - ElevenLabs (via MCP — free tier)
+  - Piper TTS (local, offline)
+  - XTTS-v2 (local, alta qualidade)
+  - Edge TTS (Microsoft, gratuito via API)
+  - gTTS (Google, fallback)
 
-Processamento de áudio (clone Audacity/Reaper):
-  - FFmpeg: normalização, equalização, compressão, redução de ruído
-  - pydub: mixagem, detecção de silêncio, fade
-  - librosa (opcional): análise espectral
+Pós-produção:
+  - FFmpeg: normalização, EQ, compressão, noise gate
+  - Pydub: mixagem de trilhas
+  - Whisper: transcrição e geração de legendas
 
-ai_generated: True — OBRIGATÓRIO em todos os outputs
+Política: SEMPRE gratuito. ElevenLabs pago só com aprovação.
+
+ai_generated: True
+ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
 """
 
-import os
-import sys
-import json
-import hashlib
 import subprocess
-import tempfile
-import time
+import json
+import os
 import re
 from pathlib import Path
+from datetime import datetime
 from typing import Optional
 
-# ── Constantes ────────────────────────────────────────────────────────────────
 
-VOZES_EDGE = {
-    "feminino": "pt-BR-LeiaNeural",
-    "masculino": "pt-BR-AntonioNeural",
-    "feminino_alt": "pt-BR-FranciscaNeural",
-    "narrador": "pt-BR-AntonioNeural",
+# ═══════════════════════════════════════════════════════
+# FICHAS TÉCNICAS DOS MOTORES TTS
+# ═══════════════════════════════════════════════════════
+MOTORES_TTS = {
+    "elevenlabs_free": {
+        "nome": "ElevenLabs (Free Tier)",
+        "tipo": "cloud_api",
+        "custo": "Gratuito até 10.000 chars/mês",
+        "qualidade": "★★★★★",
+        "vozes_ptbr": True,
+        "latencia": "2-5s",
+        "emocoes": True,
+        "modelo": "eleven_multilingual_v2",
+        "acesso": "MCP Tool: mcp__ElevenLabs__creative_generate_speech",
+        "vozes_recomendadas": {
+            "dark_narrator": {"id": "acdKA5HckGxoxxvy40dA", "nome": "Nassif"},
+            "motivacional": {"id": "9luRA11KwacKAVmLyqUs", "nome": "Edmilson"},
+            "relaxamento": {"id": "NFmEzNOony1UsEJGXLth", "nome": "Voz Suave"},
+        }
+    },
+    "piper": {
+        "nome": "Piper TTS",
+        "tipo": "local_offline",
+        "custo": "GRATUITO (open source)",
+        "qualidade": "★★★☆☆",
+        "vozes_ptbr": True,
+        "latencia": "<1s (CPU local)",
+        "emocoes": False,
+        "install": "pip install piper-tts --break-system-packages",
+        "modelos_ptbr": ["pt_BR-faber-medium", "pt_BR-edresson-low"],
+        "uso": "echo 'Texto' | piper --model pt_BR-faber-medium.onnx --output_file out.wav"
+    },
+    "xtts": {
+        "nome": "XTTS-v2 (Coqui)",
+        "tipo": "local_gpu",
+        "custo": "GRATUITO (open source)",
+        "qualidade": "★★★★☆",
+        "vozes_ptbr": True,
+        "latencia": "5-30s (GPU recomendada)",
+        "emocoes": True,
+        "install": "pip install TTS --break-system-packages",
+        "vram_minima": "4GB",
+        "nota": "Coqui descontinuado mas XTTS-v2 ainda funciona via TTS library"
+    },
+    "edge_tts": {
+        "nome": "Edge TTS (Microsoft)",
+        "tipo": "cloud_gratuito",
+        "custo": "GRATUITO (sem limite prático)",
+        "qualidade": "★★★★☆",
+        "vozes_ptbr": True,
+        "latencia": "1-3s",
+        "emocoes": False,
+        "install": "pip install edge-tts --break-system-packages",
+        "vozes_ptbr_ids": ["pt-BR-AntonioNeural", "pt-BR-FranciscaNeural"],
+        "uso": "edge-tts --voice pt-BR-AntonioNeural --text 'Texto' --write-media out.mp3"
+    },
+    "gtts": {
+        "nome": "gTTS (Google Text-to-Speech)",
+        "tipo": "cloud_gratuito",
+        "custo": "GRATUITO",
+        "qualidade": "★★★☆☆",
+        "vozes_ptbr": True,
+        "latencia": "2-4s",
+        "emocoes": False,
+        "install": "pip install gtts --break-system-packages",
+        "uso": "gtts-cli 'Texto' --lang pt --output out.mp3"
+    }
 }
-
-VOZES_PIPER = {
-    "feminino": "pt_BR-edresson_carvalho-low",
-    "masculino": "pt_BR-faber-medium",
-}
-
-# Presets de tratamento de áudio (clone EQ/Compressor profissional)
-AUDIO_PRESETS = {
-    "narração_documentario": {
-        "eq": "equalizer=f=80:width_type=h:width=80:g=-3,equalizer=f=200:width_type=o:width=2:g=-1,equalizer=f=3000:width_type=o:width=2:g=2,equalizer=f=8000:width_type=o:width=2:g=1",
-        "compressor": "acompressor=threshold=-18dB:ratio=4:attack=10:release=100:makeup=2dB",
-        "limiter": "alimiter=level_in=1:level_out=0.95:limit=0.95:attack=5:release=50",
-        "norm": "-18",  # LUFS alvo
-    },
-    "narração_tecnologia": {
-        "eq": "equalizer=f=100:width_type=h:width=100:g=-2,equalizer=f=4000:width_type=o:width=2:g=3,equalizer=f=10000:width_type=o:width=2:g=2",
-        "compressor": "acompressor=threshold=-20dB:ratio=3:attack=5:release=80:makeup=3dB",
-        "limiter": "alimiter=level_in=1:level_out=0.95:limit=0.95:attack=5:release=50",
-        "norm": "-16",
-    },
-    "narração_misterio": {
-        "eq": "equalizer=f=60:width_type=h:width=60:g=2,equalizer=f=300:width_type=o:width=2:g=1,equalizer=f=5000:width_type=o:width=2:g=-1",
-        "compressor": "acompressor=threshold=-22dB:ratio=5:attack=15:release=150:makeup=4dB",
-        "limiter": "alimiter=level_in=1:level_out=0.95:limit=0.95:attack=5:release=50",
-        "norm": "-20",
-    },
-    "narração_motivacao": {
-        "eq": "equalizer=f=120:width_type=h:width=120:g=-1,equalizer=f=2500:width_type=o:width=2:g=3,equalizer=f=8000:width_type=o:width=2:g=2",
-        "compressor": "acompressor=threshold=-15dB:ratio=3:attack=5:release=60:makeup=2dB",
-        "limiter": "alimiter=level_in=1:level_out=0.95:limit=0.95:attack=3:release=30",
-        "norm": "-14",
-    },
-    "narração_natureza": {
-        "eq": "equalizer=f=80:width_type=h:width=80:g=-2,equalizer=f=6000:width_type=o:width=2:g=1",
-        "compressor": "acompressor=threshold=-20dB:ratio=3:attack=10:release=120:makeup=2dB",
-        "limiter": "alimiter=level_in=1:level_out=0.95:limit=0.95:attack=5:release=50",
-        "norm": "-18",
-    },
-    "padrão": {
-        "eq": "equalizer=f=100:width_type=h:width=100:g=-2,equalizer=f=3000:width_type=o:width=2:g=1",
-        "compressor": "acompressor=threshold=-18dB:ratio=3:attack=10:release=100:makeup=2dB",
-        "limiter": "alimiter=level_in=1:level_out=0.95:limit=0.95:attack=5:release=50",
-        "norm": "-18",
-    },
-}
-
-NICHO_PRESET = {
-    "natureza": "narração_natureza",
-    "historia": "narração_documentario",
-    "tecnologia": "narração_tecnologia",
-    "misterio": "narração_misterio",
-    "motivacao": "narração_motivacao",
-    "psicologia": "narração_documentario",
-    "filosofia": "narração_documentario",
-    "ciencia": "narração_tecnologia",
-    "financas": "narração_motivacao",
-    "saude": "narração_natureza",
-    "geral": "padrão",
-}
-
-OUTPUT_DIR = Path("/tmp/dark-studio/audio")
-CACHE_DIR = Path("/tmp/dark-studio/cache/audio")
 
 
 class DarkAudioStudio:
     """
-    Clone funcional de ElevenLabs + XTTS + Piper.
-    Narração profissional em português brasileiro — custo R$0,00.
+    Agente de pós-produção de áudio do DARK STUDIO AAA.
     """
 
-    def __init__(self):
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        self._backends = self._detectar_backends()
+    def __init__(self, output_dir: str = "outputs/audio"):
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    # ── Detecção de backends ───────────────────────────────────────────────────
+    def verificar_ffmpeg(self) -> bool:
+        r = subprocess.run(["ffmpeg", "-version"], capture_output=True)
+        return r.returncode == 0
 
-    def _detectar_backends(self) -> dict:
-        backends = {}
-
-        # edge-tts (Microsoft Neural, gratuito, sem limite claro)
-        try:
-            r = subprocess.run(["edge-tts", "--list-voices"], capture_output=True, timeout=10)
-            backends["edge_tts"] = r.returncode == 0
-        except Exception:
-            backends["edge_tts"] = False
-
-        # gTTS (Google Text-to-Speech, gratuito)
-        try:
-            import gtts  # noqa: F401
-            backends["gtts"] = True
-        except ImportError:
-            backends["gtts"] = False
-
-        # Piper TTS (local, MIT)
-        try:
-            r = subprocess.run(["piper", "--version"], capture_output=True, timeout=5)
-            backends["piper"] = r.returncode == 0
-        except Exception:
-            backends["piper"] = False
-
-        # XTTS v2 via TTS library (Coqui, GPL-3.0, local)
-        try:
-            import TTS  # noqa: F401
-            backends["xtts"] = True
-        except ImportError:
-            backends["xtts"] = False
-
-        # espeak-ng (fallback offline puro)
-        try:
-            r = subprocess.run(["espeak-ng", "--version"], capture_output=True, timeout=5)
-            backends["espeak"] = r.returncode == 0
-        except Exception:
-            backends["espeak"] = False
-
-        # FFmpeg (processamento de áudio)
-        try:
-            r = subprocess.run(["ffmpeg", "-version"], capture_output=True, timeout=5)
-            backends["ffmpeg"] = r.returncode == 0
-        except Exception:
-            backends["ffmpeg"] = False
-
-        return backends
-
-    # ── TTS — Síntese de fala ──────────────────────────────────────────────────
-
-    def narrar(
-        self,
-        texto: str,
-        voz: str = "feminino",
-        velocidade: float = 1.0,
-        pitch: float = 0.0,
-        nicho: str = "geral",
-        output_path: Optional[str] = None,
-        usar_cache: bool = True,
-    ) -> dict:
+    def normalizar_audio(self, input_path: str, output_path: str = None,
+                         loudness: float = -16.0) -> dict:
         """
-        Sintetiza narração em português brasileiro.
-        Cascade: edge-tts → gTTS → piper → espeak → erro.
+        Normaliza volume para broadcast (-16 LUFS padrão YouTube).
         """
-        if not texto or not texto.strip():
-            return self._resultado(None, "erro", "Texto vazio", backend="none")
+        if not output_path:
+            p = Path(input_path)
+            output_path = str(p.parent / f"{p.stem}_norm{p.suffix}")
 
-        # Cache
-        cache_key = hashlib.md5(f"{texto}|{voz}|{velocidade}|{pitch}".encode()).hexdigest()
-        cache_path = CACHE_DIR / f"{cache_key}.mp3"
-        if usar_cache and cache_path.exists():
-            return self._resultado(str(cache_path), "ok", "Cache hit", backend="cache")
-
-        if output_path is None:
-            output_path = str(OUTPUT_DIR / f"narr_{cache_key[:12]}.mp3")
-
-        # Cascade de backends
-        for backend_fn, nome in [
-            (self._tts_edge, "edge_tts"),
-            (self._tts_gtts, "gtts"),
-            (self._tts_piper, "piper"),
-            (self._tts_espeak, "espeak"),
-        ]:
-            if not self._backends.get(nome, False):
-                continue
-            try:
-                raw_path = str(output_path).replace(".mp3", "_raw.wav")
-                ok = backend_fn(texto, voz, velocidade, pitch, raw_path)
-                if ok and Path(raw_path).exists() and Path(raw_path).stat().st_size > 1000:
-                    # Processar áudio (normalizar, equalizar)
-                    final = self._processar_audio(raw_path, output_path, nicho)
-                    if final:
-                        # Salvar cache
-                        try:
-                            import shutil
-                            shutil.copy2(final, str(cache_path))
-                        except Exception:
-                            pass
-                        return self._resultado(final, "ok", f"TTS via {nome}", backend=nome, custo=0.00)
-            except Exception as e:
-                continue
-
-        # Fallback offline: gerar áudio placeholder via FFmpeg (silêncio com tom suave)
-        try:
-            placeholder = self._tts_ffmpeg_placeholder(texto, output_path)
-            if placeholder:
-                return self._resultado(placeholder, "ok", "TTS via FFmpeg placeholder (offline)", backend="ffmpeg_placeholder", custo=0.00)
-        except Exception:
-            pass
-
-        return self._resultado(None, "erro", "Todos os backends falharam", backend="none")
-
-    def _tts_edge(self, texto: str, voz: str, velocidade: float, pitch: float, output: str) -> bool:
-        """edge-tts — Microsoft Neural, gratuito"""
-        voz_id = VOZES_EDGE.get(voz, VOZES_EDGE["narrador"])
-        rate = f"+{int((velocidade-1)*100)}%" if velocidade != 1.0 else "+0%"
-        pitch_str = f"+{int(pitch)}Hz" if pitch != 0.0 else "+0Hz"
         cmd = [
-            "edge-tts",
-            "--voice", voz_id,
-            "--text", texto,
-            "--rate", rate,
-            "--pitch", pitch_str,
-            "--write-media", output,
+            "ffmpeg", "-y", "-i", input_path,
+            "-af", f"loudnorm=I={loudness}:TP=-1.5:LRA=11",
+            "-ar", "44100", "-ac", "2",
+            output_path
         ]
-        r = subprocess.run(cmd, capture_output=True, timeout=60)
-        return r.returncode == 0 and Path(output).exists()
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        if r.returncode == 0:
+            return {"status": "OK", "arquivo": output_path, "loudness_target": loudness}
+        return {"status": "erro", "log": r.stderr[-200:]}
 
-    def _tts_gtts(self, texto: str, voz: str, velocidade: float, pitch: float, output: str) -> bool:
-        """gTTS — Google Text-to-Speech gratuito"""
-        try:
-            from gtts import gTTS
-            tts = gTTS(text=texto, lang="pt", slow=(velocidade < 0.8))
-            mp3_tmp = output.replace(".wav", ".mp3")
-            tts.save(mp3_tmp)
-            # Converter para wav via ffmpeg
-            subprocess.run(
-                ["ffmpeg", "-y", "-i", mp3_tmp, output],
-                capture_output=True, timeout=30
-            )
-            return Path(output).exists()
-        except Exception:
-            return False
-
-    def _tts_piper(self, texto: str, voz: str, velocidade: float, pitch: float, output: str) -> bool:
-        """Piper TTS — local, MIT, ultra-rápido"""
-        modelo = VOZES_PIPER.get(voz, "pt_BR-edresson_carvalho-low")
-        cmd = ["piper", "--model", modelo, "--output_file", output]
-        r = subprocess.run(cmd, input=texto.encode("utf-8"), capture_output=True, timeout=120)
-        return r.returncode == 0 and Path(output).exists()
-
-    def _tts_espeak(self, texto: str, voz: str, velocidade: float, pitch: float, output: str) -> bool:
-        """espeak-ng — fallback offline puro"""
-        spd = int(150 * velocidade)
-        pit = 50 + int(pitch)
-        cmd = ["espeak-ng", "-v", "pt-br", "-s", str(spd), "-p", str(pit), "-w", output, texto]
-        r = subprocess.run(cmd, capture_output=True, timeout=60)
-        return r.returncode == 0 and Path(output).exists()
-
-    def _tts_ffmpeg_placeholder(self, texto: str, output_path: str) -> Optional[str]:
+    def reduzir_ruido(self, input_path: str, output_path: str = None) -> dict:
         """
-        Fallback offline TOTAL — gera áudio placeholder com FFmpeg.
-        Cria silêncio com duração proporcional ao texto (≈160 wpm).
-        Funciona sem internet, sem espeak, sem qualquer serviço externo.
-        Na máquina do usuário, este fallback é substituído por edge-tts/gTTS.
+        Reduz ruído de fundo usando filtro anlmdn do FFmpeg.
         """
-        palavras = len(texto.split())
-        duracao = max(2.0, palavras / 2.5)  # ~150 palavras/min
-        output_path = str(output_path).replace("_raw.wav", ".mp3")
-        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-        # Gera silêncio com metadados do texto como comentário
+        if not output_path:
+            p = Path(input_path)
+            output_path = str(p.parent / f"{p.stem}_denoise{p.suffix}")
+
         cmd = [
-            "ffmpeg", "-y",
-            "-f", "lavfi",
-            "-i", f"anullsrc=r=22050:cl=mono",
-            "-t", str(duracao),
-            "-metadata", f"comment=DARK_TTS:{texto[:100]}",
-            "-q:a", "4",
-            output_path,
+            "ffmpeg", "-y", "-i", input_path,
+            "-af", "anlmdn=s=7:p=0.002:r=0.002:m=5:b=0.001",
+            output_path
         ]
-        r = subprocess.run(cmd, capture_output=True, timeout=30)
-        if r.returncode == 0 and Path(output_path).exists():
-            return output_path
-        return None
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        if r.returncode == 0:
+            return {"status": "OK", "arquivo": output_path}
+        return {"status": "erro", "log": r.stderr[-200:]}
 
-    # ── Processamento de áudio ─────────────────────────────────────────────────
+    def masterizar(self, input_path: str, output_path: str = None,
+                   preset: str = "narration") -> dict:
+        """
+        Masteriza áudio com presets por tipo de conteúdo.
+        Presets: narration | podcast | music | relaxation | documentary
+        """
+        presets = {
+            "narration": {
+                "filters": [
+                    "highpass=f=80",          # Remove rumble
+                    "equalizer=f=3000:t=h:width=1000:g=2",  # Presença vocal
+                    "compand=attacks=0.1:decays=0.5:points=-70/-70|-20/-15|-5/-3|0/-1",
+                    "loudnorm=I=-16:TP=-1.5:LRA=7",
+                ],
+                "desc": "Narração clara e presente"
+            },
+            "documentary": {
+                "filters": [
+                    "highpass=f=60",
+                    "equalizer=f=200:t=h:width=200:g=-3",  # Reduz boom
+                    "equalizer=f=4000:t=h:width=2000:g=3", # Clareza
+                    "compand=attacks=0.2:decays=1:points=-70/-70|-25/-18|-5/-2|0/-1",
+                    "loudnorm=I=-16:TP=-1:LRA=9",
+                ],
+                "desc": "Tom de documentário profissional"
+            },
+            "relaxation": {
+                "filters": [
+                    "lowpass=f=8000",          # Corta agudos duros
+                    "equalizer=f=300:t=h:width=200:g=2",   # Warmth
+                    "compand=attacks=0.5:decays=2:points=-70/-70|-20/-17|-3/-2|0/-1",
+                    "loudnorm=I=-18:TP=-2:LRA=12",
+                ],
+                "desc": "Som suave e relaxante"
+            },
+            "podcast": {
+                "filters": [
+                    "highpass=f=100",
+                    "equalizer=f=1000:t=h:width=500:g=1",
+                    "equalizer=f=5000:t=h:width=2000:g=2",
+                    "compand=attacks=0.05:decays=0.3:points=-70/-70|-15/-10|-5/-2|0/-1",
+                    "loudnorm=I=-16:TP=-1.5:LRA=7",
+                ],
+                "desc": "Tom podcast profissional"
+            }
+        }
 
-    def _processar_audio(self, input_path: str, output_path: str, nicho: str = "geral") -> Optional[str]:
-        """Aplica EQ, compressão e normalização (clone Audacity/Reaper)."""
-        if not self._backends.get("ffmpeg"):
-            # Sem FFmpeg, só converter
-            try:
-                import shutil
-                shutil.copy2(input_path, output_path)
-                return output_path
-            except Exception:
-                return None
+        cfg = presets.get(preset, presets["narration"])
+        af_chain = ",".join(cfg["filters"])
 
-        preset_nome = NICHO_PRESET.get(nicho, "padrão")
-        preset = AUDIO_PRESETS[preset_nome]
-
-        af_chain = ",".join([
-            preset["eq"],
-            preset["compressor"],
-            preset["limiter"],
-            f"loudnorm=I={preset['norm']}:TP=-1:LRA=11",
-        ])
+        if not output_path:
+            p = Path(input_path)
+            output_path = str(p.parent / f"{p.stem}_master_{preset}{p.suffix}")
 
         cmd = [
-            "ffmpeg", "-y",
-            "-i", input_path,
+            "ffmpeg", "-y", "-i", input_path,
             "-af", af_chain,
-            "-ar", "44100",
-            "-ac", "1",
-            "-b:a", "128k",
-            output_path,
+            "-ar", "44100", "-ac", "2",
+            "-b:a", "192k",
+            output_path
         ]
-        r = subprocess.run(cmd, capture_output=True, timeout=120)
-        if r.returncode == 0 and Path(output_path).exists():
-            return output_path
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        if r.returncode == 0:
+            return {"status": "OK", "arquivo": output_path,
+                    "preset": preset, "descricao": cfg["desc"]}
+        return {"status": "erro", "log": r.stderr[-200:]}
 
-        # Fallback: só normalizar
-        cmd_simples = [
-            "ffmpeg", "-y",
-            "-i", input_path,
-            "-af", "loudnorm=I=-18:TP=-1:LRA=11",
-            "-ar", "44100", "-ac", "1",
-            output_path,
-        ]
-        r2 = subprocess.run(cmd_simples, capture_output=True, timeout=60)
-        return output_path if r2.returncode == 0 else None
+    def mixar_trilha(self, voz_path: str, musica_path: str,
+                     output_path: str = None,
+                     musica_vol: float = 0.12) -> dict:
+        """
+        Mixa narração com trilha sonora.
+        musica_vol: volume da música (0.0-1.0, default 0.12 = -18dB)
+        """
+        if not Path(voz_path).exists():
+            return {"status": "erro", "msg": f"Voz não encontrada: {voz_path}"}
+        if not Path(musica_path).exists():
+            return {"status": "erro", "msg": f"Música não encontrada: {musica_path}"}
 
-    def tratar_audio(
-        self,
-        audio_path: str,
-        nicho: str = "geral",
-        output_path: Optional[str] = None,
-        reduzir_ruido: bool = True,
-        normalizar: bool = True,
-    ) -> dict:
-        """Aplica tratamento profissional em áudio existente."""
-        if not Path(audio_path).exists():
-            return self._resultado(None, "erro", "Arquivo não encontrado", backend="ffmpeg")
+        if not output_path:
+            p = Path(voz_path)
+            output_path = str(p.parent / f"{p.stem}_mix{p.suffix}")
 
-        if output_path is None:
-            p = Path(audio_path)
-            output_path = str(OUTPUT_DIR / f"{p.stem}_tratado.mp3")
+        # Detectar duração da voz
+        dur_result = subprocess.run([
+            "ffprobe", "-v", "error", "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1", voz_path
+        ], capture_output=True, text=True)
+        dur = float(dur_result.stdout.strip() or "60")
 
-        preset_nome = NICHO_PRESET.get(nicho, "padrão")
-        preset = AUDIO_PRESETS[preset_nome]
-
-        filtros = [preset["eq"], preset["compressor"], preset["limiter"]]
-        if reduzir_ruido:
-            filtros.insert(0, "afftdn=nf=-20")
-        if normalizar:
-            filtros.append(f"loudnorm=I={preset['norm']}:TP=-1:LRA=11")
-
+        # Mixar: música em loop cortada na duração da voz, com fade out
         cmd = [
             "ffmpeg", "-y",
-            "-i", audio_path,
-            "-af", ",".join(filtros),
-            "-ar", "44100",
-            "-b:a", "192k",
-            output_path,
+            "-i", voz_path,
+            "-stream_loop", "-1", "-i", musica_path,
+            "-t", str(dur),
+            "-filter_complex",
+            f"[1:a]volume={musica_vol},afade=t=out:st={max(0,dur-3)}:d=3[bg];"
+            f"[0:a][bg]amix=inputs=2:duration=first[mix]",
+            "-map", "[mix]",
+            "-ar", "44100", "-b:a", "192k",
+            output_path
         ]
-        r = subprocess.run(cmd, capture_output=True, timeout=180)
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
         if r.returncode == 0:
-            return self._resultado(output_path, "ok", "Áudio tratado", backend="ffmpeg", custo=0.00)
-        return self._resultado(None, "erro", r.stderr.decode()[:200], backend="ffmpeg")
+            return {"status": "OK", "arquivo": output_path,
+                    "duracao": dur, "vol_musica": musica_vol}
+        return {"status": "erro", "log": r.stderr[-200:]}
 
-    def mixar(
-        self,
-        narração_path: str,
-        trilha_path: Optional[str] = None,
-        output_path: Optional[str] = None,
-        vol_narr: float = 1.0,
-        vol_trilha: float = 0.12,
-        fade_in: float = 2.0,
-        fade_out: float = 3.0,
-    ) -> dict:
-        """Mixa narração com trilha sonora (clone Audacity mixagem)."""
-        if not Path(narração_path).exists():
-            return self._resultado(None, "erro", "Narração não encontrada", backend="ffmpeg")
-
-        if output_path is None:
-            output_path = str(OUTPUT_DIR / "mix_final.mp3")
-
-        if trilha_path and Path(trilha_path).exists():
-            # Mixar narração + trilha
-            cmd = [
-                "ffmpeg", "-y",
-                "-i", narração_path,
-                "-i", trilha_path,
-                "-filter_complex",
-                f"[0:a]volume={vol_narr}[narr];"
-                f"[1:a]volume={vol_trilha},afade=in:d={fade_in},afade=out:st=999:d={fade_out}[trilha];"
-                "[narr][trilha]amix=inputs=2:duration=first[out]",
-                "-map", "[out]",
-                "-ar", "44100", "-b:a", "192k",
-                output_path,
-            ]
-        else:
-            # Só narração com fade
-            cmd = [
-                "ffmpeg", "-y",
-                "-i", narração_path,
-                "-af", f"afade=in:d=0.5,afade=out:st=999:d={fade_out},volume={vol_narr}",
-                "-ar", "44100", "-b:a", "192k",
-                output_path,
-            ]
-
-        r = subprocess.run(cmd, capture_output=True, timeout=180)
-        if r.returncode == 0:
-            return self._resultado(output_path, "ok", "Mixagem concluída", backend="ffmpeg", custo=0.00)
-        return self._resultado(None, "erro", r.stderr.decode()[:200], backend="ffmpeg")
-
-    def transcrever(self, audio_path: str, idioma: str = "pt") -> dict:
+    def gerar_legendas_whisper(self, audio_path: str,
+                                idioma: str = "pt",
+                                output_dir: str = None) -> dict:
         """
-        Transcreve áudio para texto (clone Whisper/WhisperX).
-        Backends: openai-whisper local → faster-whisper → erro.
+        Gera legendas SRT via Whisper (gratuito, local).
+        Requer: pip install openai-whisper --break-system-packages
         """
-        if not Path(audio_path).exists():
-            return {"status": "erro", "texto": None, "ai_generated": True}
-
-        # Tentar whisper local
         try:
             import whisper
-            model = whisper.load_model("base")
-            result = model.transcribe(audio_path, language=idioma)
-            return {
-                "status": "ok",
-                "texto": result["text"],
-                "segmentos": result.get("segments", []),
-                "backend": "whisper_local",
-                "custo_brl": 0.00,
-                "ai_generated": True,
-                "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
-            }
         except ImportError:
-            pass
+            return {
+                "status": "erro_install",
+                "msg": "Whisper não instalado",
+                "install": "pip install openai-whisper --break-system-packages",
+                "alternativa": "Use WhisperX para timestamps mais precisos: pip install whisperx"
+            }
 
-        # Tentar faster-whisper
+        if not output_dir:
+            output_dir = str(Path(audio_path).parent)
+
+        model = whisper.load_model("base")
+        result = model.transcribe(audio_path, language=idioma, task="transcribe")
+
+        # Gerar SRT
+        srt_path = Path(output_dir) / (Path(audio_path).stem + ".srt")
+        with open(srt_path, "w", encoding="utf-8") as f:
+            for i, seg in enumerate(result["segments"], 1):
+                start = seg["start"]
+                end = seg["end"]
+                text = seg["text"].strip()
+
+                def fmt_time(t):
+                    h = int(t // 3600)
+                    m = int((t % 3600) // 60)
+                    s = int(t % 60)
+                    ms = int((t % 1) * 1000)
+                    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+                f.write(f"{i}\n{fmt_time(start)} --> {fmt_time(end)}\n{text}\n\n")
+
+        return {
+            "status": "OK",
+            "srt": str(srt_path),
+            "texto_completo": result["text"],
+            "segmentos": len(result["segments"]),
+            "idioma": result.get("language", "?")
+        }
+
+    def tts_edge(self, texto: str, output_path: str,
+                 voz: str = "pt-BR-AntonioNeural") -> dict:
+        """
+        Narração via Edge TTS (Microsoft, gratuito).
+        """
         try:
-            from faster_whisper import WhisperModel
-            model = WhisperModel("base", device="cpu", compute_type="int8")
-            segments, info = model.transcribe(audio_path, language=idioma)
-            texto = " ".join(s.text for s in segments)
-            return {
-                "status": "ok",
-                "texto": texto,
-                "backend": "faster_whisper",
-                "custo_brl": 0.00,
-                "ai_generated": True,
-                "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
-            }
-        except ImportError:
-            pass
+            r = subprocess.run([
+                "edge-tts", "--voice", voz,
+                "--text", texto,
+                "--write-media", output_path
+            ], capture_output=True, text=True, timeout=60)
+            if r.returncode == 0 and Path(output_path).exists():
+                return {"status": "OK", "arquivo": output_path,
+                        "voz": voz, "custo": "GRATUITO"}
+            return {"status": "erro", "log": r.stderr[-200:],
+                    "install": "pip install edge-tts --break-system-packages"}
+        except FileNotFoundError:
+            return {"status": "erro", "msg": "edge-tts não instalado",
+                    "install": "pip install edge-tts --break-system-packages"}
 
-        return {"status": "erro", "texto": None, "mensagem": "whisper não instalado", "ai_generated": True}
-
-    def gerar_srt(self, segmentos: list, output_path: Optional[str] = None) -> dict:
-        """Gera arquivo SRT de legendas a partir de segmentos do Whisper."""
-        if output_path is None:
-            output_path = str(OUTPUT_DIR / "legendas.srt")
-
-        def ts(s):
-            h = int(s // 3600)
-            m = int((s % 3600) // 60)
-            sc = s % 60
-            return f"{h:02d}:{m:02d}:{sc:06.3f}".replace(".", ",")
-
-        linhas = []
-        for i, seg in enumerate(segmentos, 1):
-            linhas.append(str(i))
-            linhas.append(f"{ts(seg['start'])} --> {ts(seg['end'])}")
-            linhas.append(seg.get("text", "").strip())
-            linhas.append("")
-
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write("\n".join(linhas))
-
-        return {
-            "status": "ok",
-            "srt_path": output_path,
-            "total_legendas": len(segmentos),
-            "custo_brl": 0.00,
-            "ai_generated": True,
-            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
-        }
-
-    def narrar_lote(self, textos: list[dict], output_dir: Optional[str] = None,
-                    max_workers: int = 4) -> list[dict]:
+    def pipeline_completo(self, texto: str, nome: str,
+                          estilo: str = "documentary",
+                          musica: Optional[str] = None) -> dict:
         """
-        Narra múltiplos segmentos em paralelo (ThreadPoolExecutor).
-        max_workers=4 reduz tempo ~4x no PC local com TTS async.
+        Pipeline completo: TTS → normalização → masterização → mix (opcional)
         """
-        from concurrent.futures import ThreadPoolExecutor, as_completed
-        if output_dir:
-            Path(output_dir).mkdir(parents=True, exist_ok=True)
+        print(f"\n[AUDIO_MASTER] Pipeline: {nome} ({estilo})")
 
-        def _processar(args):
-            i, item = args
-            texto = item.get("texto", "")
-            nicho = item.get("nicho", "geral")
-            voz = item.get("voz", "narrador")
-            out = str(Path(output_dir) / f"narr_{i:03d}.mp3") if output_dir else None
-            res = self.narrar(texto, voz=voz, nicho=nicho, output_path=out)
-            res["indice"] = i
-            return i, res
+        # 1. TTS via Edge (gratuito, sem install extra)
+        raw = str(self.output_dir / f"{nome}_raw.mp3")
+        tts = self.tts_edge(texto, raw)
+        if tts["status"] != "OK":
+            print(f"  ⚠ Edge TTS falhou: {tts.get('msg','?')}")
+            return tts
 
-        resultados_map = {}
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {executor.submit(_processar, (i, item)): i for i, item in enumerate(textos)}
-            for fut in as_completed(futures):
-                try:
-                    idx, res = fut.result()
-                    resultados_map[idx] = res
-                except Exception as e:
-                    i = futures[fut]
-                    resultados_map[i] = {"audio_path": None, "status": "erro", "indice": i, "erro": str(e)}
+        print(f"  ✅ TTS gerado: {raw}")
 
-        return [resultados_map[i] for i in sorted(resultados_map)]
+        # 2. Masterizar
+        master = self.masterizar(raw, preset=estilo)
+        if master["status"] != "OK":
+            print(f"  ⚠ Masterização falhou")
+            master["arquivo"] = raw  # Usar bruto
 
-    def status(self) -> dict:
-        backends = self._detectar_backends()
-        backend_ativo = "none"
-        for nome in ["edge_tts", "gtts", "piper", "xtts", "espeak"]:
-            if backends.get(nome):
-                backend_ativo = nome
-                break
+        master_path = master.get("arquivo", raw)
+        print(f"  ✅ Masterizado: {master_path}")
+
+        # 3. Mixar com música (opcional)
+        final_path = master_path
+        if musica and Path(musica).exists():
+            mix = self.mixar_trilha(master_path, musica)
+            if mix["status"] == "OK":
+                final_path = mix["arquivo"]
+                print(f"  ✅ Mixado com trilha: {final_path}")
 
         return {
-            "status": "ok",
-            "backends": backends,
-            "backend_tts_ativo": backend_ativo,
-            "vozes_disponiveis": list(VOZES_EDGE.keys()),
-            "presets_audio": list(AUDIO_PRESETS.keys()),
-            "nichos_suportados": list(NICHO_PRESET.keys()),
-            "funcionalidades": [
-                "narração_ptbr",
-                "tratamento_audio",
-                "mixagem",
-                "transcrição_whisper",
-                "geração_srt",
-                "narração_lote",
-            ],
-            "custo_mensal_brl": 0.00,
+            "status": "OK",
+            "arquivo_final": final_path,
+            "nome": nome,
+            "estilo": estilo,
             "ai_generated": True,
-            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
-        }
-
-    # ── Helper ─────────────────────────────────────────────────────────────────
-
-    def _resultado(self, path, status, msg, backend="ffmpeg", custo=0.00) -> dict:
-        return {
-            "status": status,
-            "audio_path": path,
-            "mensagem": msg,
-            "backend": backend,
-            "custo_brl": custo,
-            "ai_generated": True,
-            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
         }
 
 
-# ── CLI de teste ───────────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════
+# CONTRATO JSON PARA DARK MANAGER
+# ═══════════════════════════════════════════════════════
+CONTRACT = {
+    "agente": "AUDIO_MASTER",
+    "versao": "1.0.0",
+    "descricao": "Narração, mixagem e masterização de áudio",
+    "entrada": {
+        "texto": "str — script para narração",
+        "nome": "str — identificador do arquivo",
+        "estilo": "str? — narration|documentary|relaxation|podcast",
+        "musica": "str? — path da trilha sonora (opcional)",
+        "motor_tts": "str? — elevenlabs|edge_tts|piper|xtts"
+    },
+    "saida": {
+        "status": "OK|erro",
+        "arquivo_final": "str — path do MP3 masterizado",
+        "ai_generated": True,
+        "ai_disclosure": "str"
+    },
+    "motores_tts": list(MOTORES_TTS.keys()),
+    "politica_custo": "SEMPRE gratuito. ElevenLabs pago só com aprovação."
+}
+
 
 if __name__ == "__main__":
-    print("=== DARK AUDIO STUDIO — Diagnóstico ===")
     studio = DarkAudioStudio()
-    st = studio.status()
-    print(json.dumps(st, indent=2, ensure_ascii=False))
 
-    if len(sys.argv) > 1:
-        texto = " ".join(sys.argv[1:])
-        print(f"\nNarrando: {texto[:60]}...")
-        res = studio.narrar(texto, voz="narrador", nicho="documentario")
-        print(json.dumps(res, indent=2, ensure_ascii=False))
+    print("\n╔══════════════════════════════════════════════════════╗")
+    print("║   DARK AUDIO STUDIO — FASE 6                         ║")
+    print("║   Narração + Pós-produção de Áudio                   ║")
+    print("╚══════════════════════════════════════════════════════╝\n")
+
+    print("MOTORES TTS DISPONÍVEIS:")
+    for nome, m in MOTORES_TTS.items():
+        print(f"\n  [{nome.upper()}]")
+        print(f"    Custo: {m['custo']}")
+        print(f"    Qualidade: {m['qualidade']}")
+        print(f"    Vozes PT-BR: {'✅' if m['vozes_ptbr'] else '❌'}")
+        print(f"    Latência: {m['latencia']}")
+
+    print("\nVERIFICANDO FFMPEG:")
+    if studio.verificar_ffmpeg():
+        print("  ✅ FFmpeg disponível")
+    else:
+        print("  ✗ FFmpeg não encontrado")
+
+    # Salvar contrato
+    with open("core/dark_audio_studio_contract.json", "w", encoding="utf-8") as f:
+        json.dump(CONTRACT, f, ensure_ascii=False, indent=2)
+    print("\n  Contrato: core/dark_audio_studio_contract.json")
+    print("\n  Para narração offline: instale edge-tts")
+    print("  pip install edge-tts --break-system-packages\n")

@@ -1,0 +1,26 @@
+{
+  "agente": "AUDIO_MASTER",
+  "versao": "1.0.0",
+  "descricao": "Narração, mixagem e masterização de áudio",
+  "entrada": {
+    "texto": "str — script para narração",
+    "nome": "str — identificador do arquivo",
+    "estilo": "str? — narration|documentary|relaxation|podcast",
+    "musica": "str? — path da trilha sonora (opcional)",
+    "motor_tts": "str? — elevenlabs|edge_tts|piper|xtts"
+  },
+  "saida": {
+    "status": "OK|erro",
+    "arquivo_final": "str — path do MP3 masterizado",
+    "ai_generated": true,
+    "ai_disclosure": "str"
+  },
+  "motores_tts": [
+    "elevenlabs_free",
+    "piper",
+    "xtts",
+    "edge_tts",
+    "gtts"
+  ],
+  "politica_custo": "SEMPRE gratuito. ElevenLabs pago só com aprovação."
+}

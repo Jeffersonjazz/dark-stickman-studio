@@ -1,0 +1,58 @@
+{
+  "agente": "CINEMATIC_DIRECTOR",
+  "versao": "1.0.0",
+  "descricao": "Direção de fotografia, composição, iluminação e continuidade visual",
+  "entrada": {
+    "roteiro": "list — lista de cenas [{descricao, plano?, movimento?}]",
+    "estilo": "str — documentary|dark_thriller|nature|history|sci_tech|relaxation|education|music",
+    "titulo": "str — título do projeto",
+    "personagens": "list? — descrição visual dos personagens",
+    "cenarios": "list? — descrição dos ambientes"
+  },
+  "saida": {
+    "cenas": "list — prompts visuais por cena",
+    "biblia_visual": "dict — banco de referências do projeto",
+    "ai_generated": true,
+    "ai_disclosure": "str"
+  },
+  "estilos_disponiveis": [
+    "documentary",
+    "dark_thriller",
+    "nature",
+    "history",
+    "sci_tech",
+    "relaxation",
+    "education",
+    "music"
+  ],
+  "planos_disponiveis": [
+    "ECU",
+    "CU",
+    "MCU",
+    "MS",
+    "MLS",
+    "LS",
+    "VLS",
+    "ELS",
+    "OTS",
+    "POV",
+    "AERIAL",
+    "WORM"
+  ],
+  "movimentos_disponiveis": [
+    "static",
+    "slow_pan",
+    "slow_tilt",
+    "push_in",
+    "pull_out",
+    "crane_up",
+    "crane_down",
+    "orbit",
+    "tracking",
+    "dutch_angle",
+    "drone_aerial",
+    "handheld",
+    "slow_reveal",
+    "whip_pan"
+  ]
+}

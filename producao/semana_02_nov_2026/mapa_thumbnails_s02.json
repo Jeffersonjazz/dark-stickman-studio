@@ -1,0 +1,34 @@
+{
+  "gerado_em": "2026-11-02T21:09:54.823969",
+  "semana": "02",
+  "total": 5,
+  "thumbnails": [
+    {
+      "id": "s02_short1",
+      "canal": "ESQUINA DO MEDO",
+      "thumb": "outputs/thumbnails/s02_thumb_5d631686_o_fenômeno_de_dyatlov.jpg"
+    },
+    {
+      "id": "s02_short2",
+      "canal": "HORIZONTE CÓSMICO",
+      "thumb": "outputs/thumbnails/s02_thumb_76346198_o_objeto_mais_brilhante_do_uni.jpg"
+    },
+    {
+      "id": "s02_short3",
+      "canal": "MESTRE DO OCULTO",
+      "thumb": "outputs/thumbnails/s02_thumb_b2c93240_kryptos.jpg"
+    },
+    {
+      "id": "s02_short4",
+      "canal": "RAÍZES DA TERRA",
+      "thumb": "outputs/thumbnails/s02_thumb_d34e0484_o_maior_ser_vivo_da_terra.jpg"
+    },
+    {
+      "id": "s02_short5",
+      "canal": "PULSO DIGITAL",
+      "thumb": "outputs/thumbnails/s02_thumb_04c689fa_o_chip_que_vai_substituir_o_sm.jpg"
+    }
+  ],
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}

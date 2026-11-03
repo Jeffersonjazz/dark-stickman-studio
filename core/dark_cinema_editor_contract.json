@@ -1,0 +1,40 @@
+{
+  "agente": "VIDEO_EDITOR_PRO",
+  "versao": "1.0.0",
+  "descricao": "Montagem, color grading e renderização de vídeos",
+  "entrada": {
+    "input_video": "str — path do vídeo base",
+    "input_audio": "str — path do áudio (narração)",
+    "nome": "str — nome do arquivo de saída",
+    "color_preset": "str? — dark_thriller|documentary|nature|history|sci_tech|cinematic|relaxation"
+  },
+  "saida": {
+    "status": "OK|erro",
+    "arquivo": "str — path do MP4 final",
+    "mb": "float",
+    "color_grade": "str",
+    "ai_generated": true,
+    "ai_disclosure": "str"
+  },
+  "presets_color": [
+    "dark_thriller",
+    "documentary",
+    "nature",
+    "history",
+    "sci_tech",
+    "cinematic",
+    "relaxation"
+  ],
+  "transicoes": [
+    "fade",
+    "dissolve",
+    "wipe_left",
+    "wipe_right",
+    "zoom_in",
+    "none"
+  ],
+  "dependencias": [
+    "ffmpeg",
+    "ffprobe"
+  ]
+}

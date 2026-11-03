@@ -1,0 +1,78 @@
+{
+  "semana": "02",
+  "periodo": "10-14 Nov 2026",
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "shorts": [
+    {
+      "id": "s02_short1",
+      "canal": "Esquina_do_Medo",
+      "nicho": "terror_suspense",
+      "dia": "Seg 10/11",
+      "titulo": "O Fenômeno de Dyatlov: 9 Mortes Sem Explicação",
+      "tags": "#mistério #terror #dyatlov #shorts #conspiração #estranho",
+      "categoria": "Entertainment",
+      "voz": "Nassif",
+      "voice_id": "acdKA5HckGxoxxvy40dA",
+      "script": "Fevereiro de 1959. Montanhas Urais. Nove alpinistas experientes mortos.\n\nA barraca rasgada de dentro para fora. Marcas de radiação nos corpos. Fraturas internas sem ferimentos externos. Olhos e línguas ausentes de alguns.\n\nA URSS classificou o caso por décadas. A explicação oficial: 'força desconhecida irresistível'.\n\nEm 2019, a Rússia reabriu a investigação. Conclusão: avalanche.\n\nNinguém acredita.",
+      "duracao_estimada": 38,
+      "prompt_thumb": "Dark mountainside at night, Soviet-era photo style, orange tent with torn fabric, mysterious light beam from sky, horror atmosphere, cinematic"
+    },
+    {
+      "id": "s02_short2",
+      "canal": "Horizonte_Cosmico",
+      "nicho": "espaco_astronomia",
+      "dia": "Ter 11/11",
+      "titulo": "O Objeto Mais Brilhante do Universo Foi Descoberto",
+      "tags": "#espaço #astronomia #universo #shorts #ciência #quasar",
+      "categoria": "Science & Technology",
+      "voz": "Nassif",
+      "voice_id": "acdKA5HckGxoxxvy40dA",
+      "script": "Em 2024, astrônomos descobriram o quasar mais brilhante já registrado.\n\nJ0529-4351. Tão luminoso que equivale a 500 trilhões de sóis.\n\nNo centro: um buraco negro consumindo 370 massas solares por ano.\n\nEle existe há 12 bilhões de anos. Estamos vendo luz de quando o universo tinha apenas 1,5 bilhão de anos.\n\nE ainda assim... o universo é maior do que podemos imaginar.",
+      "duracao_estimada": 35,
+      "prompt_thumb": "Massive quasar in deep space, brilliant light rays, surrounding galaxy, cosmic dust, ultra-realistic astronomy photo, cinematic space photography"
+    },
+    {
+      "id": "s02_short3",
+      "canal": "Mestre_do_Oculto",
+      "nicho": "ocultismo_misterios",
+      "dia": "Qua 12/11",
+      "titulo": "A Cifra de Kryptos Que Desafia a CIA Há 35 Anos",
+      "tags": "#mistério #criptografia #cia #shorts #oculto #código",
+      "categoria": "Education",
+      "voz": "Nassif",
+      "voice_id": "acdKA5HckGxoxxvy40dA",
+      "script": "1990. CIA, Langley. Uma escultura de cobre com 865 caracteres.\n\nKryptos. Criada por Jim Sanborn.\n\nTrês das quatro partes foram decifradas. A última — K4 — permanece intacta.\n\nO próprio criador deu pistas ao longo dos anos. 'BERLIM'. 'CLOCK'. Nada funcionou.\n\nOs melhores criptógrafos do mundo falharam.\n\nA resposta existe. Está lá. Esperando.",
+      "duracao_estimada": 36,
+      "prompt_thumb": "Mysterious copper sculpture with encrypted text, CIA headquarters background, dim lighting, cryptic symbols glowing, noir atmosphere"
+    },
+    {
+      "id": "s02_short4",
+      "canal": "Raizes_da_Terra",
+      "nicho": "natureza_ecologia",
+      "dia": "Qui 13/11",
+      "titulo": "A Floresta Que É Um Único Organismo Vivo",
+      "tags": "#natureza #floresta #ciência #shorts #ecologia #fascinante",
+      "categoria": "Science & Technology",
+      "voz": "Edmilson",
+      "voice_id": "9luRA11KwacKAVmLyqUs",
+      "script": "Em Utah existe um bosque chamado Pando.\n\nAparentemente são 47.000 árvores. Na realidade é uma única planta.\n\nTodas conectadas por um sistema de raízes subterrâneo. Um único organismo com 80.000 anos de idade.\n\nO maior ser vivo do planeta Terra.\n\nE está morrendo. A pressão humana e o pastoreio excessivo estão destruindo o que 80 milênios construíram.",
+      "duracao_estimada": 33,
+      "prompt_thumb": "Aerial view of massive aspen forest in autumn, golden leaves, underground root system visualization, Utah landscape, nature documentary style"
+    },
+    {
+      "id": "s02_short5",
+      "canal": "Pulso_Digital",
+      "nicho": "tecnologia_inovacao",
+      "dia": "Sex 14/11",
+      "titulo": "O Chip Que Vai Substituir Seu Smartphone",
+      "tags": "#tecnologia #futuro #chip #shorts #inovação #digital",
+      "categoria": "Science & Technology",
+      "voz": "Nassif",
+      "voice_id": "acdKA5HckGxoxxvy40dA",
+      "script": "Neuralink. NVIDIA. Apple. Todos correndo para o mesmo objetivo.\n\nUm chip implantável menor que uma moeda.\n\nJá testado em humanos. Já permitiu que um paciente paralisado controlasse um computador com o pensamento.\n\nA projeção para 2030: chips que substituem smartphones. Sem telas. Sem teclados.\n\nApenas pensamento e resposta.\n\nA pergunta não é se isso vai acontecer. É quando você vai aceitar.",
+      "duracao_estimada": 38,
+      "prompt_thumb": "Futuristic neural chip implant technology, glowing circuits on dark background, human brain scan overlay, tech noir aesthetic"
+    }
+  ]
+}
