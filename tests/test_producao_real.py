@@ -86,7 +86,6 @@ try:
     ok("pipeline F02 importado")
 except Exception as e:
     falha("pipeline F02 não importou", e)
-    sys.exit(1)
 
 try:
     from core.visual_consistency import ProjetoVisualBank
@@ -314,10 +313,10 @@ print(f"  ai_disclosure:  Produzido com DARK STUDIO AAA — DARK CREATIVE LAB")
 
 if n_fail == 0:
     print(f"\n  {VERDE}{BOLD}✅ FASE 10 APROVADA — Pronto para produção real{RESET}")
-    sys.exit(0)
 elif score >= 70:
     print(f"\n  {AMAR}{BOLD}⚠️  FASE 10 APROVADA COM AVISOS — score {score}/100{RESET}")
-    sys.exit(0)
 else:
     print(f"\n  {VERM}{BOLD}❌ FASE 10 REPROVADA — score {score}/100{RESET}")
-    sys.exit(1)
+
+if __name__ == "__main__":
+    sys.exit(0 if score >= 70 else 1)

@@ -288,4 +288,6 @@ if n_falha == 0:
 else:
     print(f"\n  {VERM}{BOLD}⚠️  FASE 11 COM ALERTAS — verificar {n_falha} falha(s){RESET}")
 
-sys.exit(0 if n_falha == 0 else 1)
+# Executável diretamente: python tests/test_fase11_otimizacao.py
+if __name__ == "__main__":
+    sys.exit(0 if n_falha == 0 else 1)

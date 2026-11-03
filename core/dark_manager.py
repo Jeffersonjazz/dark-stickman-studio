@@ -694,3 +694,154 @@ if __name__ == "__main__":
     print(f"\n  Etapas concluídas: {list(r['etapas'].keys())}")
     print(f"  QA aprovado: {r['qa_aprovado']}")
     print(f"  Custo: R${r['custo_total_brl']:.2f}\n")
+
+
+# ─── Funções de módulo para compatibilidade com testes e integrações ──────────
+
+_manager_singleton: "DarkManager | None" = None
+
+def _get_manager() -> "DarkManager":
+    global _manager_singleton
+    if _manager_singleton is None:
+        _manager_singleton = DarkManager()
+    return _manager_singleton
+
+
+def executar(tarefa: str, params: dict = None, verbose: bool = True, **kwargs) -> dict:
+    """Alias de módulo: despacha uma tarefa para o agente adequado.
+    
+    Args:
+        tarefa: nome da tarefa (ex: 'gerar_imagem', 'narrar', 'gerar_video', 'thumbnail')
+        **kwargs: parâmetros passados ao agente
+    
+    Returns:
+        dict com resultado da operação
+    """
+    # Mesclar params dict com kwargs
+    if params:
+        kwargs.update(params)
+
+    manager = _get_manager()
+    agente = manager.decidir_agente(tarefa)
+
+    # Mapear tarefas para métodos do pipeline
+    task_lower = tarefa.lower().replace(" ", "_")
+    
+    if "imagem" in task_lower or "image" in task_lower or "thumbnail" in task_lower:
+        try:
+            from core.dark_image_engine import DarkImageEngine
+            eng = DarkImageEngine()
+            prompt = kwargs.get("prompt", kwargs.get("titulo", kwargs.get("descricao", f"cena de {tarefa}")))
+            nicho = kwargs.get("nicho", kwargs.get("canal", "natureza"))
+            output_path = kwargs.get("output_path")
+            extra = {k:v for k,v in kwargs.items() if k not in ("prompt","nicho","descricao","titulo","canal","output_path")}
+            from pathlib import Path as _Path
+            result = eng.gerar(prompt=prompt, nicho=nicho, output_path=_Path(output_path) if output_path else None, **extra)
+            result["status"] = "ok"
+            return result
+        except Exception as e:
+            return {"status": "erro", "agente": agente, "erro": str(e), "tarefa": tarefa,
+                    "ai_generated": True, "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"}
+    
+    elif "video" in task_lower or "vídeo" in task_lower:
+        try:
+            from core.dark_video_generator import DarkVideoGenerator
+            gen = DarkVideoGenerator()
+            prompt = kwargs.get("prompt", kwargs.get("descricao", f"vídeo de {tarefa}"))
+            output_path = kwargs.get("output_path")
+            duracao_s = kwargs.get("duracao_s", 5)
+            # DarkVideoGenerator usa gerar_broll_sintetico como método principal de geração por texto
+            result = gen.gerar_broll_sintetico(
+                tema=prompt,
+                output_path=output_path or "/tmp/dark_video_exec.mp4",
+                duracao=float(duracao_s),
+            ) if hasattr(gen, "gerar_broll_sintetico") else gen.gerar_broll(prompt=prompt, output_path=output_path)
+            if isinstance(result, dict) and "status" not in result:
+                result["status"] = "ok"
+            return result
+        except Exception as e:
+            return {"status": "erro", "agente": agente, "erro": str(e), "tarefa": tarefa,
+                    "ai_generated": True, "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"}
+    
+    elif "narr" in task_lower or "audio" in task_lower or "voz" in task_lower or "tts" in task_lower:
+        try:
+            from core.piper_tts import synthesize
+            texto = kwargs.get("texto", kwargs.get("text", "Narração de teste."))
+            output = kwargs.get("output_path", "/tmp/dark_narr_exec.wav")
+            from pathlib import Path as _Path
+            result = synthesize(texto, _Path(output))
+            return {"status": "ok" if result else "erro", "audio_path": output, "agente": agente,
+                    "ai_generated": True, "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"}
+        except Exception as e:
+            return {"status": "erro", "agente": agente, "erro": str(e), "tarefa": tarefa,
+                    "ai_generated": True, "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"}
+    
+    return {
+        "status": "despachado",
+        "tarefa": tarefa,
+        "agente_decidido": agente,
+        "ai_generated": True,
+        "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+    }
+
+
+def check_all_agents() -> dict:
+    """Verifica status de todos os 9 agentes especialistas.
+    
+    Returns:
+        dict com status de cada agente
+    """
+    status = {}
+    
+    agentes_modulos = [
+        ("IMAGE_ENGINE",        "core.dark_image_engine",    "DarkImageEngine"),
+        ("VIDEO_GENERATOR",     "core.dark_video_generator", "DarkVideoGenerator"),
+        ("CINEMATIC_DIRECTOR",  "core.cinematic_director",   "gerar_prompt_visual"),
+        ("VIDEO_EDITOR_PRO",    "core.cinema_editor",        "Timeline"),
+        ("MOTION_GRAPHICS",     "core.motion_graphics",      "gerar_titulo_animado"),
+        ("AUDIO_MASTER",        "core.piper_tts",            "PiperTTS"),
+        ("VISUAL_CONSISTENCY",  "core.visual_consistency",   "VisualConsistencyDB"),
+        ("ASSET_MANAGER",       "core.asset_manager",        "AssetDB"),
+        ("CREATIVE_QA",         "core.creative_qa",          "verificar_qualidade"),
+    ]
+    
+    agentes_status = {}
+    for nome, modulo, classe in agentes_modulos:
+        try:
+            import importlib
+            mod = importlib.import_module(modulo)
+            getattr(mod, classe)
+            agentes_status[nome] = {"status": "ok", "modulo": modulo, "symbol": classe}
+        except Exception as e:
+            agentes_status[nome] = {"status": "erro", "modulo": modulo, "symbol": classe, "erro": str(e)}
+
+    n_ok = sum(1 for v in agentes_status.values() if v["status"] == "ok")
+    status["agentes"] = agentes_status
+    status["_resumo"] = {
+        "total": len(agentes_modulos),
+        "ok": n_ok,
+        "falhas": len(agentes_modulos) - n_ok,
+        "ai_generated": True,
+        "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+    }
+    return status
+
+
+# TASK_TYPES: mapeamento de tarefas para agentes (compatibilidade)
+TASK_TYPES = {
+    "gerar_imagem":   "IMAGE_ENGINE",
+    "thumbnail":      "IMAGE_ENGINE",
+    "gerar_video":    "VIDEO_GENERATOR",
+    "animar":         "VIDEO_GENERATOR",
+    "narrar":         "AUDIO_MASTER",
+    "tts":            "AUDIO_MASTER",
+    "audio":          "AUDIO_MASTER",
+    "montar":         "VIDEO_EDITOR_PRO",
+    "editar":         "VIDEO_EDITOR_PRO",
+    "motion":         "MOTION_GRAPHICS",
+    "titulo":         "MOTION_GRAPHICS",
+    "consistencia":   "VISUAL_CONSISTENCY",
+    "qa":             "CREATIVE_QA",
+    "asset":          "ASSET_MANAGER",
+    "cinematic":      "CINEMATIC_DIRECTOR",
+}
