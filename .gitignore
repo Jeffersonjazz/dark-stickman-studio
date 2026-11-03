@@ -54,7 +54,6 @@ Thumbs.db
 *.onnx.json
 
 # Outputs gerados (binários — não versionar)
-outputs/thumbnails/
 outputs/audio/
 outputs/video/
 outputs/referencias/
