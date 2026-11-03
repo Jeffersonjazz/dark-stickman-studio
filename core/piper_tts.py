@@ -1,6 +1,6 @@
 """
 DARK STICKMAN STUDIO — Narração PT-BR Multi-Engine TTS
-Prioridade: Piper (local) → edge-tts (Microsoft online) → gTTS (Google online) → silêncio
+Prioridade: Piper (local) → espeak-ng (offline) → edge-tts (Microsoft online) → gTTS (Google online) → silêncio
 
 Licença: MIT — DARK CREATIVE LAB
 ai_generated: True
@@ -67,7 +67,82 @@ def _synthesize_piper(text: str, output_path: Path, length_scale: float = 1.0) -
 
 
 # ─────────────────────────────────────────────
-# ENGINE 2: EDGE-TTS (Microsoft, online, voz natural)
+# ENGINE 2: ESPEAK-NG (offline, via espeakng_loader embutido)
+# ─────────────────────────────────────────────
+
+def _synthesize_espeak(text: str, output_path: Path, voice: str = "pt-br") -> bool:
+    """
+    Sintetiza com espeak-ng embutido via ctypes (espeakng_loader).
+    Totalmente offline — sem dependências externas.
+    Qualidade: robótica mas inteligível. Funciona no cloud e no Windows.
+    Retorna True se ok.
+    """
+    try:
+        import espeakng_loader
+        import ctypes
+        import wave
+        import struct
+
+        lib = ctypes.CDLL(str(espeakng_loader.get_library_path()))
+        data_path = str(espeakng_loader.get_data_path())
+
+        AUDIO_OUTPUT_SYNCHRONOUS = 0x02
+        ESPEAKNG_ENCODING_UTF8 = 1
+
+        sample_rate = lib.espeak_Initialize(
+            AUDIO_OUTPUT_SYNCHRONOUS, 500, data_path.encode(), 0
+        )
+        if sample_rate <= 0:
+            return False
+
+        lib.espeak_SetVoiceByName.restype = ctypes.c_int
+        if lib.espeak_SetVoiceByName(voice.encode()) != 0:
+            # Tenta fallback "pt"
+            lib.espeak_SetVoiceByName(b"pt")
+
+        audio_data = []
+        SYNTH_CB = ctypes.CFUNCTYPE(
+            ctypes.c_int, ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p
+        )
+
+        def _cb(wav, numsamples, events):
+            if wav and numsamples > 0:
+                samples = (ctypes.c_short * numsamples).from_address(wav)
+                audio_data.extend(list(samples))
+            return 0
+
+        cb = SYNTH_CB(_cb)
+        lib.espeak_SetSynthCallback(cb)
+
+        encoded = text.encode("utf-8")
+        lib.espeak_Synth.restype = ctypes.c_int
+        lib.espeak_Synth(
+            encoded, len(encoded) + 1,
+            0, 0, 0,
+            ESPEAKNG_ENCODING_UTF8,
+            ctypes.c_void_p(0),
+            ctypes.c_void_p(0),
+        )
+        lib.espeak_Synchronize()
+
+        if not audio_data:
+            return False
+
+        with wave.open(str(output_path), "wb") as wf:
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(sample_rate)
+            wf.writeframes(struct.pack(f"<{len(audio_data)}h", *audio_data))
+
+        return output_path.exists() and output_path.stat().st_size > 100
+
+    except Exception as e:
+        print(f"[TTS] espeak-ng falhou: {e}")
+        return False
+
+
+# ─────────────────────────────────────────────
+# ENGINE 3: EDGE-TTS (Microsoft, online, voz natural)
 # ─────────────────────────────────────────────
 
 def _synthesize_edge_tts(text: str, output_path: Path, voice: str = EDGE_TTS_VOICE) -> bool:
@@ -114,7 +189,7 @@ def _synthesize_edge_tts(text: str, output_path: Path, voice: str = EDGE_TTS_VOI
 
 
 # ─────────────────────────────────────────────
-# ENGINE 3: gTTS (Google, online, fallback)
+# ENGINE 4: gTTS (Google, online, fallback)
 # ─────────────────────────────────────────────
 
 def _synthesize_gtts(text: str, output_path: Path) -> bool:
@@ -143,7 +218,7 @@ def _synthesize_gtts(text: str, output_path: Path) -> bool:
 
 
 # ─────────────────────────────────────────────
-# ENGINE 4: SILÊNCIO (fallback final)
+# ENGINE 5: SILÊNCIO (fallback final)
 # ─────────────────────────────────────────────
 
 def _synthesize_silence(output_path: Path, duration_s: float = 5.0) -> bool:
@@ -195,21 +270,26 @@ def synthesize(
         print(f"[TTS] Piper ✅ → {output_path.name}")
         return output_path
 
-    # ENGINE 2 — edge-tts (Microsoft Neural PT-BR)
+    # ENGINE 2 — espeak-ng (offline, via espeakng_loader)
+    if _synthesize_espeak(text, output_path):
+        print(f"[TTS] espeak-ng ✅ → {output_path.name}")
+        return output_path
+
+    # ENGINE 3 — edge-tts (Microsoft Neural PT-BR)
     if _synthesize_edge_tts(text, output_path, voice):
         print(f"[TTS] edge-tts ✅ → {output_path.name}")
         return output_path
 
-    # ENGINE 3 — gTTS (Google)
+    # ENGINE 4 — gTTS (Google)
     if _synthesize_gtts(text, output_path):
         print(f"[TTS] gTTS ✅ → {output_path.name}")
         return output_path
 
-    # ENGINE 4 — silêncio
+    # ENGINE 5 — silêncio (fallback final)
     words = len(text.split())
     dur = max(3.0, words * 0.4)
     _synthesize_silence(output_path, dur)
-    print(f"[TTS] ⚠️ silêncio ({dur:.0f}s) → {output_path.name} — instale Piper para voz real")
+    print(f"[TTS] ⚠️ silêncio ({dur:.0f}s) → {output_path.name} — todos os engines falharam")
     return output_path
 
 
@@ -245,8 +325,20 @@ def get_audio_duration(path: Path) -> float:
 
 def check_tts_engines() -> dict:
     """Retorna status de cada engine TTS disponível."""
-    status = {"piper": False, "edge_tts": False, "gtts": False, "silence_fallback": True}
+    status = {
+        "piper": False,
+        "espeakng": False,
+        "edge_tts": False,
+        "gtts": False,
+        "silence_fallback": True,
+    }
     status["piper"] = _model_path(DEFAULT_MODEL) is not None
+    try:
+        import espeakng_loader
+        lib_path = espeakng_loader.get_library_path()
+        status["espeakng"] = Path(str(lib_path)).exists()
+    except Exception:
+        pass
     try:
         import edge_tts; status["edge_tts"] = True
     except ImportError:
@@ -310,3 +402,74 @@ if __name__ == "__main__":
 def check_piper() -> dict:
     """Verifica disponibilidade dos engines TTS."""
     return check_tts_engines()
+
+
+# ─────────────────────────────────────────────────────────────────────
+# CLASSE PiperTTS — interface orientada a objetos (compatibilidade v1.4)
+# ─────────────────────────────────────────────────────────────────────
+
+class PiperTTS:
+    """
+    Wrapper OOP para o engine TTS do DARK STUDIO AAA.
+    Prioridade: Piper local → edge-tts (pt-BR) → gTTS → silêncio.
+
+    Uso:
+        tts = PiperTTS()
+        path = tts.narrar("Bem-vindo ao canal.", "saida.wav")
+        print(tts.status())
+
+    ai_generated: True
+    ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
+    """
+
+    def __init__(self, model: str = DEFAULT_MODEL, voice: str = EDGE_TTS_VOICE):
+        self.model = model
+        self.voice = voice
+        self._engines = check_tts_engines()
+
+    def status(self) -> dict:
+        """Retorna status de cada engine TTS disponível."""
+        self._engines = check_tts_engines()
+        melhor = "piper" if self._engines["piper"] else \
+                 "espeakng" if self._engines.get("espeakng") else \
+                 "edge_tts" if self._engines["edge_tts"] else \
+                 "gtts" if self._engines["gtts"] else "silence"
+        return {
+            "engines": self._engines,
+            "engine_ativo": melhor,
+            "modelo_piper": self.model,
+            "voz_edge_tts": self.voice,
+            "custo": "R$0,00 (todos backends gratuitos)",
+        }
+
+    def narrar(self, texto: str, output_path, length_scale: float = 1.0) -> Path:
+        """
+        Narra um texto e salva em output_path.
+        Usa o melhor engine disponível automaticamente.
+        """
+        return synthesize(texto, Path(output_path), length_scale=length_scale)
+
+    def narrar_roteiro_completo(self, roteiro: list, output_dir: Path,
+                                 prefixo: str = "cena") -> list:
+        """
+        Narra uma lista de frases/cenas.
+        Retorna lista de Paths dos áudios gerados.
+        """
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        audios = []
+        for i, frase in enumerate(roteiro):
+            out = output_dir / f"{prefixo}_{i+1:02d}.wav"
+            self.narrar(str(frase), out)
+            audios.append(out)
+        return audios
+
+    def engine_ativo(self) -> str:
+        """Retorna o nome do engine TTS que será usado."""
+        s = self.status()
+        return s["engine_ativo"]
+
+
+def piper_tts(texto: str, output_path, **kwargs) -> Path:
+    """Atalho funcional para PiperTTS().narrar() — retrocompatibilidade."""
+    return PiperTTS().narrar(texto, output_path, **kwargs)
