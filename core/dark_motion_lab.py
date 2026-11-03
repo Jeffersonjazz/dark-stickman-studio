@@ -663,10 +663,11 @@ class DarkMotionLab:
                 f"enable='gte(t,{delay:.2f})'"
             )
             # Valor acima da barra (aparece quando barra está quase cheia)
+            val_text = self._esc(str(item["valor"]))
             filtros.append(
-                f"drawtext={fonte_sub}text='{self._esc(str(item[\"valor\"]))}%':"
+                f"drawtext={fonte_sub}text='{val_text}%':"
                 f"fontcolor=0xFFFFFF:fontsize={fs_val}:"
-                f"x={x + bar_w//2 - fs_val}:y='{base_y-bar_h_final}-{fs_val+8}':"
+                f"x={x + bar_w//2 - fs_val}:y={base_y-bar_h_final-fs_val-8}:"
                 f"enable='gte(t,{delay+anim_dur*0.5:.2f})'"
             )
 
@@ -800,7 +801,8 @@ class DarkMotionLab:
             "funcionalidades": [
                 "titulo_animado", "lower_third", "abertura",
                 "encerramento", "burn_legendas", "overlay_texto",
-                "infografico_barras",
+                "infografico_barras", "contagem_regressiva",
+                "animacao_logo", "infografico_video", "contador_estatisticas",
             ],
             "animacoes": ["fade", "slide", "typewriter", "glow"],
             "nichos_suportados": list(PALETAS.keys()),
