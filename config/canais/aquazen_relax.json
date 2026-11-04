@@ -1,0 +1,21 @@
+{
+  "nome": "AquaZen Relax",
+  "canal_id": "UC89YZqbZ02RTaT2FYepPHCQ",
+  "handle": "@aquazenrelaxbr",
+  "nicho": "relaxamento",
+  "nicho_descricao": "Relaxamento, meditação, sons da natureza, bem-estar",
+  "tom": "calmo, suave e tranquilo",
+  "stickman_color": "#06B6D4",
+  "stickman_seed": 1012,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 0.85,
+  "watermark": true,
+  "descricao": "Sons e cenas de relaxamento para aliviar o estresse",
+  "tags_padrao": ["relaxamento", "meditação", "sono", "natureza", "bem-estar", "sons relaxantes", "zen"],
+  "duracao_alvo_s": 300,
+  "re_hook_intervalo_s": 60,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "topicos_validos": ["meditação guiada", "sons da natureza", "relaxamento profundo", "técnicas de respiração", "sono", "mindfulness"],
+  "topicos_invalidos": ["terror", "tecnologia", "história", "violência"]
+}

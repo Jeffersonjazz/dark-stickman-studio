@@ -1,0 +1,21 @@
+{
+  "nome": "Esquina do Medo",
+  "canal_id": "UCwuyz5ABF6ooQUn2HwG9xHQ",
+  "handle": "@esquinadomedo-k3s",
+  "nicho": "misterio",
+  "nicho_descricao": "Mistérios, horror, lugares assombrados, fenômenos inexplicáveis",
+  "tom": "suspense e tensão crescente",
+  "stickman_color": "#8B5CF6",
+  "stickman_seed": 1007,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 0.90,
+  "watermark": true,
+  "descricao": "Histórias perturbadoras, lugares malditos e mistérios sem explicação",
+  "tags_padrao": ["mistério", "terror", "assombrado", "fenômenos", "dark", "medo", "sobrenatural"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "topicos_validos": ["lugares assombrados", "mistérios inexplicáveis", "fenômenos sobrenaturais", "crimes não resolvidos", "histórias de terror", "conspirações", "objetos amaldiçoados"],
+  "topicos_invalidos": ["natureza", "tecnologia", "psicologia positiva", "motivação", "história educativa"]
+}

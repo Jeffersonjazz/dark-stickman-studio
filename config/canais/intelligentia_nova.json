@@ -1,0 +1,21 @@
+{
+  "nome": "Intelligentia Nova",
+  "canal_id": "UCoGPdIQM2Bt5zSlV0DW0HQg",
+  "handle": "@intelligentianova",
+  "nicho": "tecnologia",
+  "nicho_descricao": "Inteligência Artificial, tecnologia, inovação, futuro",
+  "tom": "analítico e visionário",
+  "stickman_color": "#3B82F6",
+  "stickman_seed": 1003,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 1.05,
+  "watermark": true,
+  "descricao": "IA, tecnologia e o futuro que está chegando",
+  "tags_padrao": ["inteligência artificial", "tecnologia", "IA", "inovação", "futuro", "robótica", "ciência"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "topicos_validos": ["inteligência artificial", "machine learning", "tecnologia emergente", "cibersegurança", "computação quântica", "robótica", "espaço", "biotecnologia"],
+  "topicos_invalidos": ["terror", "história medieval", "animais selvagens", "relaxamento"]
+}

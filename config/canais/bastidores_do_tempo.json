@@ -1,0 +1,21 @@
+{
+  "nome": "Bastidores do Tempo",
+  "canal_id": "UCMinaADQVJ6QbbhOr_idVdA",
+  "handle": "@bastidoresdotempo-l6p",
+  "nicho": "historia",
+  "nicho_descricao": "História, fatos ocultos, bastidores de eventos históricos",
+  "tom": "narrativo e revelador",
+  "stickman_color": "#B45309",
+  "stickman_seed": 1006,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 0.95,
+  "watermark": true,
+  "descricao": "Os bastidores da história que os livros não contam",
+  "tags_padrao": ["história", "bastidores", "fatos históricos", "guerras", "civilizações", "documentário", "curiosidades históricas"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "topicos_validos": ["história mundial", "guerras", "civilizações antigas", "personagens históricos", "fatos ocultos da história", "revoluções", "descobertas", "acontecimentos históricos"],
+  "topicos_invalidos": ["terror sobrenatural", "tecnologia moderna", "psicologia", "natureza contemporânea"]
+}

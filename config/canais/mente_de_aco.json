@@ -1,0 +1,21 @@
+{
+  "nome": "Mente de Aço",
+  "canal_id": "UCPRWgHoI85u-gmZmS9uVbqA",
+  "handle": "@mentedeaco-o7u",
+  "nicho": "psicologia",
+  "nicho_descricao": "Psicologia, neurociência, hábitos mentais, autoconhecimento",
+  "tom": "inspirador e científico",
+  "stickman_color": "#F59E0B",
+  "stickman_seed": 1001,
+  "modelo_tts": "faber-medium",
+  "velocidade_fala": 1.0,
+  "watermark": true,
+  "descricao": "Ciência da mente, hábitos poderosos e psicologia aplicada ao dia a dia",
+  "tags_padrao": ["psicologia", "mente", "neurociência", "hábitos", "autoconhecimento", "mindset", "procrastinação"],
+  "duracao_alvo_s": 240,
+  "re_hook_intervalo_s": 45,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+  "topicos_validos": ["psicologia cognitiva", "neurociência do comportamento", "hábitos mentais", "procrastinação", "ansiedade", "tomada de decisão", "inteligência emocional", "produtividade mental"],
+  "topicos_invalidos": ["terror", "mistério", "tecnologia de hardware", "história medieval"]
+}
