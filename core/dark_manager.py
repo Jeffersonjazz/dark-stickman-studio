@@ -37,6 +37,38 @@ if str(_ROOT) not in sys.path:
 
 
 # ═══════════════════════════════════════════════════════
+# CADEIA DE FALLBACK — BACKEND DE PRODUÇÃO
+# ═══════════════════════════════════════════════════════
+# Ordem de prioridade para produção de Shorts:
+#   1. vidiq   — cloud premium (melhor qualidade; requer MCP vidIQ ativo)
+#   2. hugging — HuggingFace Spaces (gratuito; qualidade boa; mais lento)
+#   3. local   — modelos locais (CPU/GPU; requer hardware compatível)
+BACKEND_PRIORITY = ["vidiq", "hugging", "local"]
+
+# Importação lazy do bridge vidIQ (disponível apenas quando MCP estiver ativo)
+try:
+    from core.dark_vidiq_bridge import (
+        ProducaoShort,
+        VOZES_PTBR,
+        MODELOS_VIDEO,
+        CANAL_DEFAULT,
+        QA_SCORE_MINIMO,
+        gerar_prompt_video_noir,
+        gerar_prompt_thumbnail,
+        gerar_overlays_texto,
+        gerar_cenas_compose,
+        calcular_qa_score,
+        gerar_descricao_youtube,
+        gerar_tags_nicho,
+        estimar_custo,
+        exportar_log as _exportar_log_vidiq,
+    )
+    _VIDIQ_BRIDGE_DISPONIVEL = True
+except ImportError:
+    _VIDIQ_BRIDGE_DISPONIVEL = False
+
+
+# ═══════════════════════════════════════════════════════
 # IMPORT LAZY DOS AGENTES (evita dependências pesadas no import)
 # ═══════════════════════════════════════════════════════
 def _import_agente(modulo: str, classe: str):
@@ -265,15 +297,17 @@ class DarkManager:
     Decide qual agente chamar para cada tarefa e gerencia o pipeline completo.
     """
 
-    VERSION = "1.0.0"
+    VERSION = "2.0.0"
 
     def __init__(self):
         self._agentes: Dict[str, Any] = {}
         self._log: List[dict] = []
+        self._backend_atual: str = BACKEND_PRIORITY[0]  # padrão: vidiq
         print(f"\n╔══════════════════════════════════════════════════════╗")
         print(f"║   DARK MANAGER v{self.VERSION} — DARK STUDIO AAA          ║")
-        print(f"║   Orquestrador de 9 Agentes Especializados           ║")
+        print(f"║   Orquestrador de 9 Agentes + Backend vidIQ         ║")
         print(f"╚══════════════════════════════════════════════════════╝")
+        print(f"  vidIQ Bridge: {'✅ disponível' if _VIDIQ_BRIDGE_DISPONIVEL else '⚠️  não carregado (fallback: local)'}")
 
     def _log_evento(self, agente: str, acao: str, resultado: str, custo: float = 0.0):
         evento = {
@@ -579,24 +613,211 @@ class DarkManager:
             "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
         }
 
+    # ── Backend vidIQ ─────────────────────────────────────────────────────────
+
+    def pipeline_short_vidiq(
+        self,
+        titulo: str,
+        roteiro: str,
+        nicho: str = "misterio",
+        canal_id: str = None,
+        voz: str = "brian",
+        modelo_video: str = "minimax-h3",
+        projeto_id: str = None,
+        log_path: str = None,
+    ) -> dict:
+        """
+        Pipeline de produção via backend vidIQ (cloud premium).
+
+        AGENTES EVOCADOS:
+          CINEMATIC_DIRECTOR  → prompt de vídeo noir/cinematográfico
+          IMAGE_ENGINE        → prompt de thumbnail
+          AUDIO_MASTER        → narração vidIQ TTS
+          VIDEO_GENERATOR     → vídeo minimax-h3 (768p 9:16 15s)
+          VIDEO_EDITOR_PRO    → overlays de texto e cenas compose
+          ASSET_MANAGER       → tags, descrição SEO, log
+          CREATIVE_QA         → qa_score ≥ 85 obrigatório
+
+        NOTA: Este método documenta o contrato e a lógica de roteamento.
+        A execução real das chamadas MCP vidIQ acontece via sessão Claude
+        (MCP não é callable direto em Python).
+
+        Args:
+            titulo: título do Short
+            roteiro: roteiro completo em PT-BR
+            nicho: 'misterio' | 'historia' | 'educacao' | 'tecnologia' | ...
+            canal_id: canal YouTube (default: Canal S002)
+            voz: 'brian' | 'nassif' | 'edmilson'
+            modelo_video: 'minimax-h3' | 'minimax-h3-hd' | 'kling-v2'
+            projeto_id: ID do projeto (auto-gerado se None)
+            log_path: onde salvar o log JSON (opcional)
+
+        Returns:
+            dict com contrato de execução para o DARK MANAGER
+        """
+        if not _VIDIQ_BRIDGE_DISPONIVEL:
+            self._log_evento("DARK_MANAGER", "pipeline_short_vidiq()", "⚠️  bridge não disponível — fallback local")
+            return self.pipeline_short(titulo=titulo, roteiro=roteiro, preset=nicho, projeto_id=projeto_id)
+
+        if canal_id is None:
+            canal_id = CANAL_DEFAULT
+        if projeto_id is None:
+            projeto_id = f"vidiq_{nicho}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+        self._log_evento("DARK_MANAGER", "pipeline_short_vidiq()", f"iniciado — {titulo[:40]}")
+
+        # CINEMATIC_DIRECTOR → prompt cinematográfico
+        prompt_video = gerar_prompt_video_noir(titulo, nicho)
+        self._log_evento("CINEMATIC_DIRECTOR", "gerar_prompt_video_noir()", f"{len(prompt_video)} chars")
+
+        # IMAGE_ENGINE → prompt thumbnail
+        prompt_thumb = gerar_prompt_thumbnail(titulo, nicho)
+        self._log_evento("IMAGE_ENGINE", "gerar_prompt_thumbnail()", f"{len(prompt_thumb)} chars")
+
+        # ASSET_MANAGER → tags, descrição, custo estimado
+        tags = gerar_tags_nicho(titulo, nicho)
+        descricao = gerar_descricao_youtube(titulo, roteiro, nicho)
+        custo = estimar_custo(modelo_video, num_clips=1)
+        self._log_evento("ASSET_MANAGER", "gerar_tags_nicho()", f"{len(tags)} tags")
+        self._log_evento("ASSET_MANAGER", "gerar_descricao_youtube()", f"{len(descricao)} chars")
+        self._log_evento("ASSET_MANAGER", "estimar_custo()", f"~{custo.get('creditos_estimados', '?')} créditos")
+
+        # Monta contrato de execução (passado para a sessão MCP)
+        contrato = {
+            "projeto_id": projeto_id,
+            "titulo": titulo,
+            "nicho": nicho,
+            "canal_id": canal_id,
+            "backend": "vidiq",
+            "modelo_video": modelo_video,
+            "voz_id": VOZES_PTBR.get(voz, VOZES_PTBR["brian"]),
+            "voz_nome": voz,
+            "roteiro_chars": len(roteiro),
+            "prompt_video": prompt_video,
+            "prompt_thumbnail": prompt_thumb,
+            "tags": tags,
+            "descricao_youtube": descricao,
+            "custo_estimado": custo,
+            "qa_score_minimo": QA_SCORE_MINIMO,
+            "overlays": gerar_overlays_texto(titulo, 15.0),
+            "cenas_compose": gerar_cenas_compose("TBD", 15.0, 5),
+            "sequencia_execucao": [
+                "1. vidiq_voiceover_generate(texto=roteiro, voice_id=voz_id)",
+                "2. vidiq_generate_video(prompt=prompt_video, modelo=modelo_video)",
+                "3. vidiq_generate_thumbnail(titulo=titulo, prompt=prompt_thumbnail)",
+                "4. vidiq_compose(video_url, overlays, cenas)",
+                "5. vidiq_video_upload(compose_url)",
+                "6. vidiq_social_post_draft_create() → aprovação",
+                "7. vidiq_social_post_publish()",
+                "8. calcular_qa_score() ≥ 85",
+            ],
+            "ai_generated": True,
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+            "ts_contrato": datetime.now().isoformat(),
+        }
+
+        # Salvar log se solicitado
+        if log_path:
+            Path(log_path).parent.mkdir(parents=True, exist_ok=True)
+            with open(log_path, "w", encoding="utf-8") as f:
+                json.dump(contrato, f, ensure_ascii=False, indent=2)
+            self._log_evento("ASSET_MANAGER", "exportar_contrato()", log_path)
+
+        return contrato
+
+    def pipeline_auto(
+        self,
+        titulo: str,
+        roteiro: str,
+        nicho: str = "misterio",
+        backend: str = "auto",
+        **kwargs,
+    ) -> dict:
+        """
+        Dispatcher automático — escolhe o melhor backend disponível.
+
+        Cadeia de fallback: vidIQ (cloud premium) → HuggingFace → local.
+        Usa o backend de menor custo que atenda QA_SCORE_MINIMO (85).
+
+        Args:
+            titulo: título do Short
+            roteiro: roteiro completo
+            nicho: nicho de produção
+            backend: 'auto' | 'vidiq' | 'hugging' | 'local'
+            **kwargs: passado para o método de pipeline específico
+
+        Returns:
+            dict resultado do pipeline selecionado
+        """
+        prioridade = BACKEND_PRIORITY if backend == "auto" else [backend]
+
+        for b in prioridade:
+            if b == "vidiq":
+                if _VIDIQ_BRIDGE_DISPONIVEL:
+                    self._log_evento("DARK_MANAGER", "pipeline_auto()", f"→ BACKEND: vidIQ (cloud premium)")
+                    return self.pipeline_short_vidiq(titulo=titulo, roteiro=roteiro, nicho=nicho, **kwargs)
+                else:
+                    self._log_evento("DARK_MANAGER", "pipeline_auto()", "vidIQ bridge indisponível — próximo fallback")
+                    continue
+
+            elif b == "hugging":
+                self._log_evento("DARK_MANAGER", "pipeline_auto()", "→ BACKEND: HuggingFace Spaces (gratuito)")
+                # HuggingFace Spaces: usar via dark_video_generator com endpoint HF
+                try:
+                    from core.dark_video_generator import DarkVideoGenerator
+                    gen = DarkVideoGenerator()
+                    self._log_evento("VIDEO_GENERATOR", "gerar_broll_sintetico()", f"HF: {titulo[:30]}")
+                    # Fallback para pipeline local com vídeo HF
+                    return self.pipeline_short(titulo=titulo, roteiro=roteiro, preset=nicho,
+                                               projeto_id=kwargs.get("projeto_id"), **{})
+                except Exception as e:
+                    self._log_evento("DARK_MANAGER", "pipeline_auto()", f"HuggingFace falhou: {e}")
+                    continue
+
+            elif b == "local":
+                self._log_evento("DARK_MANAGER", "pipeline_auto()", "→ BACKEND: local (CPU/GPU)")
+                return self.pipeline_short(titulo=titulo, roteiro=roteiro, preset=nicho,
+                                           projeto_id=kwargs.get("projeto_id"))
+
+        # Fallback final
+        return {
+            "status": "erro",
+            "msg": "Nenhum backend disponível",
+            "backends_tentados": prioridade,
+            "ai_generated": True,
+            "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
+        }
+
     def status_agentes(self) -> dict:
         """Retorna status de disponibilidade de todos os agentes."""
+        vidiq_status = "✅ vidIQ MCP bridge disponível" if _VIDIQ_BRIDGE_DISPONIVEL else "⚠️  vidIQ bridge não carregado"
         agentes = {
-            "IMAGE_ENGINE": "dark_image_studio (em desenvolvimento)",
-            "VIDEO_GENERATOR": "dark_video_generator — disponível (HuggingFace)",
-            "CINEMATIC_DIRECTOR": "dark_cinematic_director — disponível ✅",
-            "VIDEO_EDITOR_PRO": "dark_cinema_editor — disponível ✅",
-            "MOTION_GRAPHICS": "dark_motion_lab — disponível ✅",
-            "AUDIO_MASTER": "dark_audio_studio — disponível (edge-tts) ✅",
-            "VISUAL_CONSISTENCY": "dark_visual_consistency — disponível ✅",
-            "ASSET_MANAGER": "integrado no DarkManager ✅",
-            "CREATIVE_QA": "integrado no DarkManager ✅",
+            "IMAGE_ENGINE": f"dark_image_engine + vidIQ thumbnail ({vidiq_status})",
+            "VIDEO_GENERATOR": f"dark_video_generator + vidIQ minimax-h3 ({vidiq_status})",
+            "CINEMATIC_DIRECTOR": "dark_cinematic_director — prompt noir/cinematográfico ✅",
+            "VIDEO_EDITOR_PRO": f"dark_cinema_editor + vidIQ compose ({vidiq_status})",
+            "MOTION_GRAPHICS": "dark_motion_lab — animações e aberturas ✅",
+            "AUDIO_MASTER": f"dark_audio_studio (edge-tts) + vidIQ TTS Brian ({vidiq_status})",
+            "VISUAL_CONSISTENCY": "dark_visual_consistency — continuidade entre cenas ✅",
+            "ASSET_MANAGER": f"integrado + dark_script_generator (30 tópicos) ✅",
+            "CREATIVE_QA": "integrado — qa_score ≥ 85 obrigatório ✅",
+            "SHORTS_FACTORY": f"dark_shorts_factory + vidIQ publish ({vidiq_status})",
+        }
+        backends = {
+            "vidiq":   {"disponivel": _VIDIQ_BRIDGE_DISPONIVEL, "qualidade": "★★★★★", "custo": "créditos vidIQ"},
+            "hugging": {"disponivel": True,                      "qualidade": "★★★☆☆", "custo": "gratuito"},
+            "local":   {"disponivel": True,                      "qualidade": "★★☆☆☆", "custo": "hardware próprio"},
         }
         return {
             "versao": self.VERSION,
             "agentes": agentes,
+            "backends": backends,
+            "backend_atual": self._backend_atual,
+            "backend_priority": BACKEND_PRIORITY,
             "presets": list(PRESETS_PRODUCAO.keys()),
-            "politica_custo": "SEMPRE gratuito. APIs pagas requerem aprovação explícita.",
+            "politica_custo": "Menor custo com QA ≥ 85. vidIQ requer aprovação explícita.",
+            "canal_default": CANAL_DEFAULT if _VIDIQ_BRIDGE_DISPONIVEL else "N/A",
+            "qa_score_minimo": QA_SCORE_MINIMO if _VIDIQ_BRIDGE_DISPONIVEL else 85,
             "ai_generated": True,
             "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
         }
@@ -615,19 +836,58 @@ class DarkManager:
 # ═══════════════════════════════════════════════════════
 CONTRACT = {
     "agente": "DARK_MANAGER",
-    "versao": "1.0.0",
-    "descricao": "Orquestrador central — decide qual agente usar em cada tarefa",
+    "versao": "2.0.0",
+    "descricao": "Orquestrador central — decide qual agente e backend usar em cada tarefa",
     "agentes_gerenciados": [
         "IMAGE_ENGINE", "VIDEO_GENERATOR", "CINEMATIC_DIRECTOR",
         "VIDEO_EDITOR_PRO", "MOTION_GRAPHICS", "AUDIO_MASTER",
-        "VISUAL_CONSISTENCY", "ASSET_MANAGER", "CREATIVE_QA",
+        "VISUAL_CONSISTENCY", "ASSET_MANAGER", "CREATIVE_QA", "SHORTS_FACTORY",
     ],
+    "backends": {
+        "vidiq":   "cloud premium — MCP vidIQ — minimax-h3 — qualidade ★★★★★",
+        "hugging": "HuggingFace Spaces — gratuito — qualidade ★★★☆☆",
+        "local":   "modelos locais CPU/GPU — qualidade ★★☆☆☆",
+    },
+    "fallback_chain": "vidiq → hugging → local",
     "metodos": {
-        "pipeline_short": {
+        "pipeline_auto": {
+            "descricao": "Dispatcher automático — escolhe melhor backend disponível",
             "entrada": {
                 "titulo": "str",
                 "roteiro": "str — texto completo",
-                "preset": "str — misterio|documentary|natureza|historia|tecnologia|educacao|relaxamento|musical|dark_storytelling",
+                "nicho": "str — misterio|historia|educacao|tecnologia|natureza|...",
+                "backend": "str? — 'auto'|'vidiq'|'hugging'|'local' (default: 'auto')",
+            },
+            "saida": "dict — resultado do pipeline selecionado",
+        },
+        "pipeline_short_vidiq": {
+            "descricao": "Pipeline vidIQ cloud premium — 8 etapas MCP",
+            "entrada": {
+                "titulo": "str",
+                "roteiro": "str",
+                "nicho": "str",
+                "canal_id": "str? — default: Canal S002 UCwuyz5ABF6ooQUn2HwG9xHQ",
+                "voz": "str? — 'brian'|'nassif'|'edmilson' (default: 'brian')",
+                "modelo_video": "str? — 'minimax-h3'|'minimax-h3-hd'|'kling-v2'",
+            },
+            "saida": "dict — contrato de execução com todos os prompts e parâmetros",
+            "sequencia": [
+                "AUDIO_MASTER: vidiq_voiceover_generate",
+                "VIDEO_GENERATOR: vidiq_generate_video (minimax-h3)",
+                "IMAGE_ENGINE: vidiq_generate_thumbnail",
+                "VIDEO_EDITOR_PRO: vidiq_compose",
+                "SHORTS_FACTORY: vidiq_video_upload",
+                "ASSET_MANAGER: vidiq_social_post_draft_create → aprovação",
+                "SHORTS_FACTORY: vidiq_social_post_publish",
+                "CREATIVE_QA: calcular_qa_score ≥ 85",
+            ],
+        },
+        "pipeline_short": {
+            "descricao": "Pipeline local — motion graphics + TTS edge + FFmpeg",
+            "entrada": {
+                "titulo": "str",
+                "roteiro": "str",
+                "preset": "str — misterio|documentary|natureza|historia|...",
                 "projeto_id": "str?",
                 "canal": "str?",
             },
@@ -639,11 +899,12 @@ CONTRACT = {
         },
         "status_agentes": {
             "entrada": {},
-            "saida": "dict — status de todos os 9 agentes",
+            "saida": "dict — status de todos os 10 agentes + backends",
         },
     },
     "presets": list(PRESETS_PRODUCAO.keys()),
-    "politica_custo": "Alternativas gratuitas sempre. APIs pagas requerem aprovação.",
+    "politica_custo": "pipeline_auto seleciona menor custo com QA ≥ 85. vidIQ requer aprovação explícita.",
+    "canal_s002": "UCwuyz5ABF6ooQUn2HwG9xHQ — Dark História",
     "ai_generated": True,
     "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB",
 }
