@@ -22,7 +22,7 @@ class DarkManager:
         "image_engine":        ["gerar_imagem", "editar_imagem", "thumbnail", "upscale"],
         "video_generator":     ["gerar_video", "animar_imagem", "broll", "motion"],
         "cinematic_director":  ["composicao", "enquadramento", "iluminacao", "continuidade"],
-        "video_editor_pro":    ["montar_video", "cortar", "transicao", "renderizar", "compose"],
+        "video_editor_pro":    ["montar_video", "cortar", "transicao", "renderizar", "compose", "color_grade", "grading", "silencio", "silence", "xfade", "cinema_editor", "pipeline_cinema"],
         "motion_graphics":     ["titulo", "legenda", "infografico", "animacao_logo"],
         "audio_master":        ["narrar", "voiceover", "mixar", "masterizar", "tts"],
         "visual_consistency":  ["consistencia", "paleta", "personagem", "estilo"],
