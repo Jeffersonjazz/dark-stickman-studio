@@ -1076,6 +1076,37 @@ def executar(tarefa: str, params: dict = None, verbose: bool = True, **kwargs) -
             return {"status": "erro", "agente": agente, "erro": str(e), "tarefa": tarefa,
                     "ai_generated": True, "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"}
     
+    elif (
+        "multilin" in task_lower or "traduz" in task_lower
+        or "expan" in task_lower or "internacional" in task_lower
+        or "dublar" in task_lower or "expand_canal" in task_lower
+    ):
+        try:
+            from core.dark_multilingual_agent import DarkMultilingualAgent, expandir_canal
+            canal = kwargs.get("canal", "")
+            video_id = kwargs.get("video_id", "")
+            titulo = kwargs.get("titulo", kwargs.get("title", ""))
+            descricao = kwargs.get("descricao", kwargs.get("description", ""))
+            tags = kwargs.get("tags", [])
+            script = kwargs.get("script")
+            srt_path = kwargs.get("srt_path")
+            if canal and video_id and titulo:
+                return expandir_canal(
+                    canal=canal,
+                    video_id=video_id,
+                    titulo=titulo,
+                    descricao=descricao,
+                    tags=tags,
+                    script=script,
+                    srt_path=srt_path,
+                )
+            # Sem parâmetros suficientes: retornar status do agente
+            agente_ml = DarkMultilingualAgent()
+            return agente_ml.status()
+        except Exception as e:
+            return {"status": "erro", "agente": "MULTILINGUAL_AGENT", "erro": str(e), "tarefa": tarefa,
+                    "ai_generated": True, "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"}
+
     return {
         "status": "despachado",
         "tarefa": tarefa,
@@ -1086,24 +1117,25 @@ def executar(tarefa: str, params: dict = None, verbose: bool = True, **kwargs) -
 
 
 def check_all_agents() -> dict:
-    """Verifica status de todos os 9 agentes especialistas.
-    
+    """Verifica status de todos os 11 agentes especialistas (incluindo Multilingual).
+
     Returns:
         dict com status de cada agente
     """
     status = {}
-    
+
     agentes_modulos = [
-        ("IMAGE_ENGINE",        "core.dark_image_studio",    "DarkImageStudio"),
-        ("VIDEO_STUDIO",        "core.dark_video_studio",    "DarkVideoStudio"),
-        ("VIDEO_GENERATOR",     "core.dark_video_generator", "DarkVideoGenerator"),
-        ("CINEMATIC_DIRECTOR",  "core.cinematic_director",   "gerar_prompt_visual"),
-        ("VIDEO_EDITOR_PRO",    "core.cinema_editor",        "Timeline"),
-        ("MOTION_GRAPHICS",     "core.motion_graphics",      "gerar_titulo_animado"),
-        ("AUDIO_MASTER",        "core.piper_tts",            "PiperTTS"),
-        ("VISUAL_CONSISTENCY",  "core.visual_consistency",   "VisualConsistencyDB"),
-        ("ASSET_MANAGER",       "core.asset_manager",        "AssetDB"),
-        ("CREATIVE_QA",         "core.creative_qa",          "verificar_qualidade"),
+        ("IMAGE_ENGINE",        "core.dark_image_studio",        "DarkImageStudio"),
+        ("VIDEO_STUDIO",        "core.dark_video_studio",        "DarkVideoStudio"),
+        ("VIDEO_GENERATOR",     "core.dark_video_generator",     "DarkVideoGenerator"),
+        ("CINEMATIC_DIRECTOR",  "core.cinematic_director",       "gerar_prompt_visual"),
+        ("VIDEO_EDITOR_PRO",    "core.cinema_editor",            "Timeline"),
+        ("MOTION_GRAPHICS",     "core.motion_graphics",          "gerar_titulo_animado"),
+        ("AUDIO_MASTER",        "core.piper_tts",                "PiperTTS"),
+        ("VISUAL_CONSISTENCY",  "core.visual_consistency",       "VisualConsistencyDB"),
+        ("ASSET_MANAGER",       "core.asset_manager",            "AssetDB"),
+        ("CREATIVE_QA",         "core.creative_qa",              "verificar_qualidade"),
+        ("MULTILINGUAL_AGENT",  "core.dark_multilingual_agent",  "DarkMultilingualAgent"),
     ]
     
     agentes_status = {}
@@ -1146,4 +1178,11 @@ TASK_TYPES = {
     "qa":             "CREATIVE_QA",
     "asset":          "ASSET_MANAGER",
     "cinematic":      "CINEMATIC_DIRECTOR",
+    # Expansão internacional
+    "multilingual":   "MULTILINGUAL_AGENT",
+    "traduzir":       "MULTILINGUAL_AGENT",
+    "expandir":       "MULTILINGUAL_AGENT",
+    "internacional":  "MULTILINGUAL_AGENT",
+    "dublar":         "MULTILINGUAL_AGENT",
+    "expand_canal":   "MULTILINGUAL_AGENT",
 }
