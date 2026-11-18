@@ -352,7 +352,7 @@ def gerar_intro(
             # Nicho / tagline
             (f"drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
              f":text='{_escape_text(nicho.upper())}'"
-             f":fontcolor={cor_detalhe}:fontsize=32:letter_spacing=8"
+             f":fontcolor={cor_detalhe}:fontsize=32"
              f":x=(w-text_w)/2:y=(h-text_h)/2+60"),
         ]),
         "-c:v", "libx264",
