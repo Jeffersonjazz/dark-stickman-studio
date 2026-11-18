@@ -1,0 +1,70 @@
+{
+  "agente": "DARK_EDGE_TTS",
+  "versao": "2.0.0",
+  "descricao": "Motor TTS primário gratuito — substitui ElevenLabs",
+  "status": "ATIVO",
+  "custo": "R$0,00",
+  "engines": [
+    "edge_tts",
+    "gtts",
+    "espeakng",
+    "piper",
+    "silencio"
+  ],
+  "idiomas": [
+    "pt-BR",
+    "pt-PT",
+    "en-US",
+    "en-GB",
+    "es-ES",
+    "es-MX",
+    "fr-FR",
+    "de-DE",
+    "it-IT",
+    "ja-JP",
+    "zh-CN"
+  ],
+  "canais_suportados": [
+    "mente_de_aco",
+    "universo_misterioso",
+    "esquina_do_medo",
+    "corte_brasil",
+    "aquazen",
+    "aquazen_relax",
+    "shorts_dark",
+    "documentario",
+    "historia",
+    "suspense",
+    "misterio",
+    "motivacional",
+    "relaxamento",
+    "meditacao",
+    "natureza",
+    "educacao",
+    "shorts",
+    "padrao"
+  ],
+  "entrada": {
+    "texto": "str — script para narrar",
+    "output_path": "str — caminho do arquivo MP3/WAV de saída",
+    "canal": "str? — nome do canal DARK STUDIO",
+    "idioma": "str? — código ISO ex: pt-BR",
+    "genero": "str? — masculino|feminino|jovem|padrao",
+    "voz": "str? — ID direto da voz edge-tts"
+  },
+  "saida": {
+    "status": "OK|fallback_silencio|erro",
+    "arquivo": "str — path do áudio gerado",
+    "motor": "str — engine utilizado",
+    "tier": "int — 1=edge_tts, 2=gtts, 3=espeak, 4=piper, 5=silencio",
+    "voz": "str — voz utilizada",
+    "custo": "GRATUITO",
+    "ai_generated": true
+  },
+  "elevenlabs": {
+    "status": "BLOQUEADO",
+    "motivo": "Falta de pagamento — reconectar em connector settings",
+    "alternativa": "edge-tts (Tier 1) substitui com qualidade equivalente ao free tier"
+  },
+  "nota": "ElevenLabs bloqueado — sistema 100% gratuito ativo"
+}

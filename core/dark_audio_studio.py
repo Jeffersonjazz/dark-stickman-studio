@@ -2,19 +2,21 @@
 DARK AUDIO STUDIO — FASE 6 do DARK CREATIVE LAB
 Agente de narração, mixagem e masterização de áudio.
 
-Motores TTS suportados (gratuitos):
-  - ElevenLabs (via MCP — free tier)
-  - Piper TTS (local, offline)
-  - XTTS-v2 (local, alta qualidade)
-  - Edge TTS (Microsoft, gratuito via API)
-  - gTTS (Google, fallback)
+Motores TTS suportados (gratuitos) — via DarkEdgeTTS:
+  Tier 1: Edge TTS (Microsoft Neural, cloud gratuito, sem API key) ← PRIMÁRIO
+  Tier 2: gTTS (Google Text-to-Speech, cloud gratuito)
+  Tier 3: espeak-ng (offline, via espeakng_loader)
+  Tier 4: Piper TTS (local, precisa de modelos)
+  Tier 5: Silêncio (fallback final)
+
+  ElevenLabs: BLOQUEADO por falta de pagamento (reconectar em connector settings)
 
 Pós-produção:
   - FFmpeg: normalização, EQ, compressão, noise gate
   - Pydub: mixagem de trilhas
   - Whisper: transcrição e geração de legendas
 
-Política: SEMPRE gratuito. ElevenLabs pago só com aprovação.
+Política: 100% GRATUITO. ElevenLabs removido da cascata primária.
 
 ai_generated: True
 ai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB
@@ -27,6 +29,18 @@ import re
 from pathlib import Path
 from datetime import datetime
 from typing import Optional
+
+# Motor TTS primário gratuito — substitui ElevenLabs
+try:
+    from core.dark_edge_tts import DarkEdgeTTS as _DarkEdgeTTS
+    _EDGE_TTS_AVAILABLE = True
+except ImportError:
+    try:
+        from dark_edge_tts import DarkEdgeTTS as _DarkEdgeTTS
+        _EDGE_TTS_AVAILABLE = True
+    except ImportError:
+        _EDGE_TTS_AVAILABLE = False
+        _DarkEdgeTTS = None  # type: ignore
 
 
 # ═══════════════════════════════════════════════════════
@@ -43,11 +57,25 @@ MOTORES_TTS = {
         "emocoes": True,
         "modelo": "eleven_multilingual_v2",
         "acesso": "MCP Tool: mcp__ElevenLabs__creative_generate_speech",
+        "status": "⚠️ BLOQUEADO — Reconectar em connector settings",
         "vozes_recomendadas": {
             "dark_narrator": {"id": "acdKA5HckGxoxxvy40dA", "nome": "Nassif"},
             "motivacional": {"id": "9luRA11KwacKAVmLyqUs", "nome": "Edmilson"},
             "relaxamento": {"id": "NFmEzNOony1UsEJGXLth", "nome": "Voz Suave"},
         }
+    },
+    "edge_tts_v2": {
+        "nome": "Edge TTS v2 (via DarkEdgeTTS)",
+        "tipo": "cloud_gratuito",
+        "custo": "GRATUITO (sem limite prático)",
+        "qualidade": "★★★★☆",
+        "vozes_ptbr": True,
+        "latencia": "1-3s",
+        "emocoes": False,
+        "acesso": "from core.dark_edge_tts import DarkEdgeTTS",
+        "vozes_ptbr_ids": ["pt-BR-AntonioNeural", "pt-BR-FranciscaNeural"],
+        "status": "✅ ATIVO — Motor primário atual",
+        "nota": "Substitui ElevenLabs enquanto bloqueado",
     },
     "piper": {
         "nome": "Piper TTS",
@@ -102,11 +130,16 @@ MOTORES_TTS = {
 class DarkAudioStudio:
     """
     Agente de pós-produção de áudio do DARK STUDIO AAA.
+
+    Motor TTS primário: DarkEdgeTTS (edge-tts → gTTS → espeak-ng → Piper → silêncio)
+    ElevenLabs: BLOQUEADO — reconectar em connector settings quando disponível.
     """
 
     def __init__(self, output_dir: str = "outputs/audio"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        # Motor TTS primário gratuito
+        self._edge_tts = _DarkEdgeTTS(output_dir) if _EDGE_TTS_AVAILABLE else None
 
     def verificar_ffmpeg(self) -> bool:
         r = subprocess.run(["ffmpeg", "-version"], capture_output=True)
@@ -386,50 +419,70 @@ class DarkAudioStudio:
         }
 
     def tts_cascade(self, texto: str, output_path: str,
-                    voz_edge: str = "pt-BR-AntonioNeural") -> dict:
+                    voz_edge: str = "pt-BR-AntonioNeural",
+                    canal: Optional[str] = None) -> dict:
         """
-        Cascade TTS: Edge → gTTS → Piper → retorna plano vidIQ.
-        Sempre retorna resultado — nunca falha silenciosamente.
+        Cascade TTS via DarkEdgeTTS (100% gratuito):
+          Tier 1: Edge TTS (Microsoft Neural)
+          Tier 2: gTTS (Google)
+          Tier 3: espeak-ng (offline)
+          Tier 4: Piper TTS (local)
+          Tier 5: Silêncio + plano vidIQ
+
+        ElevenLabs BLOQUEADO — foi removido da cascata primária.
         """
-        # Tier 1: Edge TTS
+        # Usar DarkEdgeTTS se disponível (cascata automática completa)
+        if self._edge_tts:
+            resultado = self._edge_tts.narrar(
+                texto, output_path, voz=voz_edge, canal=canal
+            )
+            if resultado.get("status") in ("OK", "fallback_silencio"):
+                return resultado
+
+        # Fallback legacy: Edge TTS via CLI
         r = self.tts_edge(texto, output_path, voz=voz_edge)
         if r.get("status") == "OK":
             r["tier"] = 1
             return r
 
-        # Tier 2: gTTS
+        # Fallback legacy: gTTS
         r2 = self.tts_gtts(texto, output_path)
         if r2.get("status") == "OK":
             r2["tier"] = 2
             return r2
 
-        # Tier 3: Piper local
+        # Fallback legacy: Piper local
         r3 = self.tts_piper(texto, output_path)
         if r3.get("status") == "OK":
             r3["tier"] = 3
             return r3
 
-        # Tier 4: vidIQ (MCP interativo)
+        # Plano vidIQ (MCP interativo — último recurso)
         r4 = self.tts_vidiq_instructions(texto, Path(output_path).stem)
-        r4["tier"] = 4
+        r4["tier"] = "vidiq_plan"
+        r4["elevenlabs_status"] = "BLOQUEADO — reconectar em connector settings"
         r4["fallback_errors"] = {
-            "edge": r.get("msg", r.get("log", "?")[:80]),
-            "gtts": r2.get("msg", "?"),
-            "piper": r3.get("msg", "?"),
+            "edge": r.get("msg", r.get("log", "?"))[:80] if isinstance(r.get("log"), str) else str(r.get("msg", "?")),
+            "gtts": str(r2.get("msg", "?")),
+            "piper": str(r3.get("msg", "?")),
         }
         return r4
 
     def pipeline_completo(self, texto: str, nome: str,
                           estilo: str = "documentary",
-                          musica: Optional[str] = None) -> dict:
+                          musica: Optional[str] = None,
+                          canal: Optional[str] = None) -> dict:
         """
         Pipeline completo: TTS cascade → masterização → mix (opcional)
+        Motor primário: DarkEdgeTTS (edge-tts → gTTS → espeak-ng → Piper)
+        ElevenLabs: BLOQUEADO — cascata gratuita ativa.
         """
         print(f"\n[AUDIO_MASTER] Pipeline: {nome} ({estilo})")
+        print(f"[AUDIO_MASTER] Motor: DarkEdgeTTS (ElevenLabs BLOQUEADO)")
 
-        # 1. TTS via cascade (Edge → gTTS → Piper → vidIQ plan)
+        # 1. TTS via cascade (DarkEdgeTTS: Edge → gTTS → espeak → Piper → silêncio)
         raw = str(self.output_dir / f"{nome}_raw.mp3")
-        tts = self.tts_cascade(texto, raw)
+        tts = self.tts_cascade(texto, raw, canal=canal or estilo)
         if tts.get("status") == "pendente_mcp":
             print(f"  ⚠ TTS requer sessão interativa (vidIQ). Plano gerado.")
             return tts
