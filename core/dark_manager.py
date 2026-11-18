@@ -990,15 +990,34 @@ def executar(tarefa: str, params: dict = None, verbose: bool = True, **kwargs) -
     
     if "imagem" in task_lower or "image" in task_lower or "thumbnail" in task_lower:
         try:
-            from core.dark_image_engine import DarkImageEngine
-            eng = DarkImageEngine()
-            prompt = kwargs.get("prompt", kwargs.get("titulo", kwargs.get("descricao", f"cena de {tarefa}")))
-            nicho = kwargs.get("nicho", kwargs.get("canal", "natureza"))
-            output_path = kwargs.get("output_path")
-            extra = {k:v for k,v in kwargs.items() if k not in ("prompt","nicho","descricao","titulo","canal","output_path")}
-            from pathlib import Path as _Path
-            result = eng.gerar(prompt=prompt, nicho=nicho, output_path=_Path(output_path) if output_path else None, **extra)
-            result["status"] = "ok"
+            # Fase 2: preferir DarkImageStudio (unified engine)
+            try:
+                from core.dark_image_studio import DarkImageStudio
+                studio = DarkImageStudio()
+                prompt = kwargs.get("prompt", kwargs.get("titulo", kwargs.get("descricao", f"cena de {tarefa}")))
+                nicho = kwargs.get("nicho", kwargs.get("canal", "natureza"))
+                output_path = kwargs.get("output_path")
+                from pathlib import Path as _Path
+                if "thumbnail" in task_lower:
+                    result = studio.gerar_thumbnail(
+                        titulo=prompt, nicho=nicho,
+                        output_path=_Path(output_path) if output_path else None,
+                    )
+                else:
+                    extra = {k:v for k,v in kwargs.items() if k not in ("prompt","nicho","descricao","titulo","canal","output_path")}
+                    result = studio.gerar(prompt=prompt, nicho=nicho,
+                                          output_path=_Path(output_path) if output_path else None, **extra)
+            except ImportError:
+                # Fallback: DarkImageEngine legado
+                from core.dark_image_engine import DarkImageEngine
+                eng = DarkImageEngine()
+                prompt = kwargs.get("prompt", kwargs.get("titulo", kwargs.get("descricao", f"cena de {tarefa}")))
+                nicho = kwargs.get("nicho", kwargs.get("canal", "natureza"))
+                output_path = kwargs.get("output_path")
+                extra = {k:v for k,v in kwargs.items() if k not in ("prompt","nicho","descricao","titulo","canal","output_path")}
+                from pathlib import Path as _Path
+                result = eng.gerar(prompt=prompt, nicho=nicho, output_path=_Path(output_path) if output_path else None, **extra)
+            result["status"] = result.get("status", "ok")
             return result
         except Exception as e:
             return {"status": "erro", "agente": agente, "erro": str(e), "tarefa": tarefa,
@@ -1055,7 +1074,7 @@ def check_all_agents() -> dict:
     status = {}
     
     agentes_modulos = [
-        ("IMAGE_ENGINE",        "core.dark_image_engine",    "DarkImageEngine"),
+        ("IMAGE_ENGINE",        "core.dark_image_studio",    "DarkImageStudio"),
         ("VIDEO_GENERATOR",     "core.dark_video_generator", "DarkVideoGenerator"),
         ("CINEMATIC_DIRECTOR",  "core.cinematic_director",   "gerar_prompt_visual"),
         ("VIDEO_EDITOR_PRO",    "core.cinema_editor",        "Timeline"),

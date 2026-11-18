@@ -1,1 +1,453 @@
-"""\nDARK VIDIQ BRIDGE — Integração vidIQ ↔ DARK MANAGER\n=====================================================\nEncapsula o pipeline completo de produção de Shorts via vidIQ MCP:\n\n  AUDIO MASTER    → vidiq_voiceover_generate (Brian — PT-BR)\n  IMAGE ENGINE    → vidiq_generate_thumbnail\n  VIDEO GENERATOR → vidiq_generate_video (minimax-h3, 9:16)\n  VIDEO EDITOR PRO → vidiq_compose (cenas + narração + overlays)\n  ASSET MANAGER   → vidiq_video_upload + vidiq_social_post_draft_create\n  CREATIVE QA     → score validation (mínimo 85%)\n\nEste módulo é usado pelo DARK SHORTS FACTORY quando o backend é 'vidiq'.\nNão usa APIs externas além do vidIQ MCP — sem custo adicional de créditos\nalém do modelo minimax-h3 (~240 créditos por 15s de vídeo).\n\nCONTRATO JSON — DARK MANAGER:\n{\n  \"agent\": \"SHORTS_FACTORY\",\n  \"backend\": \"vidiq\",\n  \"input\": {\n    \"titulo\": \"string\",\n    \"roteiro\": \"string\",\n    \"nicho\": \"historia|tecnologia|misterio|documentario\",\n    \"canal_id\": \"UCwuyz5ABF6ooQUn2HwG9xHQ\",\n    \"voz_id\": \"nPczCjzI2devNBz1zQrb\",   # Brian (PT-BR)\n    \"privacidade\": \"public|private|unlisted\",\n    \"tags\": [\"list\", \"de\", \"tags\"]\n  },\n  \"output\": {\n    \"youtube_url\": \"https://www.youtube.com/watch?v=...\",\n    \"post_id\": \"uuid\",\n    \"qa_score\": 93,\n    \"duracao_s\": 65,\n    \"custo_creditos\": 240\n  }\n}\n\nai_generated: True\nai_disclosure: Produzido com DARK STUDIO AAA — DARK CREATIVE LAB\n"""\n\nfrom __future__ import annotations\nimport json\nimport time\nfrom dataclasses import dataclass, field\nfrom typing import Optional\n\n\n# ═══════════════════════════════════════════════════════════════════\n#  CONSTANTES\n# ═══════════════════════════════════════════════════════════════════\n\n# Voice IDs vidIQ disponíveis para PT-BR\nVOZES_PTBR = {\n    \"brian\":    \"nPczCjzI2devNBz1zQrb\",   # ★★★★★ Narrador sombrio — recomendado Dark História\n    \"nassif\":   \"acdKA5HckGxoxxvy40dA\",   # ★★★★☆ Narrador formal\n    \"edmilson\": \"9luRA11KwacKAVmLyqUs\",   # ★★★★☆ Narrador motivacional\n}\n\n# Modelos de vídeo disponíveis no vidIQ\nMODELOS_VIDEO = {\n    \"minimax-h3\":   {\"creditos_15s\": 240, \"resolucao\": \"768p\", \"max_s\": 15, \"aspect\": \"9:16\"},\n    \"minimax-h3-hd\": {\"creditos_15s\": 480, \"resolucao\": \"1080p\", \"max_s\": 15, \"aspect\": \"9:16\"},\n    \"kling-v2\":     {\"creditos_15s\": 320, \"resolucao\": \"1080p\", \"max_s\": 10, \"aspect\": \"9:16\"},\n}\n\n# Canal S002 — Dark História\nCANAL_DEFAULT = \"UCwuyz5ABF6ooQUn2HwG9xHQ\"\n\n# Categorias YouTube: 25 = News & Politics, 24 = Entertainment, 27 = Education\nCATEGORIAS_NICHO = {\n    \"historia\":      25,\n    \"misterio\":      24,\n    \"documentario\":  25,\n    \"tecnologia\":    28,\n    \"educacao\":      27,\n    \"geral\":         22,\n}\n\n# Score mínimo aprovação CREATIVE QA\nQA_SCORE_MINIMO = 85\n\n\n# ═══════════════════════════════════════════════════════════════════\n#  DATACLASSES\n# ═══════════════════════════════════════════════════════════════════\n\n@dataclass\nclass ProducaoShort:\n    \"\"\"Resultado completo de uma produção via vidIQ.\"\"\"\n    titulo: str\n    roteiro: str\n    nicho: str\n    canal_id: str = CANAL_DEFAULT\n\n    # Assets gerados\n    voiceover_id: str = \"\"\n    voiceover_url: str = \"\"\n    voiceover_dur_s: float = 0.0\n\n    thumbnail_url: str = \"\"\n    thumbnail_image_id: str = \"\"\n    thumbnail_score: int = 0\n\n    video_url: str = \"\"\n    video_job_id: str = \"\"\n\n    compose_url: str = \"\"\n    upload_id: str = \"\"\n\n    post_id: str = \"\"\n    post_revision: str = \"\"\n    youtube_url: str = \"\"\n\n    # Métricas\n    qa_score: int = 0\n    creditos_usados: int = 0\n    duracao_s: float = 0.0\n    tempo_producao_s: float = 0.0\n    etapas: list = field(default_factory=list)\n\n    # Metadados\n    ai_generated: bool = True\n    ai_disclosure: str = \"Produzido com DARK STUDIO AAA — DARK CREATIVE LAB\"\n\n    def to_dict(self) -> dict:\n        return {\n            \"titulo\": self.titulo,\n            \"nicho\": self.nicho,\n            \"canal_id\": self.canal_id,\n            \"assets\": {\n                \"voiceover_id\": self.voiceover_id,\n                \"voiceover_url\": self.voiceover_url,\n                \"voiceover_dur_s\": self.voiceover_dur_s,\n                \"thumbnail_image_id\": self.thumbnail_image_id,\n                \"thumbnail_url\": self.thumbnail_url,\n                \"thumbnail_score\": self.thumbnail_score,\n                \"video_url\": self.video_url,\n                \"compose_url\": self.compose_url,\n                \"upload_id\": self.upload_id,\n            },\n            \"publicacao\": {\n                \"post_id\": self.post_id,\n                \"youtube_url\": self.youtube_url,\n            },\n            \"metricas\": {\n                \"qa_score\": self.qa_score,\n                \"creditos_usados\": self.creditos_usados,\n                \"duracao_s\": self.duracao_s,\n                \"tempo_producao_s\": round(self.tempo_producao_s, 1),\n            },\n            \"etapas\": self.etapas,\n            \"ai_generated\": self.ai_generated,\n            \"ai_disclosure\": self.ai_disclosure,\n        }\n\n\n# ═══════════════════════════════════════════════════════════════════\n#  GERADOR DE PARÂMETROS — CINEMATIC DIRECTOR\n# ═══════════════════════════════════════════════════════════════════\n\ndef gerar_prompt_video_noir(titulo: str, nicho: str) -> str:\n    \"\"\"CINEMATIC DIRECTOR — gera prompt cinematográfico otimizado por nicho.\"\"\"\n    estilos = {\n        \"historia\": (\n            \"Cinematic noir documentary scene, government building at night, \"\n            \"dramatic shadows, vintage film grain, desaturated amber tones, \"\n            \"35mm lens, chiaroscuro lighting, 1950s government laboratory interior, \"\n            \"classified documents on desk, single overhead lamp, smoke atmosphere, \"\n            \"ultra realistic, 8K, vertical 9:16\"\n        ),\n        \"misterio\": (\n            \"Dark cinematic mystery scene, shadowy corridor, blue and purple tones, \"\n            \"fog machine atmosphere, dramatic backlighting, security cameras, \"\n            \"abandoned facility, industrial aesthetic, horror tension, \"\n            \"ultra realistic, 8K, vertical 9:16\"\n        ),\n        \"documentario\": (\n            \"Professional documentary cinematography, natural lighting, \"\n            \"journalism style, wide establishing shot, urban environment, \"\n            \"modern city, clean composition, 24mm wide angle, news footage aesthetic, \"\n            \"ultra realistic, 8K, vertical 9:16\"\n        ),\n        \"tecnologia\": (\n            \"Futuristic technology environment, server room with blue lights, \"\n            \"holographic displays, data visualization, clean minimal aesthetic, \"\n            \"silicon valley laboratory, fiber optic cables, cool cyan palette, \"\n            \"ultra realistic, 8K, vertical 9:16\"\n        ),\n    }\n    base = estilos.get(nicho, estilos[\"historia\"])\n    return f\"{base}. Subject: {titulo[:60]}.\"\n\n\ndef gerar_prompt_thumbnail(titulo: str, nicho: str) -> str:\n    \"\"\"IMAGE ENGINE — gera prompt otimizado para thumbnail de alto CTR.\"\"\"\n    estilos = {\n        \"historia\": (\n            f\"YouTube thumbnail, portrait composition, noir style, \"\n            f\"dramatic face partially in shadow, old classified document background, \"\n            f\"red CONFIDENTIAL stamp, text overlay area reserved, \"\n            f\"vintage sepia tone, high contrast, 1080x1920\"\n        ),\n        \"misterio\": (\n            f\"YouTube Shorts thumbnail, mysterious figure silhouette, \"\n            f\"dark background with single light source, conspiracy theory aesthetic, \"\n            f\"question marks, dark blue gradient, face in shadows, \"\n            f\"vertical portrait composition 9:16\"\n        ),\n    }\n    base = estilos.get(nicho, estilos[\"historia\"])\n    return f\"{base}. Title context: {titulo[:50]}.\"\n\n\ndef gerar_overlays_texto(titulo: str, duracao_s: float) -> list:\n    \"\"\"VIDEO EDITOR PRO — gera overlays de texto para o compose.\"\"\"\n    titulo_curto = titulo[:40].upper()\n    return [\n        {\n            \"text\": titulo_curto,\n            \"startTime\": 0, \"endTime\": 4,\n            \"position\": \"top\", \"style\": \"title\"\n        },\n        {\n            \"text\": \"DARK HISTÓRIA\",\n            \"startTime\": 1, \"endTime\": 4,\n            \"position\": \"bottom\", \"style\": \"subtitle\"\n        },\n        {\n            \"text\": \"O que você não aprendeu na escola...\",\n            \"startTime\": max(0, duracao_s - 8),\n            \"endTime\": max(0, duracao_s - 4),\n            \"position\": \"center\", \"style\": \"cta\"\n        },\n        {\n            \"text\": \"🤖 Produzido com IA — DARK STUDIO AAA\",\n            \"startTime\": max(0, duracao_s - 4),\n            \"endTime\": duracao_s,\n            \"position\": \"bottom\", \"style\": \"disclosure\"\n        }\n    ]\n\n\ndef gerar_cenas_compose(video_url: str, duracao_s: float, num_cenas: int = 5) -> list:\n    \"\"\"VIDEO EDITOR PRO — divide vídeo em cenas para o compose.\"\"\"\n    dur_cena = min(14, duracao_s / num_cenas)\n    offsets = [0, 2, 5, 8, 11][:num_cenas]\n    transicoes = [\"dip_to_black\", \"fade\", \"dip_to_black\", \"fade\", \"dip_to_black\"]\n\n    cenas = []\n    for i, offset in enumerate(offsets):\n        cenas.append({\n            \"videoUrl\": video_url,\n            \"startFromSeconds\": offset,\n            \"durationSeconds\": dur_cena,\n            \"transition\": transicoes[i % len(transicoes)],\n        })\n    return cenas\n\n\n# ═══════════════════════════════════════════════════════════════════\n#  QA — CREATIVE QA AGENT\n# ═══════════════════════════════════════════════════════════════════\n\ndef calcular_qa_score(producao: ProducaoShort) -> int:\n    \"\"\"CREATIVE QA — avalia qualidade da produção (0–100).\"\"\"\n    score = 0\n    detalhes = []\n\n    score += 15\n    detalhes.append(f\"✅ Resolução 1080×1920 (+15)\")\n\n    if producao.voiceover_id:\n        score += 15\n        detalhes.append(f\"✅ Voiceover PT-BR ({round(producao.voiceover_dur_s, 1)}s) (+15)\")\n    else:\n        detalhes.append(\"❌ Sem voiceover (-15)\")\n\n    if producao.duracao_s >= 60:\n        score += 15\n        detalhes.append(f\"✅ Duração ótima {round(producao.duracao_s, 0)}s (+15)\")\n    elif producao.duracao_s >= 30:\n        score += 10\n        detalhes.append(f\"⚠️ Duração aceitável {round(producao.duracao_s, 0)}s (+10)\")\n    else:\n        detalhes.append(f\"❌ Muito curto {round(producao.duracao_s, 0)}s (+0)\")\n\n    if producao.thumbnail_score >= 70:\n        score += 15\n        detalhes.append(f\"✅ Thumbnail {producao.thumbnail_score}/100 (+15)\")\n    elif producao.thumbnail_score >= 55:\n        score += 10\n        detalhes.append(f\"⚠️ Thumbnail {producao.thumbnail_score}/100 (+10)\")\n    elif producao.thumbnail_score > 0:\n        score += 5\n        detalhes.append(f\"⚠️ Thumbnail {producao.thumbnail_score}/100 (+5)\")\n    else:\n        detalhes.append(\"❌ Sem thumbnail (+0)\")\n\n    if producao.video_url:\n        score += 15\n        detalhes.append(\"✅ Vídeo noir gerado (+15)\")\n    else:\n        detalhes.append(\"❌ Sem vídeo (+0)\")\n\n    if producao.compose_url:\n        score += 10\n        detalhes.append(\"✅ Compose final OK (+10)\")\n\n    if producao.upload_id:\n        score += 5\n        detalhes.append(\"✅ Upload YouTube OK (+5)\")\n\n    score += 10\n    detalhes.append(\"✅ AI disclosure incluído (+10)\")\n\n    roteiro = producao.roteiro.strip()\n    primeira_linha = roteiro.split(\"\\n\")[0] if roteiro else \"\"\n    if any(w in primeira_linha.lower() for w in [\"em 1953\", \"em 19\", \"secreto\", \"proibido\", \"nunca\", \"desapareceu\"]):\n        score = min(100, score)\n        detalhes.append(\"✅ Hook histórico detectado\")\n\n    producao.etapas.append({\n        \"agente\": \"CREATIVE_QA\",\n        \"score\": score,\n        \"detalhes\": detalhes,\n        \"aprovado\": score >= QA_SCORE_MINIMO,\n    })\n\n    return min(100, score)\n\n\n# ═══════════════════════════════════════════════════════════════════\n#  GERADOR DE DESCRIÇÃO E TAGS — ASSET MANAGER\n# ═══════════════════════════════════════════════════════════════════\n\ndef gerar_descricao_youtube(titulo: str, roteiro: str, nicho: str) -> str:\n    \"\"\"ASSET MANAGER — gera descrição otimizada para SEO do YouTube.\"\"\"\n    primeiros_200 = \" \".join(roteiro.split()[:30])\n    return (\n        f\"{primeiros_200}...\\n\\n\"\n        f\"🔍 Mergulhe nos casos mais sombrios e esquecidos da história.\\n\\n\"\n        f\"📺 Canal Dark História — Episódios sem apresentador, fatos reais, \"\n        f\"narrativa cinematográfica.\\n\\n\"\n        f\"🤖 Produzido com DARK STUDIO AAA — DARK CREATIVE LAB\\n\"\n        f\"ai_generated: True\\n\\n\"\n        f\"#DarkHistória #CasosReais #HistóriaSombria #Documentário #Shorts\"\n    )\n\n\ndef gerar_tags_nicho(titulo: str, nicho: str) -> list[str]:\n    \"\"\"ASSET MANAGER — gera lista de tags otimizadas por nicho.\"\"\"\n    tags_base = [\"dark história\", \"casos reais\", \"história sombria\", \"documentário\", \"shorts\"]\n    tags_nicho = {\n        \"historia\": [\"história proibida\", \"segredos históricos\", \"fatos esquecidos\", \"conspiração histórica\"],\n        \"misterio\": [\"mistério\", \"investigação\", \"caso não resolvido\", \"suspense\"],\n        \"documentario\": [\"documentário\", \"jornalismo investigativo\", \"fatos reais\", \"investigação\"],\n        \"tecnologia\": [\"tecnologia\", \"inteligência artificial\", \"futuro\", \"ciência\"],\n    }\n    palavras_titulo = [w for w in titulo.lower().split() if len(w) > 4][:3]\n    return list(dict.fromkeys(\n        tags_base +\n        tags_nicho.get(nicho, []) +\n        palavras_titulo\n    ))[:15]\n\n\n# ═══════════════════════════════════════════════════════════════════\n#  ESTIMATIVA DE CUSTO — ASSET MANAGER\n# ═══════════════════════════════════════════════════════════════════\n\ndef estimar_custo(modelo_video: str = \"minimax-h3\", num_clips: int = 1) -> dict:\n    \"\"\"ASSET MANAGER — estima custo em créditos vidIQ antes de produzir.\"\"\"\n    modelo = MODELOS_VIDEO.get(modelo_video, MODELOS_VIDEO[\"minimax-h3\"])\n    creditos_video = modelo[\"creditos_15s\"] * num_clips\n    return {\n        \"voiceover_creditos\": 0,\n        \"thumbnail_creditos\": 0,\n        \"video_creditos\": creditos_video,\n        \"compose_creditos\": 0,\n        \"upload_creditos\": 0,\n        \"publish_creditos\": 0,\n        \"total_creditos\": creditos_video,\n        \"modelo_video\": modelo_video,\n        \"resolucao\": modelo[\"resolucao\"],\n    }\n\n\n# ═══════════════════════════════════════════════════════════════════\n#  EXPORTAR LOG DE PRODUÇÃO\n# ═══════════════════════════════════════════════════════════════════\n\ndef exportar_log(producao: ProducaoShort, path: str) -> None:\n    \"\"\"Salva log completo de produção em JSON para o ASSET MANAGER.\"\"\"\n    from pathlib import Path\n    import datetime\n    log = {\n        \"timestamp\": datetime.datetime.now(datetime.UTC).isoformat(),\n        \"producao\": producao.to_dict(),\n    }\n    Path(path).parent.mkdir(parents=True, exist_ok=True)\n    Path(path).write_text(json.dumps(log, indent=2, ensure_ascii=False), encoding=\"utf-8\")\n\n\n# ═══════════════════════════════════════════════════════════════════\n#  CONTRATO JSON — DARK MANAGER\n# ═══════════════════════════════════════════════════════════════════\n\nCONTRATO_VIDIQ = {\n    \"task_type\": \"SHORTS_YOUTUBE\",\n    \"backend\": \"vidiq\",\n    \"agent_chain\": [\n        \"AUDIO_MASTER\",\n        \"IMAGE_ENGINE\",\n        \"VIDEO_GENERATOR\",\n        \"VIDEO_EDITOR_PRO\",\n        \"CREATIVE_QA\",\n        \"ASSET_MANAGER\",\n    ],\n    \"input_schema\": {\n        \"titulo\": \"string — Título do Short\",\n        \"roteiro\": \"string — Script narrado (ideal 400–600 chars)\",\n        \"nicho\": \"historia|misterio|documentario|tecnologia|educacao\",\n        \"canal_id\": f\"string — Default: {CANAL_DEFAULT}\",\n        \"voz_id\": f\"string — Default: {VOZES_PTBR['brian']} (Brian)\",\n        \"modelo_video\": \"minimax-h3|minimax-h3-hd|kling-v2\",\n        \"privacidade\": \"public|private|unlisted\",\n        \"tags\": \"list[str]\",\n    },\n    \"output_schema\": {\n        \"youtube_url\": \"string\",\n        \"post_id\": \"uuid\",\n        \"qa_score\": \"int (0–100)\",\n        \"duracao_s\": \"float\",\n        \"creditos_usados\": \"int\",\n        \"ai_generated\": True,\n        \"ai_disclosure\": \"Produzido com DARK STUDIO AAA — DARK CREATIVE LAB\",\n    },\n    \"custo_estimado\": estimar_custo(\"minimax-h3\", 1),\n    \"tempo_estimado_min\": \"8–15 min (geração de vídeo varia)\",\n    \"qa_minimo\": QA_SCORE_MINIMO,\n}\n\n\nif __name__ == \"__main__\":\n    print(\"🎬 DARK VIDIQ BRIDGE — Módulo de integração\")\n    print(f\"📡 Canal padrão: {CANAL_DEFAULT}\")\n    print(f\"🎙️  Voz padrão: Brian ({VOZES_PTBR['brian']})\")\n    print(f\"🎬 Modelo padrão: minimax-h3\")\n    print(f\"📊 Custo estimado: {estimar_custo()['total_creditos']} créditos/produção\")\n    print(f\"\\n📋 Contrato DARK MANAGER:\")\n    print(json.dumps(CONTRATO_VIDIQ, indent=2, ensure_ascii=False))\n
+"""
+DARK VIDIQ BRIDGE â IntegraÃ§Ã£o vidIQ â DARK MANAGER
+=====================================================
+Encapsula o pipeline completo de produÃ§Ã£o de Shorts via vidIQ MCP:
+
+  AUDIO MASTER    â vidiq_voiceover_generate (Brian â PT-BR)
+  IMAGE ENGINE    â vidiq_generate_thumbnail
+  VIDEO GENERATOR â vidiq_generate_video (minimax-h3, 9:16)
+  VIDEO EDITOR PRO â vidiq_compose (cenas + narraÃ§Ã£o + overlays)
+  ASSET MANAGER   â vidiq_video_upload + vidiq_social_post_draft_create
+  CREATIVE QA     â score validation (mÃ­nimo 85%)
+
+Este mÃ³dulo Ã© usado pelo DARK SHORTS FACTORY quando o backend Ã© 'vidiq'.
+NÃ£o usa APIs externas alÃ©m do vidIQ MCP â sem custo adicional de crÃ©ditos
+alÃ©m do modelo minimax-h3 (~240 crÃ©ditos por 15s de vÃ­deo).
+
+CONTRATO JSON â DARK MANAGER:
+{
+  "agent": "SHORTS_FACTORY",
+  "backend": "vidiq",
+  "input": {
+    "titulo": "string",
+    "roteiro": "string",
+    "nicho": "historia|tecnologia|misterio|documentario",
+    "canal_id": "UCwuyz5ABF6ooQUn2HwG9xHQ",
+    "voz_id": "nPczCjzI2devNBz1zQrb",   # Brian (PT-BR)
+    "privacidade": "public|private|unlisted",
+    "tags": ["list", "de", "tags"]
+  },
+  "output": {
+    "youtube_url": "https://www.youtube.com/watch?v=...",
+    "post_id": "uuid",
+    "qa_score": 93,
+    "duracao_s": 65,
+    "custo_creditos": 240
+  }
+}
+
+ai_generated: True
+ai_disclosure: Produzido com DARK STUDIO AAA â DARK CREATIVE LAB
+"""
+
+from __future__ import annotations
+import json
+import time
+from dataclasses import dataclass, field
+from typing import Optional
+
+
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+#  CONSTANTES
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+# Voice IDs vidIQ disponÃ­veis para PT-BR
+VOZES_PTBR = {
+    "brian":    "nPczCjzI2devNBz1zQrb",   # âââââ Narrador sombrio â recomendado Dark HistÃ³ria
+    "nassif":   "acdKA5HckGxoxxvy40dA",   # âââââ Narrador formal
+    "edmilson": "9luRA11KwacKAVmLyqUs",   # âââââ Narrador motivacional
+}
+
+# Modelos de vÃ­deo disponÃ­veis no vidIQ
+MODELOS_VIDEO = {
+    "minimax-h3":   {"creditos_15s": 240, "resolucao": "768p", "max_s": 15, "aspect": "9:16"},
+    "minimax-h3-hd": {"creditos_15s": 480, "resolucao": "1080p", "max_s": 15, "aspect": "9:16"},
+    "kling-v2":     {"creditos_15s": 320, "resolucao": "1080p", "max_s": 10, "aspect": "9:16"},
+}
+
+# Canal S002 â Dark HistÃ³ria
+CANAL_DEFAULT = "UCwuyz5ABF6ooQUn2HwG9xHQ"
+
+# Categorias YouTube: 25 = News & Politics, 24 = Entertainment, 27 = Education
+CATEGORIAS_NICHO = {
+    "historia":      25,
+    "misterio":      24,
+    "documentario":  25,
+    "tecnologia":    28,
+    "educacao":      27,
+    "geral":         22,
+}
+
+# Score mÃ­nimo aprovaÃ§Ã£o CREATIVE QA
+QA_SCORE_MINIMO = 85
+
+
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+#  DATACLASSES
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+@dataclass
+class ProducaoShort:
+    """Resultado completo de uma produÃ§Ã£o via vidIQ."""
+    titulo: str
+    roteiro: str
+    nicho: str
+    canal_id: str = CANAL_DEFAULT
+
+    # Assets gerados
+    voiceover_id: str = ""
+    voiceover_url: str = ""
+    voiceover_dur_s: float = 0.0
+
+    thumbnail_url: str = ""
+    thumbnail_image_id: str = ""
+    thumbnail_score: int = 0
+
+    video_url: str = ""
+    video_job_id: str = ""
+
+    compose_url: str = ""
+    upload_id: str = ""
+
+    post_id: str = ""
+    post_revision: str = ""
+    youtube_url: str = ""
+
+    # MÃ©tricas
+    qa_score: int = 0
+    creditos_usados: int = 0
+    duracao_s: float = 0.0
+    tempo_producao_s: float = 0.0
+    etapas: list = field(default_factory=list)
+
+    # Metadados
+    ai_generated: bool = True
+    ai_disclosure: str = "Produzido com DARK STUDIO AAA â DARK CREATIVE LAB"
+
+    def to_dict(self) -> dict:
+        return {
+            "titulo": self.titulo,
+            "nicho": self.nicho,
+            "canal_id": self.canal_id,
+            "assets": {
+                "voiceover_id": self.voiceover_id,
+                "voiceover_url": self.voiceover_url,
+                "voiceover_dur_s": self.voiceover_dur_s,
+                "thumbnail_image_id": self.thumbnail_image_id,
+                "thumbnail_url": self.thumbnail_url,
+                "thumbnail_score": self.thumbnail_score,
+                "video_url": self.video_url,
+                "compose_url": self.compose_url,
+                "upload_id": self.upload_id,
+            },
+            "publicacao": {
+                "post_id": self.post_id,
+                "youtube_url": self.youtube_url,
+            },
+            "metricas": {
+                "qa_score": self.qa_score,
+                "creditos_usados": self.creditos_usados,
+                "duracao_s": self.duracao_s,
+                "tempo_producao_s": round(self.tempo_producao_s, 1),
+            },
+            "etapas": self.etapas,
+            "ai_generated": self.ai_generated,
+            "ai_disclosure": self.ai_disclosure,
+        }
+
+
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+#  GERADOR DE PARÃMETROS â CINEMATIC DIRECTOR
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+def gerar_prompt_video_noir(titulo: str, nicho: str) -> str:
+    """CINEMATIC DIRECTOR â gera prompt cinematogrÃ¡fico otimizado por nicho."""
+    estilos = {
+        "historia": (
+            "Cinematic noir documentary scene, government building at night, "
+            "dramatic shadows, vintage film grain, desaturated amber tones, "
+            "35mm lens, chiaroscuro lighting, 1950s government laboratory interior, "
+            "classified documents on desk, single overhead lamp, smoke atmosphere, "
+            "ultra realistic, 8K, vertical 9:16"
+        ),
+        "misterio": (
+            "Dark cinematic mystery scene, shadowy corridor, blue and purple tones, "
+            "fog machine atmosphere, dramatic backlighting, security cameras, "
+            "abandoned facility, industrial aesthetic, horror tension, "
+            "ultra realistic, 8K, vertical 9:16"
+        ),
+        "documentario": (
+            "Professional documentary cinematography, natural lighting, "
+            "journalism style, wide establishing shot, urban environment, "
+            "modern city, clean composition, 24mm wide angle, news footage aesthetic, "
+            "ultra realistic, 8K, vertical 9:16"
+        ),
+        "tecnologia": (
+            "Futuristic technology environment, server room with blue lights, "
+            "holographic displays, data visualization, clean minimal aesthetic, "
+            "silicon valley laboratory, fiber optic cables, cool cyan palette, "
+            "ultra realistic, 8K, vertical 9:16"
+        ),
+    }
+    base = estilos.get(nicho, estilos["historia"])
+    return f"{base}. Subject: {titulo[:60]}."
+
+
+def gerar_prompt_thumbnail(titulo: str, nicho: str) -> str:
+    """IMAGE ENGINE â gera prompt otimizado para thumbnail de alto CTR."""
+    estilos = {
+        "historia": (
+            f"YouTube thumbnail, portrait composition, noir style, "
+            f"dramatic face partially in shadow, old classified document background, "
+            f"red CONFIDENTIAL stamp, text overlay area reserved, "
+            f"vintage sepia tone, high contrast, 1080x1920"
+        ),
+        "misterio": (
+            f"YouTube Shorts thumbnail, mysterious figure silhouette, "
+            f"dark background with single light source, conspiracy theory aesthetic, "
+            f"question marks, dark blue gradient, face in shadows, "
+            f"vertical portrait composition 9:16"
+        ),
+    }
+    base = estilos.get(nicho, estilos["historia"])
+    return f"{base}. Title context: {titulo[:50]}."
+
+
+def gerar_overlays_texto(titulo: str, duracao_s: float) -> list:
+    """VIDEO EDITOR PRO â gera overlays de texto para o compose."""
+    titulo_curto = titulo[:40].upper()
+    return [
+        {
+            "text": titulo_curto,
+            "startTime": 0, "endTime": 4,
+            "position": "top", "style": "title"
+        },
+        {
+            "text": "DARK HISTÃRIA",
+            "startTime": 1, "endTime": 4,
+            "position": "bottom", "style": "subtitle"
+        },
+        {
+            "text": "O que vocÃª nÃ£o aprendeu na escola...",
+            "startTime": max(0, duracao_s - 8),
+            "endTime": max(0, duracao_s - 4),
+            "position": "center", "style": "cta"
+        },
+        {
+            "text": "ð¤ Produzido com IA â DARK STUDIO AAA",
+            "startTime": max(0, duracao_s - 4),
+            "endTime": duracao_s,
+            "position": "bottom", "style": "disclosure"
+        }
+    ]
+
+
+def gerar_cenas_compose(video_url: str, duracao_s: float, num_cenas: int = 5) -> list:
+    """VIDEO EDITOR PRO â divide vÃ­deo em cenas para o compose."""
+    dur_cena = min(14, duracao_s / num_cenas)
+    offsets = [0, 2, 5, 8, 11][:num_cenas]
+    transicoes = ["dip_to_black", "fade", "dip_to_black", "fade", "dip_to_black"]
+
+    cenas = []
+    for i, offset in enumerate(offsets):
+        cenas.append({
+            "videoUrl": video_url,
+            "startFromSeconds": offset,
+            "durationSeconds": dur_cena,
+            "transition": transicoes[i % len(transicoes)],
+        })
+    return cenas
+
+
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+#  QA â CREATIVE QA AGENT
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+def calcular_qa_score(producao: ProducaoShort) -> int:
+    """CREATIVE QA â avalia qualidade da produÃ§Ã£o (0â100)."""
+    score = 0
+    detalhes = []
+
+    score += 15
+    detalhes.append(f"â ResoluÃ§Ã£o 1080Ã1920 (+15)")
+
+    if producao.voiceover_id:
+        score += 15
+        detalhes.append(f"â Voiceover PT-BR ({round(producao.voiceover_dur_s, 1)}s) (+15)")
+    else:
+        detalhes.append("â Sem voiceover (-15)")
+
+    if producao.duracao_s >= 60:
+        score += 15
+        detalhes.append(f"â DuraÃ§Ã£o Ã³tima {round(producao.duracao_s, 0)}s (+15)")
+    elif producao.duracao_s >= 30:
+        score += 10
+        detalhes.append(f"â ï¸ DuraÃ§Ã£o aceitÃ¡vel {round(producao.duracao_s, 0)}s (+10)")
+    else:
+        detalhes.append(f"â Muito curto {round(producao.duracao_s, 0)}s (+0)")
+
+    if producao.thumbnail_score >= 70:
+        score += 15
+        detalhes.append(f"â Thumbnail {producao.thumbnail_score}/100 (+15)")
+    elif producao.thumbnail_score >= 55:
+        score += 10
+        detalhes.append(f"â ï¸ Thumbnail {producao.thumbnail_score}/100 (+10)")
+    elif producao.thumbnail_score > 0:
+        score += 5
+        detalhes.append(f"â ï¸ Thumbnail {producao.thumbnail_score}/100 (+5)")
+    else:
+        detalhes.append("â Sem thumbnail (+0)")
+
+    if producao.video_url:
+        score += 15
+        detalhes.append("â VÃ­deo noir gerado (+15)")
+    else:
+        detalhes.append("â Sem vÃ­deo (+0)")
+
+    if producao.compose_url:
+        score += 10
+        detalhes.append("â Compose final OK (+10)")
+
+    if producao.upload_id:
+        score += 5
+        detalhes.append("â Upload YouTube OK (+5)")
+
+    score += 10
+    detalhes.append("â AI disclosure incluÃ­do (+10)")
+
+    roteiro = producao.roteiro.strip()
+    primeira_linha = roteiro.split("")[0] if roteiro else ""
+    if any(w in primeira_linha.lower() for w in ["em 1953", "em 19", "secreto", "proibido", "nunca", "desapareceu"]):
+        score = min(100, score)
+        detalhes.append("â Hook histÃ³rico detectado")
+
+    producao.etapas.append({
+        "agente": "CREATIVE_QA",
+        "score": score,
+        "detalhes": detalhes,
+        "aprovado": score >= QA_SCORE_MINIMO,
+    })
+
+    return min(100, score)
+
+
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+#  GERADOR DE DESCRIÃÃO E TAGS â ASSET MANAGER
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+def gerar_descricao_youtube(titulo: str, roteiro: str, nicho: str) -> str:
+    """ASSET MANAGER â gera descriÃ§Ã£o otimizada para SEO do YouTube."""
+    primeiros_200 = " ".join(roteiro.split()[:30])
+    return (
+        f"{primeiros_200}..."
+        f"ð Mergulhe nos casos mais sombrios e esquecidos da histÃ³ria."
+        f"ðº Canal Dark HistÃ³ria â EpisÃ³dios sem apresentador, fatos reais, "
+        f"narrativa cinematogrÃ¡fica."
+        f"ð¤ Produzido com DARK STUDIO AAA â DARK CREATIVE LAB"
+        f"ai_generated: True"
+        f"#DarkHistÃ³ria #CasosReais #HistÃ³riaSombria #DocumentÃ¡rio #Shorts"
+    )
+
+
+def gerar_tags_nicho(titulo: str, nicho: str) -> list[str]:
+    """ASSET MANAGER â gera lista de tags otimizadas por nicho."""
+    tags_base = ["dark histÃ³ria", "casos reais", "histÃ³ria sombria", "documentÃ¡rio", "shorts"]
+    tags_nicho = {
+        "historia": ["histÃ³ria proibida", "segredos histÃ³ricos", "fatos esquecidos", "conspiraÃ§Ã£o histÃ³rica"],
+        "misterio": ["mistÃ©rio", "investigaÃ§Ã£o", "caso nÃ£o resolvido", "suspense"],
+        "documentario": ["documentÃ¡rio", "jornalismo investigativo", "fatos reais", "investigaÃ§Ã£o"],
+        "tecnologia": ["tecnologia", "inteligÃªncia artificial", "futuro", "ciÃªncia"],
+    }
+    palavras_titulo = [w for w in titulo.lower().split() if len(w) > 4][:3]
+    return list(dict.fromkeys(
+        tags_base +
+        tags_nicho.get(nicho, []) +
+        palavras_titulo
+    ))[:15]
+
+
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+#  ESTIMATIVA DE CUSTO â ASSET MANAGER
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+def estimar_custo(modelo_video: str = "minimax-h3", num_clips: int = 1) -> dict:
+    """ASSET MANAGER â estima custo em crÃ©ditos vidIQ antes de produzir."""
+    modelo = MODELOS_VIDEO.get(modelo_video, MODELOS_VIDEO["minimax-h3"])
+    creditos_video = modelo["creditos_15s"] * num_clips
+    return {
+        "voiceover_creditos": 0,
+        "thumbnail_creditos": 0,
+        "video_creditos": creditos_video,
+        "compose_creditos": 0,
+        "upload_creditos": 0,
+        "publish_creditos": 0,
+        "total_creditos": creditos_video,
+        "modelo_video": modelo_video,
+        "resolucao": modelo["resolucao"],
+    }
+
+
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+#  EXPORTAR LOG DE PRODUÃÃO
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+def exportar_log(producao: ProducaoShort, path: str) -> None:
+    """Salva log completo de produÃ§Ã£o em JSON para o ASSET MANAGER."""
+    from pathlib import Path
+    import datetime
+    log = {
+        "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
+        "producao": producao.to_dict(),
+    }
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(json.dumps(log, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+#  CONTRATO JSON â DARK MANAGER
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+CONTRATO_VIDIQ = {
+    "task_type": "SHORTS_YOUTUBE",
+    "backend": "vidiq",
+    "agent_chain": [
+        "AUDIO_MASTER",
+        "IMAGE_ENGINE",
+        "VIDEO_GENERATOR",
+        "VIDEO_EDITOR_PRO",
+        "CREATIVE_QA",
+        "ASSET_MANAGER",
+    ],
+    "input_schema": {
+        "titulo": "string â TÃ­tulo do Short",
+        "roteiro": "string â Script narrado (ideal 400â600 chars)",
+        "nicho": "historia|misterio|documentario|tecnologia|educacao",
+        "canal_id": f"string â Default: {CANAL_DEFAULT}",
+        "voz_id": f"string â Default: {VOZES_PTBR['brian']} (Brian)",
+        "modelo_video": "minimax-h3|minimax-h3-hd|kling-v2",
+        "privacidade": "public|private|unlisted",
+        "tags": "list[str]",
+    },
+    "output_schema": {
+        "youtube_url": "string",
+        "post_id": "uuid",
+        "qa_score": "int (0â100)",
+        "duracao_s": "float",
+        "creditos_usados": "int",
+        "ai_generated": True,
+        "ai_disclosure": "Produzido com DARK STUDIO AAA â DARK CREATIVE LAB",
+    },
+    "custo_estimado": estimar_custo("minimax-h3", 1),
+    "tempo_estimado_min": "8â15 min (geraÃ§Ã£o de vÃ­deo varia)",
+    "qa_minimo": QA_SCORE_MINIMO,
+}
+
+
+if __name__ == "__main__":
+    print("ð¬ DARK VIDIQ BRIDGE â MÃ³dulo de integraÃ§Ã£o")
+    print(f"ð¡ Canal padrÃ£o: {CANAL_DEFAULT}")
+    print(f"ðï¸  Voz padrÃ£o: Brian ({VOZES_PTBR['brian']})")
+    print(f"ð¬ Modelo padrÃ£o: minimax-h3")
+    print(f"ð Custo estimado: {estimar_custo()['total_creditos']} crÃ©ditos/produÃ§Ã£o")
+    print(f"ð Contrato DARK MANAGER:")
+    print(json.dumps(CONTRATO_VIDIQ, indent=2, ensure_ascii=False))
