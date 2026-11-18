@@ -1025,20 +1025,40 @@ def executar(tarefa: str, params: dict = None, verbose: bool = True, **kwargs) -
     
     elif "video" in task_lower or "vídeo" in task_lower:
         try:
-            from core.dark_video_generator import DarkVideoGenerator
-            gen = DarkVideoGenerator()
-            prompt = kwargs.get("prompt", kwargs.get("descricao", f"vídeo de {tarefa}"))
-            output_path = kwargs.get("output_path")
-            duracao_s = kwargs.get("duracao_s", 5)
-            # DarkVideoGenerator usa gerar_broll_sintetico como método principal de geração por texto
-            result = gen.gerar_broll_sintetico(
-                tema=prompt,
-                output_path=output_path or "/tmp/dark_video_exec.mp4",
-                duracao=float(duracao_s),
-            ) if hasattr(gen, "gerar_broll_sintetico") else gen.gerar_broll(prompt=prompt, output_path=output_path)
-            if isinstance(result, dict) and "status" not in result:
-                result["status"] = "ok"
-            return result
+            # Fase 3: preferir DarkVideoStudio (unified engine com cascade)
+            try:
+                from core.dark_video_studio import DarkVideoStudio
+                studio = DarkVideoStudio()
+                prompt = kwargs.get("prompt", kwargs.get("descricao", f"vídeo de {tarefa}"))
+                nicho = kwargs.get("nicho", kwargs.get("canal", "natureza"))
+                preset = kwargs.get("preset", "documentario")
+                output_path = kwargs.get("output_path")
+                image_path = kwargs.get("image_path")
+                duracao = kwargs.get("duracao_s", kwargs.get("duracao", 5))
+                backend = kwargs.get("backend")
+                from pathlib import Path as _Path
+                result = studio.gerar(
+                    prompt=prompt, nicho=nicho, preset=preset,
+                    output_path=_Path(output_path) if output_path else None,
+                    image_path=_Path(image_path) if image_path else None,
+                    duracao=float(duracao), backend=backend,
+                )
+                return result.to_dict() if hasattr(result, "to_dict") else dict(result)
+            except ImportError:
+                # Fallback: DarkVideoGenerator legado
+                from core.dark_video_generator import DarkVideoGenerator
+                gen = DarkVideoGenerator()
+                prompt = kwargs.get("prompt", kwargs.get("descricao", f"vídeo de {tarefa}"))
+                output_path = kwargs.get("output_path")
+                duracao_s = kwargs.get("duracao_s", 5)
+                result = gen.gerar_broll_sintetico(
+                    tema=prompt,
+                    output_path=output_path or "/tmp/dark_video_exec.mp4",
+                    duracao=float(duracao_s),
+                ) if hasattr(gen, "gerar_broll_sintetico") else gen.gerar_broll(prompt=prompt, output_path=output_path)
+                if isinstance(result, dict) and "status" not in result:
+                    result["status"] = "ok"
+                return result
         except Exception as e:
             return {"status": "erro", "agente": agente, "erro": str(e), "tarefa": tarefa,
                     "ai_generated": True, "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"}
@@ -1075,6 +1095,7 @@ def check_all_agents() -> dict:
     
     agentes_modulos = [
         ("IMAGE_ENGINE",        "core.dark_image_studio",    "DarkImageStudio"),
+        ("VIDEO_STUDIO",        "core.dark_video_studio",    "DarkVideoStudio"),
         ("VIDEO_GENERATOR",     "core.dark_video_generator", "DarkVideoGenerator"),
         ("CINEMATIC_DIRECTOR",  "core.cinematic_director",   "gerar_prompt_visual"),
         ("VIDEO_EDITOR_PRO",    "core.cinema_editor",        "Timeline"),
@@ -1111,8 +1132,9 @@ def check_all_agents() -> dict:
 TASK_TYPES = {
     "gerar_imagem":   "IMAGE_ENGINE",
     "thumbnail":      "IMAGE_ENGINE",
-    "gerar_video":    "VIDEO_GENERATOR",
-    "animar":         "VIDEO_GENERATOR",
+    "gerar_video":    "VIDEO_STUDIO",
+    "animar":         "VIDEO_STUDIO",
+    "video_studio":   "VIDEO_STUDIO",
     "narrar":         "AUDIO_MASTER",
     "tts":            "AUDIO_MASTER",
     "audio":          "AUDIO_MASTER",

@@ -1,6 +1,11 @@
 """
-DARK VIDEO STUDIO — Geração de Vídeos Realistas PT-BR
-Backends: local (CogVideoX / Wan 2.1) → API (Replicate / Runway / Kling) → FFmpeg fallback
+DARK VIDEO STUDIO v2.0.0 — Geração de Vídeos Realistas PT-BR
+AGENTE: VIDEO_GENERATOR — Fase 3 do DARK CREATIVE LAB
+
+Cascade de backends:
+  Tier 1: Higgsfield MCP (sessão interativa Claude)
+  Tier 2: Replicate / Runway / Kling APIs
+  Tier 3: FFmpeg Ken Burns fallback (sempre disponível)
 
 Licença: MIT — DARK CREATIVE LAB
 ai_generated: True
@@ -13,8 +18,9 @@ import shutil
 import subprocess
 import time
 import tempfile
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 # ─────────────────────────────────────────────
 # CONFIGURAÇÃO
@@ -77,6 +83,41 @@ PRESETS = {
         "color_grade": "vibrant",
         "duration": 3.0,
         "aspect": "9:16",
+    },
+    "motivacional": {
+        "fps": 30,
+        "motion": "slow_push",
+        "color_grade": "vibrant",
+        "duration": 4.0,
+        "aspect": "9:16",
+    },
+    "relaxamento": {
+        "fps": 24,
+        "motion": "slow_zoom_in",
+        "color_grade": "natural_vivid",
+        "duration": 5.0,
+        "aspect": "16:9",
+    },
+    "educacao": {
+        "fps": 30,
+        "motion": "static",
+        "color_grade": "documentario",
+        "duration": 4.0,
+        "aspect": "16:9",
+    },
+    "storytelling_dark": {
+        "fps": 24,
+        "motion": "slow_push",
+        "color_grade": "dark_moody",
+        "duration": 5.0,
+        "aspect": "9:16",
+    },
+    "musica": {
+        "fps": 30,
+        "motion": "dynamic",
+        "color_grade": "vibrant",
+        "duration": 3.0,
+        "aspect": "16:9",
     },
 }
 
@@ -674,6 +715,301 @@ def generate_scene_videos(
         results.append(out_path if result["status"] == "ok" else None)
 
     return results
+
+
+# ─────────────────────────────────────────────
+# RESULTADO ESTRUTURADO
+# ─────────────────────────────────────────────
+
+@dataclass
+class ResultadoVideo:
+    """Estrutura de retorno padronizado para geração de vídeo."""
+    status:          str = "error"      # ok | error
+    operacao:        str = "gerar"      # gerar | gerar_lote | b_roll
+    video_path:      Optional[str] = None
+    video_url:       Optional[str] = None
+    job_id:          Optional[str] = None
+    duracao_s:       float = 0.0
+    largura:         int = 0
+    altura:          int = 0
+    fps:             int = 24
+    backend:         str = ""
+    tier:            int = 3
+    custo_creditos:  int = 0
+    custo_usd:       float = 0.0
+    qa_score:        int = 0
+    prompt_usado:    str = ""
+    nicho:           str = ""
+    preset:          str = ""
+    modelo:          str = ""
+    fallback_usado:  bool = False
+    ai_generated:    bool = True
+    ai_disclosure:   str = "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+    erro:            Optional[str] = None
+    metadados:       Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {k: v for k, v in self.__dict__.items()}
+
+
+# ─────────────────────────────────────────────
+# CLASSE DARK VIDEO STUDIO
+# ─────────────────────────────────────────────
+
+class DarkVideoStudio:
+    """
+    AGENTE VIDEO_GENERATOR — Interface orientada a objetos para geração de vídeos.
+
+    Cascade automático:
+      Tier 1: Higgsfield MCP (sessão Claude interativa)
+      Tier 2: Replicate / Runway / Kling APIs
+      Tier 3: FFmpeg Ken Burns fallback
+    """
+
+    VERSION = "2.0.0"
+
+    def __init__(self, output_dir: Optional[Path] = None):
+        self.output_dir = output_dir or OUTPUT_DIR
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        self._log: List[ResultadoVideo] = []
+        self._backends = check_backends()
+
+    # ── PUBLIC API ──────────────────────────────
+
+    def gerar(
+        self,
+        prompt: str,
+        nicho: str = "documentario",
+        preset: Optional[str] = None,
+        output_path: Optional[Path] = None,
+        image_path: Optional[Path] = None,
+        duracao: Optional[float] = None,
+        backend: Optional[str] = None,
+    ) -> ResultadoVideo:
+        """Gera um vídeo a partir de texto ou imagem."""
+        preset = preset or nicho
+        out = output_path or self.output_dir / f"video_{int(time.time())}.mp4"
+        raw = generate_video(
+            prompt=prompt,
+            output_path=out,
+            image_path=image_path,
+            preset=preset,
+            backend=backend,
+            duration=duracao,
+            verbose=True,
+        )
+
+        cfg = PRESETS.get(preset, PRESETS["documentario"])
+        w, h = (720, 1280) if cfg.get("aspect") == "9:16" else (1280, 720)
+
+        tier_map = {
+            "cogvideox_local": 2, "wan_local": 2,
+            "replicate_api": 2, "runway_api": 2, "kling_api": 2,
+            "ffmpeg_fallback": 3,
+        }
+        tier = tier_map.get(raw.get("backend_used", "ffmpeg_fallback"), 3)
+
+        resultado = ResultadoVideo(
+            status=raw["status"],
+            operacao="gerar",
+            video_path=raw.get("output_path"),
+            duracao_s=raw.get("duration_requested", 0),
+            largura=w,
+            altura=h,
+            fps=cfg.get("fps", 24),
+            backend=raw.get("backend_used", ""),
+            tier=tier,
+            custo_usd=raw.get("cost_estimate_usd", 0.0),
+            prompt_usado=prompt,
+            nicho=nicho,
+            preset=preset,
+            fallback_usado=raw.get("backend_used") == "ffmpeg_fallback",
+            ai_generated=True,
+            metadados=raw,
+        )
+        resultado.qa_score = self._calcular_qa(resultado)
+        self._log.append(resultado)
+        return resultado
+
+    def gerar_lote(
+        self,
+        cenas: List[Dict],
+        nicho: str = "documentario",
+        output_dir: Optional[Path] = None,
+        image_paths: Optional[List] = None,
+    ) -> List[ResultadoVideo]:
+        """Gera vídeos para múltiplas cenas."""
+        out_dir = output_dir or (self.output_dir / f"lote_{int(time.time())}")
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        resultados = []
+        for i, cena in enumerate(cenas, 1):
+            prompt = cena.get("prompt_visual") or cena.get("descricao") or cena.get("texto", "")
+            if not prompt.strip():
+                resultados.append(ResultadoVideo(status="error", erro="Prompt vazio"))
+                continue
+
+            img = None
+            if image_paths and i <= len(image_paths) and image_paths[i - 1]:
+                img = Path(image_paths[i - 1])
+
+            out_path = out_dir / f"cena_{i:02d}.mp4"
+            dur = cena.get("duracao_s", 4.0)
+
+            resultado = self.gerar(
+                prompt=prompt,
+                nicho=nicho,
+                output_path=out_path,
+                image_path=img,
+                duracao=dur,
+            )
+            resultados.append(resultado)
+
+        return resultados
+
+    def planejar_cenas(
+        self,
+        cenas: List[Dict],
+        nicho: str = "documentario",
+        aspect_ratio: str = "16:9",
+        modelo: str = "minimax-h3",
+    ) -> Dict[str, Any]:
+        """Planeja produção (sem gerar) — para sessões com Higgsfield MCP."""
+        try:
+            from core.dark_higgsfield_video_bridge import planejar_producao_videos
+            return planejar_producao_videos(
+                cenas=cenas,
+                nicho=nicho,
+                aspect_ratio=aspect_ratio,
+                modelo=modelo,
+                usar_higgsfield=True,
+            )
+        except ImportError:
+            return {
+                "total_cenas": len(cenas),
+                "nicho": nicho,
+                "modelo": modelo,
+                "cenas": [{"numero": i + 1, "prompt": c.get("descricao", "")} for i, c in enumerate(cenas)],
+            }
+
+    def status(self) -> Dict[str, Any]:
+        """Retorna status atual de todos os backends."""
+        backends = check_backends()
+        ativo = best_backend(backends)
+        return {
+            "versao": self.VERSION,
+            "agente": "VIDEO_GENERATOR",
+            "backend_ativo": ativo,
+            "backends": backends,
+            "total_videos_gerados": len(self._log),
+            "presets_disponiveis": list(PRESETS.keys()),
+            "output_dir": str(self.output_dir),
+        }
+
+    def exportar_log(self, path: Optional[Path] = None) -> Path:
+        """Exporta log de produções em JSON."""
+        log_path = path or self.output_dir / "video_studio_log.json"
+        log_data = [r.to_dict() for r in self._log]
+        log_path.write_text(json.dumps(log_data, indent=2, ensure_ascii=False))
+        return log_path
+
+    # ── PRIVATE ─────────────────────────────────
+
+    def _calcular_qa(self, r: ResultadoVideo) -> int:
+        score = 0
+        if r.status == "ok":
+            score += 40
+        if len(r.prompt_usado) > 30:
+            score += 15
+        if not r.fallback_usado:
+            score += 25
+        if r.duracao_s >= 3.0:
+            score += 10
+        if r.video_path and Path(r.video_path).exists():
+            size = Path(r.video_path).stat().st_size
+            if size > 100_000:
+                score += 10
+        return min(score, 100)
+
+
+# ─────────────────────────────────────────────
+# CONTRATO JSON (para DARK MANAGER)
+# ─────────────────────────────────────────────
+
+CONTRATO_VIDEO_STUDIO: Dict[str, Any] = {
+    "agente": "VIDEO_GENERATOR",
+    "modulo": "core.dark_video_studio",
+    "classe": "DarkVideoStudio",
+    "versao": "2.0.0",
+    "descricao": "Geração de vídeos com cascade automático Higgsfield → API → FFmpeg",
+
+    "metodos": {
+        "gerar": {
+            "inputs": {
+                "prompt": "str",
+                "nicho": "str (documentario|natureza|historia|tecnologia|misterio|shorts|motivacional|relaxamento|educacao|storytelling_dark|musica)",
+                "preset": "str|None",
+                "output_path": "Path|None",
+                "image_path": "Path|None — para img2video",
+                "duracao": "float|None — segundos",
+            },
+            "outputs": {
+                "status": "ok | error",
+                "video_path": "str|None",
+                "backend": "str",
+                "tier": "int (1=Higgsfield, 2=API, 3=FFmpeg)",
+                "qa_score": "int (0–100)",
+                "custo_usd": "float",
+            },
+        },
+        "gerar_lote": {
+            "inputs": {"cenas": "List[Dict]", "nicho": "str", "image_paths": "List|None"},
+            "outputs": "List[ResultadoVideo]",
+        },
+        "planejar_cenas": {
+            "inputs": {"cenas": "List[Dict]", "nicho": "str", "modelo": "str"},
+            "outputs": "Dict — plano de produção para sessão Higgsfield",
+        },
+        "status": {"outputs": "Dict — status de todos os backends"},
+    },
+
+    "cascade": [
+        {"tier": 1, "backend": "Higgsfield MCP (sessão Claude)",
+         "custo": "15–35 créditos/vídeo", "qualidade": "alta"},
+        {"tier": 2, "backend": "Replicate / Runway / Kling APIs",
+         "custo": "$0.02–0.20/vídeo", "qualidade": "alta"},
+        {"tier": 3, "backend": "FFmpeg Ken Burns (local)",
+         "custo": "gratuito", "qualidade": "básica"},
+    ],
+}
+
+
+# ─────────────────────────────────────────────
+# INTERFACE FUNCIONAL (compat. com DARK MANAGER)
+# ─────────────────────────────────────────────
+
+def gerar_video_studio(
+    prompt: str,
+    nicho: str = "documentario",
+    output_path: Optional[Path] = None,
+    image_path: Optional[Path] = None,
+    duracao: Optional[float] = None,
+) -> ResultadoVideo:
+    """Wrapper funcional — instancia DarkVideoStudio e gera um vídeo."""
+    studio = DarkVideoStudio()
+    return studio.gerar(
+        prompt=prompt,
+        nicho=nicho,
+        output_path=output_path,
+        image_path=image_path,
+        duracao=duracao,
+    )
+
+
+def check_video_studio() -> Dict[str, Any]:
+    """Health check do DARK VIDEO STUDIO."""
+    studio = DarkVideoStudio()
+    return studio.status()
 
 
 # ─────────────────────────────────────────────
