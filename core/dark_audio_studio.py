@@ -327,19 +327,114 @@ class DarkAudioStudio:
             return {"status": "erro", "msg": "edge-tts não instalado",
                     "install": "pip install edge-tts --break-system-packages"}
 
+    def tts_piper(self, texto: str, output_path: str,
+                  modelo: str = "pt_BR-faber-medium") -> dict:
+        """
+        Narração via Piper TTS (local, offline).
+        Requer: pip install piper-tts --break-system-packages
+        """
+        try:
+            r = subprocess.run(
+                ["piper", "--model", modelo, "--output_file", output_path],
+                input=texto, capture_output=True, text=True, timeout=60
+            )
+            if r.returncode == 0 and Path(output_path).exists():
+                return {"status": "OK", "arquivo": output_path,
+                        "motor": "piper", "custo": "GRATUITO"}
+            return {"status": "erro", "log": r.stderr[-200:]}
+        except FileNotFoundError:
+            return {"status": "erro", "msg": "piper não instalado",
+                    "install": "pip install piper-tts --break-system-packages"}
+
+    def tts_gtts(self, texto: str, output_path: str, lang: str = "pt") -> dict:
+        """
+        Narração via gTTS (Google, gratuito, requer internet).
+        """
+        try:
+            from gtts import gTTS
+            tts = gTTS(text=texto, lang=lang)
+            tts.save(output_path)
+            if Path(output_path).exists():
+                return {"status": "OK", "arquivo": output_path,
+                        "motor": "gtts", "custo": "GRATUITO"}
+            return {"status": "erro", "msg": "gTTS não gerou arquivo"}
+        except ImportError:
+            return {"status": "erro", "msg": "gtts não instalado",
+                    "install": "pip install gtts --break-system-packages"}
+        except Exception as e:
+            return {"status": "erro", "msg": str(e)}
+
+    def tts_vidiq_instructions(self, texto: str, nome: str,
+                                voz: str = "classy-mellow-american-male") -> dict:
+        """
+        Instruções para gerar narração via vidIQ voiceover (requer sessão Claude interativa).
+        A chamada MCP real acontece em sessões interativas — este método retorna o plano.
+        """
+        return {
+            "status": "pendente_mcp",
+            "instrucao": "Executar em sessão interativa Claude",
+            "ferramenta": "mcp__vidIQ__vidiq_voiceover_generate",
+            "params": {
+                "script": texto,
+                "voice": voz,
+                "title": nome
+            },
+            "motor": "vidiq_voiceover",
+            "custo": "GRATUITO (incluído no plano vidIQ)",
+            "qualidade": "★★★★☆",
+            "nota": "vidIQ voiceover gera áudio MP3 de alta qualidade via API"
+        }
+
+    def tts_cascade(self, texto: str, output_path: str,
+                    voz_edge: str = "pt-BR-AntonioNeural") -> dict:
+        """
+        Cascade TTS: Edge → gTTS → Piper → retorna plano vidIQ.
+        Sempre retorna resultado — nunca falha silenciosamente.
+        """
+        # Tier 1: Edge TTS
+        r = self.tts_edge(texto, output_path, voz=voz_edge)
+        if r.get("status") == "OK":
+            r["tier"] = 1
+            return r
+
+        # Tier 2: gTTS
+        r2 = self.tts_gtts(texto, output_path)
+        if r2.get("status") == "OK":
+            r2["tier"] = 2
+            return r2
+
+        # Tier 3: Piper local
+        r3 = self.tts_piper(texto, output_path)
+        if r3.get("status") == "OK":
+            r3["tier"] = 3
+            return r3
+
+        # Tier 4: vidIQ (MCP interativo)
+        r4 = self.tts_vidiq_instructions(texto, Path(output_path).stem)
+        r4["tier"] = 4
+        r4["fallback_errors"] = {
+            "edge": r.get("msg", r.get("log", "?")[:80]),
+            "gtts": r2.get("msg", "?"),
+            "piper": r3.get("msg", "?"),
+        }
+        return r4
+
     def pipeline_completo(self, texto: str, nome: str,
                           estilo: str = "documentary",
                           musica: Optional[str] = None) -> dict:
         """
-        Pipeline completo: TTS → normalização → masterização → mix (opcional)
+        Pipeline completo: TTS cascade → masterização → mix (opcional)
         """
         print(f"\n[AUDIO_MASTER] Pipeline: {nome} ({estilo})")
 
-        # 1. TTS via Edge (gratuito, sem install extra)
+        # 1. TTS via cascade (Edge → gTTS → Piper → vidIQ plan)
         raw = str(self.output_dir / f"{nome}_raw.mp3")
-        tts = self.tts_edge(texto, raw)
+        tts = self.tts_cascade(texto, raw)
+        if tts.get("status") == "pendente_mcp":
+            print(f"  ⚠ TTS requer sessão interativa (vidIQ). Plano gerado.")
+            return tts
         if tts["status"] != "OK":
-            print(f"  ⚠ Edge TTS falhou: {tts.get('msg','?')}")
+            print(f"  ⚠ TTS falhou em todos os tiers")
             return tts
 
         print(f"  ✅ TTS gerado: {raw}")

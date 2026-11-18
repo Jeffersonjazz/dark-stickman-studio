@@ -210,11 +210,12 @@ class DarkCinemaEditor:
         if not output_path:
             output_path = str(self.output_dir / f"sequencia_{int(datetime.now().timestamp())}.mp4")
 
-        # Cria lista de arquivos
+        # Cria lista de arquivos (paths absolutos para -safe 0)
         lista = Path("/tmp/ffmpeg_list.txt")
         with open(lista, "w") as f:
             for v in videos:
-                f.write(f"file '{v}'\n")
+                abs_v = str(Path(v).resolve())
+                f.write(f"file '{abs_v}'\n")
 
         cmd = [
             "ffmpeg", "-y", "-f", "concat", "-safe", "0",
