@@ -1,0 +1,266 @@
+{
+  "canal": "AquaZen Relax",
+  "canal_id": "UC89YZqbZ02RTaT2FYepPHCQ",
+  "nicho": "relaxamento",
+  "video_id": "TEST003",
+  "titulo_original": "Sons do Oceano — Relaxamento Profundo 8 Horas",
+  "idiomas": [
+    {
+      "idioma": "en",
+      "titulo": "[TRADUÇÃO_PENDENTE_EN] Sons do Oceano — Relaxamento Profundo 8 Horas",
+      "descricao": "[TRADUÇÃO_PENDENTE_EN] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+      "tags": [
+        "[TRADUÇÃO_PENDENTE_EN] relaxamento",
+        "[TRADUÇÃO_PENDENTE_EN] meditação",
+        "[TRADUÇÃO_PENDENTE_EN] sons da natureza",
+        "[TRADUÇÃO_PENDENTE_EN] dormir",
+        "[TRADUÇÃO_PENDENTE_EN] aquazen"
+      ],
+      "audio_status": "sem_script",
+      "youtube_instrucoes": {
+        "canal": "AquaZen Relax",
+        "video_id": "TEST003",
+        "idioma": "en",
+        "nome_idioma": "English",
+        "code_youtube": "en",
+        "url_studio": "https://studio.youtube.com/video/TEST003/translations",
+        "titulo": "[TRADUÇÃO_PENDENTE_EN] Sons do Oceano — Relaxamento Profundo 8 Horas",
+        "descricao": "[TRADUÇÃO_PENDENTE_EN] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+        "tags": [
+          "[TRADUÇÃO_PENDENTE_EN] relaxamento",
+          "[TRADUÇÃO_PENDENTE_EN] meditação",
+          "[TRADUÇÃO_PENDENTE_EN] sons da natureza",
+          "[TRADUÇÃO_PENDENTE_EN] dormir",
+          "[TRADUÇÃO_PENDENTE_EN] aquazen"
+        ],
+        "passos": [
+          "1. Abrir YouTube Studio: https://studio.youtube.com/video/TEST003/translations",
+          "2. Clicar em 'Adicionar idioma' → selecionar 'English'",
+          "3. Título (English): [TRADUÇÃO_PENDENTE_EN] Sons do Oceano — Relaxamento Profundo 8 Horas",
+          "4. Descrição (English): [colar texto abaixo]",
+          "5. Tags (English): [TRADUÇÃO_PENDENTE_EN] relaxamento, [TRADUÇÃO_PENDENTE_EN] meditação, [TRADUÇÃO_PENDENTE_EN] sons da natureza, [TRADUÇÃO_PENDENTE_EN] dormir, [TRADUÇÃO_PENDENTE_EN] aquazen",
+          "6. Faixa de áudio: Gerar dublagem em 'English' (ver plano de dublagem)",
+          "7. Legendas: Gerar SRT em 'English' via tts_cascade + WhisperX",
+          "8. Salvar e publicar"
+        ],
+        "audio_pronto": null,
+        "srt_pronto": null
+      }
+    },
+    {
+      "idioma": "es",
+      "titulo": "[TRADUÇÃO_PENDENTE_ES] Sons do Oceano — Relaxamento Profundo 8 Horas",
+      "descricao": "[TRADUÇÃO_PENDENTE_ES] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+      "tags": [
+        "[TRADUÇÃO_PENDENTE_ES] relaxamento",
+        "[TRADUÇÃO_PENDENTE_ES] meditação",
+        "[TRADUÇÃO_PENDENTE_ES] sons da natureza",
+        "[TRADUÇÃO_PENDENTE_ES] dormir",
+        "[TRADUÇÃO_PENDENTE_ES] aquazen"
+      ],
+      "audio_status": "sem_script",
+      "youtube_instrucoes": {
+        "canal": "AquaZen Relax",
+        "video_id": "TEST003",
+        "idioma": "es",
+        "nome_idioma": "Español",
+        "code_youtube": "es",
+        "url_studio": "https://studio.youtube.com/video/TEST003/translations",
+        "titulo": "[TRADUÇÃO_PENDENTE_ES] Sons do Oceano — Relaxamento Profundo 8 Horas",
+        "descricao": "[TRADUÇÃO_PENDENTE_ES] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+        "tags": [
+          "[TRADUÇÃO_PENDENTE_ES] relaxamento",
+          "[TRADUÇÃO_PENDENTE_ES] meditação",
+          "[TRADUÇÃO_PENDENTE_ES] sons da natureza",
+          "[TRADUÇÃO_PENDENTE_ES] dormir",
+          "[TRADUÇÃO_PENDENTE_ES] aquazen"
+        ],
+        "passos": [
+          "1. Abrir YouTube Studio: https://studio.youtube.com/video/TEST003/translations",
+          "2. Clicar em 'Adicionar idioma' → selecionar 'Español'",
+          "3. Título (Español): [TRADUÇÃO_PENDENTE_ES] Sons do Oceano — Relaxamento Profundo 8 Horas",
+          "4. Descrição (Español): [colar texto abaixo]",
+          "5. Tags (Español): [TRADUÇÃO_PENDENTE_ES] relaxamento, [TRADUÇÃO_PENDENTE_ES] meditação, [TRADUÇÃO_PENDENTE_ES] sons da natureza, [TRADUÇÃO_PENDENTE_ES] dormir, [TRADUÇÃO_PENDENTE_ES] aquazen",
+          "6. Faixa de áudio: Gerar dublagem em 'Español' (ver plano de dublagem)",
+          "7. Legendas: Gerar SRT em 'Español' via tts_cascade + WhisperX",
+          "8. Salvar e publicar"
+        ],
+        "audio_pronto": null,
+        "srt_pronto": null
+      }
+    },
+    {
+      "idioma": "fr",
+      "titulo": "[TRADUÇÃO_PENDENTE_FR] Sons do Oceano — Relaxamento Profundo 8 Horas",
+      "descricao": "[TRADUÇÃO_PENDENTE_FR] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+      "tags": [
+        "[TRADUÇÃO_PENDENTE_FR] relaxamento",
+        "[TRADUÇÃO_PENDENTE_FR] meditação",
+        "[TRADUÇÃO_PENDENTE_FR] sons da natureza",
+        "[TRADUÇÃO_PENDENTE_FR] dormir",
+        "[TRADUÇÃO_PENDENTE_FR] aquazen"
+      ],
+      "audio_status": "sem_script",
+      "youtube_instrucoes": {
+        "canal": "AquaZen Relax",
+        "video_id": "TEST003",
+        "idioma": "fr",
+        "nome_idioma": "Français",
+        "code_youtube": "fr",
+        "url_studio": "https://studio.youtube.com/video/TEST003/translations",
+        "titulo": "[TRADUÇÃO_PENDENTE_FR] Sons do Oceano — Relaxamento Profundo 8 Horas",
+        "descricao": "[TRADUÇÃO_PENDENTE_FR] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+        "tags": [
+          "[TRADUÇÃO_PENDENTE_FR] relaxamento",
+          "[TRADUÇÃO_PENDENTE_FR] meditação",
+          "[TRADUÇÃO_PENDENTE_FR] sons da natureza",
+          "[TRADUÇÃO_PENDENTE_FR] dormir",
+          "[TRADUÇÃO_PENDENTE_FR] aquazen"
+        ],
+        "passos": [
+          "1. Abrir YouTube Studio: https://studio.youtube.com/video/TEST003/translations",
+          "2. Clicar em 'Adicionar idioma' → selecionar 'Français'",
+          "3. Título (Français): [TRADUÇÃO_PENDENTE_FR] Sons do Oceano — Relaxamento Profundo 8 Horas",
+          "4. Descrição (Français): [colar texto abaixo]",
+          "5. Tags (Français): [TRADUÇÃO_PENDENTE_FR] relaxamento, [TRADUÇÃO_PENDENTE_FR] meditação, [TRADUÇÃO_PENDENTE_FR] sons da natureza, [TRADUÇÃO_PENDENTE_FR] dormir, [TRADUÇÃO_PENDENTE_FR] aquazen",
+          "6. Faixa de áudio: Gerar dublagem em 'Français' (ver plano de dublagem)",
+          "7. Legendas: Gerar SRT em 'Français' via tts_cascade + WhisperX",
+          "8. Salvar e publicar"
+        ],
+        "audio_pronto": null,
+        "srt_pronto": null
+      }
+    },
+    {
+      "idioma": "de",
+      "titulo": "[TRADUÇÃO_PENDENTE_DE] Sons do Oceano — Relaxamento Profundo 8 Horas",
+      "descricao": "[TRADUÇÃO_PENDENTE_DE] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+      "tags": [
+        "[TRADUÇÃO_PENDENTE_DE] relaxamento",
+        "[TRADUÇÃO_PENDENTE_DE] meditação",
+        "[TRADUÇÃO_PENDENTE_DE] sons da natureza",
+        "[TRADUÇÃO_PENDENTE_DE] dormir",
+        "[TRADUÇÃO_PENDENTE_DE] aquazen"
+      ],
+      "audio_status": "sem_script",
+      "youtube_instrucoes": {
+        "canal": "AquaZen Relax",
+        "video_id": "TEST003",
+        "idioma": "de",
+        "nome_idioma": "Deutsch",
+        "code_youtube": "de",
+        "url_studio": "https://studio.youtube.com/video/TEST003/translations",
+        "titulo": "[TRADUÇÃO_PENDENTE_DE] Sons do Oceano — Relaxamento Profundo 8 Horas",
+        "descricao": "[TRADUÇÃO_PENDENTE_DE] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+        "tags": [
+          "[TRADUÇÃO_PENDENTE_DE] relaxamento",
+          "[TRADUÇÃO_PENDENTE_DE] meditação",
+          "[TRADUÇÃO_PENDENTE_DE] sons da natureza",
+          "[TRADUÇÃO_PENDENTE_DE] dormir",
+          "[TRADUÇÃO_PENDENTE_DE] aquazen"
+        ],
+        "passos": [
+          "1. Abrir YouTube Studio: https://studio.youtube.com/video/TEST003/translations",
+          "2. Clicar em 'Adicionar idioma' → selecionar 'Deutsch'",
+          "3. Título (Deutsch): [TRADUÇÃO_PENDENTE_DE] Sons do Oceano — Relaxamento Profundo 8 Horas",
+          "4. Descrição (Deutsch): [colar texto abaixo]",
+          "5. Tags (Deutsch): [TRADUÇÃO_PENDENTE_DE] relaxamento, [TRADUÇÃO_PENDENTE_DE] meditação, [TRADUÇÃO_PENDENTE_DE] sons da natureza, [TRADUÇÃO_PENDENTE_DE] dormir, [TRADUÇÃO_PENDENTE_DE] aquazen",
+          "6. Faixa de áudio: Gerar dublagem em 'Deutsch' (ver plano de dublagem)",
+          "7. Legendas: Gerar SRT em 'Deutsch' via tts_cascade + WhisperX",
+          "8. Salvar e publicar"
+        ],
+        "audio_pronto": null,
+        "srt_pronto": null
+      }
+    },
+    {
+      "idioma": "ja",
+      "titulo": "[TRADUÇÃO_PENDENTE_JA] Sons do Oceano — Relaxamento Profundo 8 Horas",
+      "descricao": "[TRADUÇÃO_PENDENTE_JA] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+      "tags": [
+        "[TRADUÇÃO_PENDENTE_JA] relaxamento",
+        "[TRADUÇÃO_PENDENTE_JA] meditação",
+        "[TRADUÇÃO_PENDENTE_JA] sons da natureza",
+        "[TRADUÇÃO_PENDENTE_JA] dormir",
+        "[TRADUÇÃO_PENDENTE_JA] aquazen"
+      ],
+      "audio_status": "sem_script",
+      "youtube_instrucoes": {
+        "canal": "AquaZen Relax",
+        "video_id": "TEST003",
+        "idioma": "ja",
+        "nome_idioma": "日本語",
+        "code_youtube": "ja",
+        "url_studio": "https://studio.youtube.com/video/TEST003/translations",
+        "titulo": "[TRADUÇÃO_PENDENTE_JA] Sons do Oceano — Relaxamento Profundo 8 Horas",
+        "descricao": "[TRADUÇÃO_PENDENTE_JA] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+        "tags": [
+          "[TRADUÇÃO_PENDENTE_JA] relaxamento",
+          "[TRADUÇÃO_PENDENTE_JA] meditação",
+          "[TRADUÇÃO_PENDENTE_JA] sons da natureza",
+          "[TRADUÇÃO_PENDENTE_JA] dormir",
+          "[TRADUÇÃO_PENDENTE_JA] aquazen"
+        ],
+        "passos": [
+          "1. Abrir YouTube Studio: https://studio.youtube.com/video/TEST003/translations",
+          "2. Clicar em 'Adicionar idioma' → selecionar '日本語'",
+          "3. Título (日本語): [TRADUÇÃO_PENDENTE_JA] Sons do Oceano — Relaxamento Profundo 8 Horas",
+          "4. Descrição (日本語): [colar texto abaixo]",
+          "5. Tags (日本語): [TRADUÇÃO_PENDENTE_JA] relaxamento, [TRADUÇÃO_PENDENTE_JA] meditação, [TRADUÇÃO_PENDENTE_JA] sons da natureza, [TRADUÇÃO_PENDENTE_JA] dormir, [TRADUÇÃO_PENDENTE_JA] aquazen",
+          "6. Faixa de áudio: Gerar dublagem em '日本語' (ver plano de dublagem)",
+          "7. Legendas: Gerar SRT em '日本語' via tts_cascade + WhisperX",
+          "8. Salvar e publicar"
+        ],
+        "audio_pronto": null,
+        "srt_pronto": null
+      }
+    },
+    {
+      "idioma": "ko",
+      "titulo": "[TRADUÇÃO_PENDENTE_KO] Sons do Oceano — Relaxamento Profundo 8 Horas",
+      "descricao": "[TRADUÇÃO_PENDENTE_KO] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+      "tags": [
+        "[TRADUÇÃO_PENDENTE_KO] relaxamento",
+        "[TRADUÇÃO_PENDENTE_KO] meditação",
+        "[TRADUÇÃO_PENDENTE_KO] sons da natureza",
+        "[TRADUÇÃO_PENDENTE_KO] dormir",
+        "[TRADUÇÃO_PENDENTE_KO] aquazen"
+      ],
+      "audio_status": "sem_script",
+      "youtube_instrucoes": {
+        "canal": "AquaZen Relax",
+        "video_id": "TEST003",
+        "idioma": "ko",
+        "nome_idioma": "한국어",
+        "code_youtube": "ko",
+        "url_studio": "https://studio.youtube.com/video/TEST003/translations",
+        "titulo": "[TRADUÇÃO_PENDENTE_KO] Sons do Oceano — Relaxamento Profundo 8 Horas",
+        "descricao": "[TRADUÇÃO_PENDENTE_KO] Mergulhe em sons suaves do oceano para dormir, meditar ou relaxar.\n\n#relaxamento #meditacao #aquazen",
+        "tags": [
+          "[TRADUÇÃO_PENDENTE_KO] relaxamento",
+          "[TRADUÇÃO_PENDENTE_KO] meditação",
+          "[TRADUÇÃO_PENDENTE_KO] sons da natureza",
+          "[TRADUÇÃO_PENDENTE_KO] dormir",
+          "[TRADUÇÃO_PENDENTE_KO] aquazen"
+        ],
+        "passos": [
+          "1. Abrir YouTube Studio: https://studio.youtube.com/video/TEST003/translations",
+          "2. Clicar em 'Adicionar idioma' → selecionar '한국어'",
+          "3. Título (한국어): [TRADUÇÃO_PENDENTE_KO] Sons do Oceano — Relaxamento Profundo 8 Horas",
+          "4. Descrição (한국어): [colar texto abaixo]",
+          "5. Tags (한국어): [TRADUÇÃO_PENDENTE_KO] relaxamento, [TRADUÇÃO_PENDENTE_KO] meditação, [TRADUÇÃO_PENDENTE_KO] sons da natureza, [TRADUÇÃO_PENDENTE_KO] dormir, [TRADUÇÃO_PENDENTE_KO] aquazen",
+          "6. Faixa de áudio: Gerar dublagem em '한국어' (ver plano de dublagem)",
+          "7. Legendas: Gerar SRT em '한국어' via tts_cascade + WhisperX",
+          "8. Salvar e publicar"
+        ],
+        "audio_pronto": null,
+        "srt_pronto": null
+      }
+    }
+  ],
+  "gerado_em": "2026-11-18T19:06:09.929858",
+  "status": "pronto",
+  "custo_estimado_usd": 0.0,
+  "ai_generated": true,
+  "ai_disclosure": "Produzido com DARK STUDIO AAA — DARK CREATIVE LAB"
+}
